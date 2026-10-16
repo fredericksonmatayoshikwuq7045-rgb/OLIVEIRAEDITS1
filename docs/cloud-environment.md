@@ -51,9 +51,10 @@ o launcher privado não deve ser empacotado no aplicativo Windows.
 
 Os arquivos e bibliotecas preparados pertencem ao workspace/snapshot atual;
 nenhum processo de teste é requisito persistente. Não foi verificada restauração
-em uma tarefa nova. Os commits de implementação são locais e não foram enviados
-ao GitHub. Preserve este workspace e publique o código pelo fluxo habitual antes
-de depender de reconstrução apenas a partir do remoto `main`.
+em uma tarefa nova. Os commits de implementação foram enviados ao GitHub na
+branch `refactor/v2`. Use essa branch ao obter o código atualizado: `main` mantém
+a versão anterior. Preserve o workspace/snapshot para as ferramentas e bibliotecas
+privadas preparadas durante esta tarefa.
 
 O build do instalador exige Windows, MSVC/SDK e WebView2. Os resultados e os
 comandos correspondentes estão em [REPORT.md](../REPORT.md).

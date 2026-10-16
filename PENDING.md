@@ -46,6 +46,7 @@
   permanecem referenciados por caminho e não têm esse limite de asset.
 - Transferir perfil entre computadores pode exigir re-vincular vídeos externos.
   Backups incluem assets do perfil, não uma cópia de todos os vídeos originais.
-- Builds e commits locais ainda não foram enviados ao GitHub. A restauração de
-  commits locais em novas tarefas da nuvem não foi verificada; mantenha este
-  workspace/snapshot e publique o código pelo seu fluxo habitual.
+- Os commits de implementação foram enviados ao GitHub na branch `refactor/v2`.
+  Para obter o código atualizado, selecione essa branch; `main` mantém a versão
+  anterior. Builds e instaladores não foram publicados. A restauração do ambiente
+  completo em uma nova tarefa da nuvem continua sem validação.
