@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-16",
+  "platform": "Linux x86_64",
+  "frontend": {
+    "tests": 54,
+    "files": 7,
+    "result": "passed"
+  },
+  "rustCore": {
+    "tests": 33,
+    "result": "passed"
+  },
+  "browser": {
+    "status": "passed",
+    "checks": [
+      "Criar conta e importar imagem",
+      "Pinça com dois dedos amplia e gera uma única edição desfeita",
+      "Editar texto e exportar PNG real 1080×1920",
+      "Recarregar preserva imagem e camadas",
+      "Contas isolam os projetos",
+      "501 mídias: grid virtualizado, seleção completa, desfazer e refazer",
+      "Backup .oeprofile com assets importa como conta independente"
+    ],
+    "pageErrors": []
+  },
+  "migration": {
+    "status": "passed",
+    "checks": [
+      "Migração real recupera arquivo IndexedDB, texto, grupo e template",
+      "JSON legado e arquivo originais intactos",
+      "Campos desconhecidos e arquivo ausente preservados"
+    ],
+    "pageErrors": []
+  },
+  "native": {
+    "status": "passed",
+    "checks": [
+      "Health check nativo e encoders reais",
+      "Asset nativo, FFprobe e miniatura real em cache",
+      "Job real pela ponte Tauri, transformação, progresso, H.264 e saída verificada",
+      "Prévia FFmpeg sem exigir pasta de saída",
+      "Arquivo fora do escopo é recusado",
+      "Exportação de imagem protege o original mesmo com sobrescrever",
+      "Cancelamento pela ponte nativa remove saída parcial",
+      "Retomar lote cancelado usa a fila e as fontes preservadas"
+    ]
+  },
+  "nativeClose": {
+    "status": "passed",
+    "checks": [
+      "Fechar com fila pede confirmação",
+      "Continuar mantém fila pausada",
+      "Sair cancela, persiste fila e limpa parciais antes de fechar",
+      "Origem e JSON do projeto preservados"
+    ]
+  },
+  "npmAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "windowsCoreCheck": "passed: --no-default-features --target x86_64-pc-windows-msvc",
+  "windowsInstaller": "not run: Linux host",
+  "productionBrowser": {
+    "status": "passed",
+    "checks": [
+      "Criar conta e importar imagem",
+      "Pinça com dois dedos amplia e gera uma única edição desfeita",
+      "Editar texto e exportar PNG real 1080×1920",
+      "Recarregar preserva imagem e camadas",
+      "Contas isolam os projetos",
+      "501 mídias: grid virtualizado, seleção completa, desfazer e refazer",
+      "Backup .oeprofile com assets importa como conta independente"
+    ],
+    "pageErrors": []
+  },
+  "installScript": "passed: npm ci, sidecar setup, 54 frontend tests, lint/format/files/build, 33 Rust tests and desktop check"
+}

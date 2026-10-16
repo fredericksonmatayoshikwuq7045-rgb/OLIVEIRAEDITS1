@@ -1,0 +1,293 @@
+.dashboard {
+  flex: 1;
+  overflow: auto;
+  background: radial-gradient(ellipse at 85% 0, #ed435508, transparent 45%), var(--bg);
+}
+
+.dashboard-content {
+  max-width: 1280px;
+  padding: 54px 44px;
+  margin: 0 auto;
+}
+
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.dashboard-heading h1 {
+  margin: 12px 0;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 35px 0 25px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0 12px;
+  min-width: 310px;
+  color: var(--dim);
+}
+
+.search-field input:not([type='checkbox']) {
+  border: 0;
+  background: transparent;
+  padding: 11px 0;
+  outline: none;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.account-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 4px 20px #0001;
+}
+
+.account-card:before {
+  content: '';
+  height: 3px;
+  width: 42px;
+  background: var(--account-color);
+  position: absolute;
+  top: -1px;
+  left: 22px;
+  border-radius: 0 0 4px 4px;
+}
+
+.account-card-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 19px;
+}
+
+.account-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.account-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-handle {
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.niche-tag {
+  display: inline-block;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin-top: 14px;
+}
+
+.account-stats {
+  display: flex;
+  gap: 17px;
+  margin: 24px 0 19px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.account-stats span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.account-card footer {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-card footer small {
+  font-size: 10px;
+}
+
+.account-open {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-open:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.account-menu {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 35px;
+  min-width: 180px;
+  background: #20242c;
+  border: 1px solid #414857;
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 10;
+  box-shadow: 0 12px 35px #0005;
+}
+
+.dropdown-menu > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: none;
+  color: var(--text);
+  padding: 9px;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 11px;
+}
+
+.dropdown-menu > button:hover {
+  background: var(--surface-hover);
+}
+
+.danger-text {
+  color: #ff7a89 !important;
+}
+
+.account-add {
+  min-height: 270px;
+  border: 1px dashed #343b48;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+}
+
+.account-add:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.account-add strong {
+  font-size: 13px;
+}
+
+.account-add span {
+  font-size: 11px;
+}
+
+.dashboard-footnote {
+  display: flex;
+  gap: 10px;
+  color: var(--dim);
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 33px;
+  max-width: 650px;
+}
+
+.active-account {
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.active-account-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.active-account strong {
+  font-size: 12px;
+  display: block;
+}
+
+.active-account small {
+  font-size: 10px;
+}
+
+.workflow-bar {
+  height: 58px;
+  background: #101216;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.workflow-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dim);
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 11px;
+}
