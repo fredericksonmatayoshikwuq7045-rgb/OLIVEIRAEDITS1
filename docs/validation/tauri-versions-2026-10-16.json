@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-16",
+  "platform": "Linux x86_64",
+  "reproducedBeforeFix": true,
+  "before": {
+    "apiJs": "2.12.4",
+    "tauriRust": "2.11.3",
+    "notificationJs": "2.7.0",
+    "notificationRust": "2.4.0"
+  },
+  "after": {
+    "apiJs": "2.11.1",
+    "tauriRust": "2.11.3",
+    "notificationJs": "2.4.0",
+    "notificationRust": "2.4.0"
+  },
+  "validation": {
+    "npmCi": "passed",
+    "tauriCliBuild": {
+      "command": "npm run tauri build -- --debug --no-bundle",
+      "result": "passed",
+      "afterCleanNpmCi": true
+    },
+    "frontendTests": {
+      "passed": 54,
+      "files": 7
+    },
+    "lint": "passed",
+    "format": "passed",
+    "fileSizes": "passed",
+    "npmAuditVulnerabilities": 0
+  },
+  "windowsInstaller": "Not built on Linux; the user must rerun NSIS build on Windows."
+}

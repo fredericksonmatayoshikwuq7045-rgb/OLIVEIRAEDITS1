@@ -2,6 +2,9 @@
 
 ## 0.2.0 — 2026-10-16
 
+- Corrigida incompatibilidade que bloqueava `tauri build`: API JavaScript
+  fixada em 2.11.1 para Rust Tauri 2.11.3, notification JavaScript/Rust em 2.4.0.
+  O build desktop pelo CLI real passa a integrar a verificação documentada.
 - Reconstrução em módulos de domínio, dados, render, serviços e interface,
   TypeScript estrito, arquivos de código com até 300 linhas.
 - Contas isoladas com templates, grupos, fontes, presets, projetos, identidade,

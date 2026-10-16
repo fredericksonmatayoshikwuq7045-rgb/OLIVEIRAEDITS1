@@ -22,10 +22,10 @@
     "test:close": "python3 tests/e2e/native-close.py"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/api": "2.11.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
-    "@tauri-apps/plugin-notification": "^2.7.0",
+    "@tauri-apps/plugin-notification": "2.4.0",
     "fflate": "^0.8.3",
     "lucide-react": "^0.546.0",
     "react": "^19.0.1",

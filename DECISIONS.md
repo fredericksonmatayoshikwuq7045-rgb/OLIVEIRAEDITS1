@@ -40,6 +40,10 @@
 12. **Escopo do acabamento.** Interface permanece em pt-BR e tema escuro.
     Biblioteca global, intro/outro e ponto focal automático/manual são opcionais
     do plano e ficam registrados em PENDING.md, sem controles inoperantes.
+13. **Versões coordenadas do Tauri.** API e plugins JavaScript precisam ter o
+    mesmo major/minor dos crates correspondentes. A API 2.12.4 e notification
+    2.7.0 do lock anterior bloqueavam o CLI com Rust 2.11.3/2.4.0. Fixar os pares
+    compatíveis e validar pelo CLI real, sem ignorar a checagem de versões.
 
 O mapeamento inicial foi feito sobre todos os arquivos-fonte. O build web
 original passou; o check Rust inicial estava indisponível por ausência da

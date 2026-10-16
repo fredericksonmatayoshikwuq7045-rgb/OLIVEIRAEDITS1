@@ -37,6 +37,7 @@ npm run lint
 npm run check:files
 cargo test --manifest-path src-tauri/Cargo.toml --no-default-features
 cargo check --manifest-path src-tauri/Cargo.toml
+npm run tauri build -- --debug --no-bundle
 npm run test:media
 ```
 
@@ -44,6 +45,8 @@ npm run test:media
 verifica saídas reais. Artefatos e um relatório JSON ficam em pasta temporária.
 O recurso Cargo `desktop` é padrão. `--no-default-features` testa o núcleo sem
 janela, mas não substitui a compilação da integração Tauri.
+O build pelo CLI Tauri também verifica a compatibilidade entre os pacotes
+JavaScript instalados e os crates Rust; `cargo check` sozinho não faz essa checagem.
 
 Para testes de navegador, instale Chromium pelo Playwright ou informe
 `CHROMIUM_PATH` e siga [tests/e2e/README.md](tests/e2e/README.md).
@@ -89,6 +92,14 @@ ficam fora do controle de versão.
 ## Problemas comuns
 
 - **FFmpeg indisponível:** confira Configurações e prepare os dois sidecars.
+- **Found version mismatched Tauri packages:** mantenha os lockfiles e use
+  `npm ci` ao instalar uma cópia atualizada. Em cópias anteriores com API 2.12.4
+  e notification 2.7.0, corrija antes de compilar:
+
+  ```powershell
+  npm install --save-exact @tauri-apps/api@2.11.1 @tauri-apps/plugin-notification@2.4.0
+  ```
+
 - **Caminho não autorizado:** selecione novamente pelo diálogo do aplicativo.
 - **Arquivo ausente:** re-vincule a origem; não é necessário apagar o item.
 - **Erro no export:** abra o log do item e o relatório da fila. Falhas não contam
