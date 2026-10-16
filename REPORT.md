@@ -49,6 +49,7 @@ focal. Idiomas/temas adicionais e validações de hardware estão em
 | Build web | `npm run build` passou (TypeScript + Vite). |
 | Qualidade | ESLint, Prettier, `check:files` e `git diff --check` passaram. Código novo, inclusive CSS/scripts/testes, até 300 linhas por arquivo. |
 | Desktop Linux | `cargo check` e build do binário passaram com GTK/WebKitGTK; a janela real usou IPC Tauri. |
+| Build pelo CLI Tauri | Após corrigir os pares de versões, `npm run tauri build -- --debug --no-bundle` passou com o CLI real no Linux. |
 | Núcleo Windows | `cargo check --no-default-features --target x86_64-pc-windows-msvc` passou. Não é build do aplicativo Windows. |
 | Mídia | **20/20** exports editados, verificações FFprobe, dimensões, H.264/yuv420p/BT709, áudio AAC 48 kHz, duração, faststart, overlays e tags sensíveis. |
 | Mídia adicional | Loop de fundo curto animado, metadata-only de vídeo e JPEG com EXIF, origem intacta, corrupto/ausente, diretório inválido/sem permissão, dimensões ímpares e cancelamento. |
@@ -96,6 +97,13 @@ bytes disponíveis e a falha de permissão foi exercitada de verdade.
   backup incompleto aceito. Ambos foram corrigidos com 12 regressões novas.
 - Um slider tinha rótulo acessível ambíguo; agora recebe nome explícito e o teste
   de pinça o localiza pelo papel acessível.
+- A primeira tentativa de build Windows do usuário identificou API JavaScript
+  2.12.4 versus Rust 2.11.3 e notification 2.7.0 versus 2.4.0. O erro também foi
+  reproduzido na nuvem pelo CLI, antes de compilar. As versões compatíveis foram
+  fixadas (API 2.11.1/Rust 2.11.3; notification 2.4.0 nos dois lados), com lockfile
+  atualizado. O CLI compilou o desktop Linux, e os 54 testes/ESLint/audit passaram
+  novamente. Isso resolve a checagem de versões; o instalador NSIS Windows ainda
+  requer uma execução concluída na plataforma de destino.
 - HMR e reutilização de sessão WebDriver encerrada interromperam tentativas de
   automação. As execuções finais usam código estável e sessão nativa nova; os
   resultados aprovados acima são dessas execuções concluídas.
