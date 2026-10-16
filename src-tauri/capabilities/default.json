@@ -1,19 +1,24 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "enables the default permissions",
+  "description": "Acesso mínimo ao editor e aos caminhos selecionados pelo usuário",
   "windows": [
     "main"
   ],
   "permissions": [
     "core:default",
-    "dialog:default",
-    "fs:default",
-    "fs:read-all",
-    "fs:write-all",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-ask",
+    "fs:allow-read-dir",
     {
       "identifier": "fs:scope",
-      "allow": ["**"]
-    }
+      "allow": [
+        "$APPDATA/**",
+        "$APPCACHE/**"
+      ]
+    },
+    "notification:default",
+    "window-state:default"
   ]
 }
