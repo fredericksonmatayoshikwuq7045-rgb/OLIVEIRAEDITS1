@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+@theme {
+  --font-sans: 'Segoe UI', Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Cascadia Code', ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #0c0d10;
+  --surface: #13151a;
+  --surface-raised: #1a1d24;
+  --surface-hover: #222630;
+  --border: #292d36;
+  --text: #eceef3;
+  --muted: #a0a7b5;
+  --dim: #70798a;
+  --accent: #ed4355;
+  --accent-hover: #fa5969;
+  --accent-soft: #ed435518;
+  --success: #67d5aa;
+  --warning: #eac178;
+  --radius: 12px;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  font-size: 13px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--accent);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 30px;
+  letter-spacing: -0.8px;
+}
+
+h2 {
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+h3 {
+  font-size: 14px;
+}
+
+input:not([type='checkbox']):not([type='range']):not([type='color']),
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input[type='color'] {
+  padding: 0;
+  background: none;
+  border: 0;
+  width: 38px;
+  height: 32px;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #ed43554d;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #363c47;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.button-secondary {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.button-secondary:hover {
+  background: var(--surface-hover);
+  border-color: #454d5d;
+}
+
+.button-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.button-primary:hover {
+  background: var(--accent-hover);
+}
+
+.button-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+}
+
+.button-ghost:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.button-danger {
+  background: #ed435518;
+  color: #ff7a89;
+  border-color: #ed435540;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.icon-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.button svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.muted,
+small {
+  color: var(--muted);
+}
+
+small {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.tiny {
+  font-size: 11px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}

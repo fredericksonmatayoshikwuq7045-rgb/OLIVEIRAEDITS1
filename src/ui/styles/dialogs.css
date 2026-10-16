@@ -1,0 +1,104 @@
+.log {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 10px;
+  background: var(--bg);
+  border-radius: 6px;
+  color: var(--muted);
+  max-height: 200px;
+  overflow: auto;
+  user-select: text;
+}
+
+.queue-summary {
+  display: flex;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+
+.queue-summary span {
+  background: var(--surface-raised);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+}
+
+.metadata-tags {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  font-size: 10px;
+}
+
+.metadata-tags pre {
+  overflow: auto;
+  max-height: 180px;
+}
+
+@media (max-width: 1200px) {
+  .editor-shell {
+    grid-template-columns: 205px minmax(0, 1fr) 255px;
+  }
+  .topbar {
+    padding: 0 15px;
+    gap: 10px;
+  }
+  .workflow-step {
+    padding: 7px;
+    gap: 5px;
+  }
+  .workflow-divider {
+    width: 7px;
+  }
+  .workflow-bar {
+    padding: 0 12px;
+  }
+  .active-account {
+    padding-left: 12px;
+  }
+  .library-tabs {
+    padding: 9px;
+  }
+  .dashboard-content {
+    padding: 35px 25px;
+  }
+}
+
+@media (max-height: 780px) {
+  .topbar {
+    height: 55px;
+  }
+  .workflow-bar {
+    height: 49px;
+  }
+  .media-scroll {
+    height: 121px;
+  }
+  .media-scroll-inner {
+    height: 108px;
+  }
+  .media-slot {
+    height: 106px;
+  }
+  .media-slot img,
+  .media-slot-placeholder {
+    height: 70px;
+  }
+  .stage-area {
+    padding: 15px;
+  }
+}
+
+.media-export-state {
+  position: absolute;
+  left: 3px;
+  top: 24px;
+  max-width: 100%;
+  font-size: 8px;
+  background: #111c;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 3px;
+}

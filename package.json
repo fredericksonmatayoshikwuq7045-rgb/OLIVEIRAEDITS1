@@ -1,34 +1,56 @@
 {
   "name": "oliveira-edits",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:media": "node scripts/test-media.mjs",
+    "tauri": "tauri",
+    "lint": "eslint src scripts --max-warnings 0",
+    "format:check": "prettier --check src scripts",
+    "check:files": "node scripts/check-files.mjs",
+    "setup:ffmpeg": "node scripts/setup-ffmpeg.mjs",
+    "test:parity": "python3 tests/e2e/render-parity.py",
+    "test:e2e": "node tests/e2e/app-smoke.mjs",
+    "test:migration": "node tests/e2e/migration-smoke.mjs",
+    "test:native": "python3 tests/e2e/native-smoke.py",
+    "test:close": "python3 tests/e2e/native-close.py"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.14",
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@tauri-apps/plugin-notification": "^2.7.0",
+    "fflate": "^0.8.3",
     "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
     "react": "^19.0.1",
-    "react-dom": "^19.0.1",
-    "vite": "^6.2.3"
+    "react-dom": "^19.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.1.14",
     "@tauri-apps/cli": "^2.11.3",
     "@types/node": "^22.14.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "playwright": "^1.64.1",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.1.14",
     "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "typescript-eslint": "^8.71.2",
+    "vite": "^6.2.3",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

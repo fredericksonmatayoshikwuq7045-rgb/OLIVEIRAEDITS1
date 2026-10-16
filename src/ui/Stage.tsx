@@ -1,0 +1,298 @@
+import { Film, Upload } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
+import type { MediaItem } from '../domain/models';
+import { cropSelectionGeometry, cropSourceDelta } from '../render/crop';
+import { snapMediaPan, snapRect } from '../render/snap';
+import { RenderCanvas } from '../render/RenderCanvas';
+import type { Rect } from '../render/types';
+import { mediaUrl } from '../services/native';
+import { Button, EmptyState } from './Primitives';
+import type { Drag, StageProps } from './stageTypes';
+import { usePinch } from './usePinch';
+
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+export function Stage({
+  item,
+  onChange,
+  playing,
+  time,
+  onTime,
+  onEnded,
+  cropMode,
+  cropLocked,
+  guides,
+  safeZone,
+  activeLayerId,
+  onImport,
+  resolveSource,
+  notify,
+  onDropFiles,
+}: StageProps) {
+  const [draft, setDraft] = useState<MediaItem | null>(item);
+  const [size, setSize] = useState({ width: 500, height: 500 });
+  const area = useRef<HTMLDivElement>(null),
+    preview = useRef<HTMLDivElement>(null),
+    drag = useRef<Drag | null>(null),
+    latest = useRef(item),
+    wheelTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (!drag.current && !wheelTimer.current) {
+      setDraft(item);
+      latest.current = item;
+    }
+  }, [item]);
+  useEffect(() => {
+    const element = area.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() => setSize({ width: element.clientWidth - 48, height: element.clientHeight - 48 }));
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      if (wheelTimer.current) clearTimeout(wheelTimer.current);
+    };
+  }, []);
+  const commit = useCallback(() => {
+    if (latest.current) onChange(latest.current);
+    drag.current = null;
+  }, [onChange]);
+  const changeDraft = (value: MediaItem) => {
+    latest.current = value;
+    setDraft(value);
+  };
+  const pinch = usePinch(draft, changeDraft, onChange);
+  const endPointer = (event: PointerEvent<HTMLDivElement>) => {
+    if (!pinch.end(event)) commit();
+  };
+  const start = (event: PointerEvent<HTMLDivElement | HTMLButtonElement>, handle?: string) => {
+    if (!draft || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drag.current = {
+      x: event.clientX,
+      y: event.clientY,
+      item: draft,
+      handle,
+      layerId: !handle && !cropMode ? activeLayerId || undefined : undefined,
+    };
+  };
+  const move = (event: PointerEvent<HTMLDivElement>) => {
+    const state = drag.current,
+      element = preview.current;
+    if (!state || !element) return;
+    const dx = (event.clientX - state.x) / element.clientWidth,
+      dy = (event.clientY - state.y) / element.clientHeight;
+    const media = state.item.render.media;
+    if (state.layerId) {
+      changeDraft({
+        ...state.item,
+        render: {
+          ...state.item.render,
+          layers: state.item.render.layers.map((layer) =>
+            layer.id === state.layerId
+              ? { ...layer, rect: snapRect({ ...layer.rect, x: layer.rect.x + dx, y: layer.rect.y + dy }) }
+              : layer,
+          ),
+        },
+      });
+      return;
+    }
+    if (state.handle) {
+      const delta = cropSourceDelta(state.item.render, { x: dx * state.item.render.canvas.width, y: dy * state.item.render.canvas.height });
+      const cx = delta.x,
+        cy = delta.y;
+      const crop: Rect = { ...media.crop };
+      if (state.handle.includes('w')) {
+        crop.x = clamp(media.crop.x + cx, 0, media.crop.x + media.crop.width - 0.02);
+        crop.width = media.crop.width + media.crop.x - crop.x;
+      }
+      if (state.handle.includes('e')) crop.width = clamp(media.crop.width + cx, 0.02, 1 - crop.x);
+      if (state.handle.includes('n')) {
+        crop.y = clamp(media.crop.y + cy, 0, media.crop.y + media.crop.height - 0.02);
+        crop.height = media.crop.height + media.crop.y - crop.y;
+      }
+      if (state.handle.includes('s')) crop.height = clamp(media.crop.height + cy, 0.02, 1 - crop.y);
+      if (cropLocked) {
+        const ratio = ((state.item.render.canvas.width / state.item.render.canvas.height) * media.height) / media.width;
+        if (state.handle.includes('e') || state.handle.includes('w')) crop.height = Math.min(crop.width / ratio, 1 - crop.y);
+        else crop.width = Math.min(crop.height * ratio, 1 - crop.x);
+      }
+      changeDraft({ ...state.item, render: { ...state.item.render, media: { ...media, crop } } });
+      return;
+    }
+    if (cropMode) {
+      const delta = cropSourceDelta(state.item.render, { x: dx * state.item.render.canvas.width, y: dy * state.item.render.canvas.height });
+      changeDraft({
+        ...state.item,
+        render: {
+          ...state.item.render,
+          media: {
+            ...media,
+            crop: {
+              ...media.crop,
+              x: clamp(media.crop.x + delta.x, 0, 1 - media.crop.width),
+              y: clamp(media.crop.y + delta.y, 0, 1 - media.crop.height),
+            },
+          },
+        },
+      });
+      return;
+    }
+    changeDraft({
+      ...state.item,
+      render: {
+        ...state.item.render,
+        media: { ...media, pan: snapMediaPan(state.item.render, { x: media.pan.x + dx, y: media.pan.y + dy }) },
+      },
+    });
+  };
+  const source = draft && (draft.runtimeUrl || draft.render.media.source || draft.sourcePath);
+  const valid = draft && source && draft.status !== 'missing' && draft.status !== 'empty' && draft.status !== 'error';
+  const scale = draft ? Math.max(0.01, Math.min(size.width / draft.render.canvas.width, size.height / draft.render.canvas.height)) : 1;
+  const cropSelection = valid ? cropSelectionGeometry(draft.render) : null;
+  const rect = cropSelection?.rect;
+  return (
+    <div
+      className="stage-area"
+      ref={area}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        if (!e.dataTransfer.files.length) return;
+        e.preventDefault();
+        onDropFiles(Array.from(e.dataTransfer.files));
+      }}
+    >
+      {valid ? (
+        <div
+          ref={preview}
+          className="stage-preview"
+          tabIndex={0}
+          aria-label="Prévia de edição. Arraste para mover a mídia"
+          style={{ width: draft.render.canvas.width * scale, height: draft.render.canvas.height * scale }}
+          onPointerDownCapture={(e) => {
+            if (pinch.start(e)) {
+              drag.current = null;
+              e.stopPropagation();
+            }
+          }}
+          onPointerDown={(e) => start(e)}
+          onPointerMove={(e) => {
+            if (!pinch.move(e)) move(e);
+          }}
+          onPointerUp={endPointer}
+          onPointerCancel={endPointer}
+          onWheel={(e) => {
+            e.preventDefault();
+            const current = latest.current || draft;
+            const next = {
+              ...current,
+              render: {
+                ...current.render,
+                media: { ...current.render.media, zoom: clamp(current.render.media.zoom * (e.deltaY > 0 ? 0.95 : 1.05), 0.1, 5) },
+              },
+            };
+            changeDraft(next);
+            if (wheelTimer.current) clearTimeout(wheelTimer.current);
+            wheelTimer.current = setTimeout(() => {
+              wheelTimer.current = undefined;
+              onChange(next);
+            }, 180);
+          }}
+          onKeyDown={(e) => {
+            if (e.ctrlKey || e.metaKey || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+            e.preventDefault();
+            const pixels = e.shiftKey ? 10 : 1;
+            const pan = { ...draft.render.media.pan };
+            if (e.key === 'ArrowLeft') pan.x -= pixels / draft.render.canvas.width;
+            if (e.key === 'ArrowRight') pan.x += pixels / draft.render.canvas.width;
+            if (e.key === 'ArrowUp') pan.y -= pixels / draft.render.canvas.height;
+            if (e.key === 'ArrowDown') pan.y += pixels / draft.render.canvas.height;
+            onChange({ ...draft, render: { ...draft.render, media: { ...draft.render.media, pan } } });
+          }}
+        >
+          <RenderCanvas
+            spec={{
+              ...(cropMode && cropSelection ? cropSelection.previewSpec : draft.render),
+              media: {
+                ...(cropMode && cropSelection ? cropSelection.previewSpec.media : draft.render.media),
+                source: draft.runtimeUrl || draft.render.media.source,
+              },
+            }}
+            playbackRate={draft.speed}
+            timeOrigin={draft.trim.in}
+            playing={playing && draft.kind === 'video'}
+            time={time}
+            onTimeUpdate={onTime}
+            onEnded={onEnded}
+            onError={notify}
+            resolveSource={(sourcePath) =>
+              sourcePath.startsWith('blob:') || sourcePath.startsWith('data:')
+                ? sourcePath
+                : resolveSource(sourcePath) || mediaUrl(sourcePath)
+            }
+          />
+          <div className={`stage-overlay ${guides ? 'stage-guides' : ''}`}>
+            {safeZone && (
+              <div className="safe-zone">
+                <span>Área segura</span>
+              </div>
+            )}
+          </div>
+          {cropMode && rect && (
+            <div
+              className="crop-box"
+              style={{
+                left: `${(rect.x / draft.render.canvas.width) * 100}%`,
+                top: `${(rect.y / draft.render.canvas.height) * 100}%`,
+                width: `${(rect.width / draft.render.canvas.width) * 100}%`,
+                height: `${(rect.height / draft.render.canvas.height) * 100}%`,
+                transform: `rotate(${draft.render.media.rotation}deg) scaleX(${draft.render.media.flipH ? -1 : 1}) scaleY(${draft.render.media.flipV ? -1 : 1})`,
+              }}
+              onPointerDown={(e) => start(e)}
+            >
+              {[
+                ['nw', 0, 0],
+                ['n', 50, 0],
+                ['ne', 100, 0],
+                ['e', 100, 50],
+                ['se', 100, 100],
+                ['s', 50, 100],
+                ['sw', 0, 100],
+                ['w', 0, 50],
+              ].map(([handle, x, y]) => (
+                <button
+                  key={handle}
+                  className="crop-handle"
+                  title={`Ajustar recorte ${handle}`}
+                  aria-label={`Ajustar recorte ${handle}`}
+                  style={{ left: `${x}%`, top: `${y}%`, cursor: `${handle}-resize` }}
+                  onPointerDown={(e) => start(e, String(handle))}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <EmptyState
+          icon={<Film size={28} />}
+          title={draft?.status === 'missing' ? 'Arquivo não encontrado' : 'Seu próximo post começa aqui'}
+          description={
+            draft?.status === 'missing'
+              ? 'O arquivo original foi movido ou está indisponível. Re-vincule a mídia para continuar.'
+              : draft?.error || 'Importe vídeos ou imagens e deixe o enquadramento, os templates e a exportação com a sua identidade.'
+          }
+          action={
+            <Button variant="primary" onClick={onImport}>
+              <Upload /> Importar arquivos
+            </Button>
+          }
+        />
+      )}
+      {valid && (
+        <span className="stage-caption">
+          {draft.render.canvas.width} × {draft.render.canvas.height} · {Math.round(scale * 100)}% · Arraste para mover
+        </span>
+      )}
+    </div>
+  );
+}
