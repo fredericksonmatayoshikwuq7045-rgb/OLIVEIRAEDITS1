@@ -26,6 +26,23 @@
    e pendência. Métricas vêm de FFmpeg/arquivos; hardware encoder exige tentativa
    real e fallback. Não atribuir capacidade de hardware só à lista de encoders.
 
+9. **Efeitos constantes calculados uma vez.** Gradiente e máscara circular são
+   rasterizados em PNG por item no cache privado, antes do FFmpeg. Calcular
+   `geq` a cada frame em Full HD tornou a retomada desnecessariamente lenta.
+   O alfa da origem é multiplicado pela máscara; os PNGs são removidos pelo guard.
+10. **Sair espera a limpeza.** A confirmação de fechamento cancela a fila,
+    aguarda os workers e persiste o snapshot antes de encerrar. Se o limite de
+    espera for excedido, mantém a janela aberta com erro acionável.
+11. **Critérios verificáveis.** H.264/AAC, yuv420p e faststart são verificáveis;
+    uma rede social ainda pode reprocessar o upload. Preview/export compartilham
+    geometria e composição, mas compressão e renderizadores impedem prometer
+    identidade de pixels: a comparação real tem tolerância documentada.
+12. **Escopo do acabamento.** Interface permanece em pt-BR e tema escuro.
+    Biblioteca global, intro/outro e ponto focal automático/manual são opcionais
+    do plano e ficam registrados em PENDING.md, sem controles inoperantes.
+
 O mapeamento inicial foi feito sobre todos os arquivos-fonte. O build web
-original passa. Rust e bibliotecas de desenvolvimento Tauri ainda precisam
-ser preparados para estabelecer a linha de base nativa.
+original passou; o check Rust inicial estava indisponível por ausência da
+toolchain e dos pacotes GTK/WebKit. Ambos foram preparados na nuvem sem alterar
+o sistema global. O núcleo, a compilação desktop Linux e a janela Tauri real
+foram validados ao final, conforme REPORT.md.

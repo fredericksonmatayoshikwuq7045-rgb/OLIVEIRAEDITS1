@@ -1,0 +1,59 @@
+{
+  "artifacts": "/tmp/oe-parity-qvurzm31",
+  "cases": [
+    {
+      "name": "contain",
+      "meanAbsoluteChannelError": 2.819626736111111,
+      "fractionPixelsAbove35": 0.029635416666666668,
+      "passed": true
+    },
+    {
+      "name": "crop-cover",
+      "meanAbsoluteChannelError": 2.6138758680555556,
+      "fractionPixelsAbove35": 0.022799479166666668,
+      "passed": true
+    },
+    {
+      "name": "rotate90",
+      "meanAbsoluteChannelError": 2.3081553819444443,
+      "fractionPixelsAbove35": 0.024010416666666666,
+      "passed": true
+    },
+    {
+      "name": "rotate37",
+      "meanAbsoluteChannelError": 2.7210546875,
+      "fractionPixelsAbove35": 0.024934895833333335,
+      "passed": true
+    },
+    {
+      "name": "circle-flip",
+      "meanAbsoluteChannelError": 1.2265538194444445,
+      "fractionPixelsAbove35": 0.009986979166666667,
+      "passed": true
+    },
+    {
+      "name": "gradient",
+      "meanAbsoluteChannelError": 2.066644965277778,
+      "fractionPixelsAbove35": 0.011158854166666666,
+      "passed": true
+    },
+    {
+      "name": "background-opacity",
+      "meanAbsoluteChannelError": 1.6795833333333334,
+      "fractionPixelsAbove35": 0.0098046875,
+      "passed": true
+    },
+    {
+      "name": "blur",
+      "meanAbsoluteChannelError": 2.334748263888889,
+      "fractionPixelsAbove35": 0.011744791666666667,
+      "passed": true
+    },
+    {
+      "name": "dynamic-video",
+      "meanAbsoluteChannelError": 3.1914756944444442,
+      "fractionPixelsAbove35": 0.03393229166666667,
+      "passed": true
+    }
+  ]
+}
