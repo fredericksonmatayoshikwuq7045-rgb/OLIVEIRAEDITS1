@@ -1,15 +1,12 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { createMediaItem } from '../domain/defaults';
+import { mediaKind } from '../domain/mediaFormats';
 import type { AssetRef, MediaItem, MediaKind, MediaProbe, Profile } from '../domain/models';
 import { AssetManager, saveAsset } from './assets';
-import { authorizePaths, isNative } from './storage';
+import { isNative } from './storage';
 import { generateThumbnail } from './thumbnails';
 
-export function mediaKind(name: string): MediaKind | null {
-  if (/\.(mp4|m4v|mov|mkv|avi|webm|wmv|mpeg|mpg|mts|m2ts)$/i.test(name)) return 'video';
-  if (/\.(png|jpe?g|webp|gif|bmp|tiff?|avif)$/i.test(name)) return 'image';
-  return null;
-}
+export { mediaKind } from '../domain/mediaFormats';
 export function baseName(path: string): string {
   return path.split(/[\\/]/).at(-1) || path;
 }
@@ -89,15 +86,19 @@ export async function importMedia(
   let asset: AssetRef | undefined;
   if (typeof input === 'string') {
     if (!isNative()) throw new Error('Importação por caminho exige o aplicativo desktop. No navegador, selecione os arquivos.');
-    await authorizePaths([input]);
     item.sourcePath = input;
     item.runtimeUrl = convertFileSrc(input);
     item.probe = await invoke<MediaProbe>('probe_media', { path: input });
   } else {
+    const temporaryUrl = URL.createObjectURL(input);
+    try {
+      item.probe = await probeBrowser(temporaryUrl, kind, title, input.size, input.lastModified);
+    } finally {
+      URL.revokeObjectURL(temporaryUrl);
+    }
     asset = await saveAsset(profile.id, input, input.name, kind, input.type);
     item.assetId = asset.id;
     item.runtimeUrl = await manager.resolve(asset);
-    item.probe = await probeBrowser(item.runtimeUrl, kind, title, input.size, input.lastModified);
   }
   item.status = 'ready';
   item.render.media.source = item.runtimeUrl;

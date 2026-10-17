@@ -7,14 +7,25 @@ Com Vite ativo (`npm run dev`), Node.js e Chromium:
 ```sh
 OE_TEST_URL=http://127.0.0.1:3000 npm run test:e2e
 OE_TEST_URL=http://127.0.0.1:3000 npm run test:migration
+OE_TEST_URL=http://127.0.0.1:3000 node tests/e2e/export-regressions.mjs
 ```
 
 `CHROMIUM_PATH` escolhe o executável. Os testes usam contextos descartáveis e
 dados sintéticos. O primeiro cria contas, importa/exporta PNG, testa pinça com
-dois dedos e histórico, recarrega dados, exercita 501 mídias com grid virtualizado
-e faz roundtrip `.oeprofile`. O segundo semeia o formato antigo real antes de
+dois dedos e histórico, recarrega dados e importa uma pasta real com 501 PNGs,
+um PNG corrompido e um texto incompatível. Verifica cancelamento, cliques
+repetidos com apenas um seletor, slots contínuos em ordem natural, isolamento
+das falhas, virtualização ao percorrer todo o lote e recolher/expandir o grid.
+Também testa seleção completa, desfazer/refazer e roundtrip `.oeprofile`.
+O segundo semeia o formato antigo real antes de
 inicializar o app e comprova recuperação e preservação das chaves/banco originais.
 Não execute enquanto edita o código: HMR pode reiniciar o estado da interface.
+
+`export-regressions.mjs` exercita os componentes e o Canvas em Chromium, com
+somente a fronteira IPC simulada. Verifica retry, destinos históricos, contagem
+de imagens e bloqueio da ação de energia após falha; não desliga o computador.
+Os smokes que semeiam a página interceptam também a query de timestamp do Vite,
+para impedir que a aplicação inicialize antes das fixtures.
 
 ## Equivalência visual
 

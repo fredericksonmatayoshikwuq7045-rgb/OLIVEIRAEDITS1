@@ -10,7 +10,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.route('**/src/main.tsx', (route) => route.fulfill({ contentType: 'application/javascript', body: 'export {};' }));
+  await page.route('**/src/main.tsx*', (route) => route.fulfill({ contentType: 'application/javascript', body: 'export {};' }));
   await page.goto(process.env.OE_TEST_URL || 'http://127.0.0.1:3001');
   const expected = await page.evaluate(async () => {
     const canvas = document.createElement('canvas');
@@ -55,7 +55,7 @@ try {
     });
     return { keys, size: file.size };
   });
-  await page.unroute('**/src/main.tsx');
+  await page.unroute('**/src/main.tsx*');
   await page.reload();
   await page.getByRole('button', { name: 'Abrir editor de Padrão', exact: true }).click();
   await page.locator('[role="option"]').filter({ hasText: 'original.png' }).click();

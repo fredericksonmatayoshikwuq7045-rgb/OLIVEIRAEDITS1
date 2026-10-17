@@ -5,8 +5,10 @@ import {
   exportItems,
   getImageExportReport,
   isNative,
+  startExport,
   type ImageExportResult,
   type FinishAction,
+  type JobState,
 } from '../services/native';
 import type { UiSettings } from './Settings';
 import type { EngineState } from './useEngine';
@@ -46,6 +48,8 @@ export function useExportDialog({
     onProfile({ ...profile, exportSettings: { ...profile.exportSettings, ...change } });
   const run = async () => {
     if (
+      !metadata &&
+      hasVideo &&
       finishAction !== 'none' &&
       !window.confirm(
         'Ao concluir o lote sem falhas, o computador será ' +
@@ -56,6 +60,7 @@ export function useExportDialog({
       return;
     setBusy(true);
     setError('');
+    setImageResults([]);
     try {
       const id = metadata
         ? await cleanMetadataOnly(profile, ready, { deepClean: deep, moveOriginal: moving })
@@ -76,7 +81,14 @@ export function useExportDialog({
     } catch (reason) {
       setError(String(reason));
     } finally {
-      if (!metadata) setImageResults(getImageExportReport());
+      if (!metadata) {
+        const images = getImageExportReport();
+        setImageResults(images);
+        if (finishAction !== 'none' && hasVideo && images.some((image) => image.status === 'error')) {
+          notify('A ação de desligar ou hibernar foi desativada porque uma imagem falhou. Confira o relatório.');
+          setFinishAction('none');
+        }
+      }
       setBusy(false);
     }
   };
@@ -88,6 +100,16 @@ export function useExportDialog({
       setError(String(reason));
     }
   };
+  const retryFailures = (job: JobState) =>
+    action(async () => {
+      const id = await startExport({
+        ...job.request,
+        finishAction: 'none',
+        items: job.request.items.filter((item) => job.items.some((state) => state.id === item.id && state.status === 'error')),
+      });
+      setJobId(id);
+      setTab('queue');
+    });
   const sample = ready[0];
   return {
     imageResults,
@@ -122,6 +144,7 @@ export function useExportDialog({
     patch,
     run,
     action,
+    retryFailures,
     sample,
   };
 }

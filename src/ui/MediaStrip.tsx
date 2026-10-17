@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, Image as ImageIcon, Plus } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, FolderOpen, Image as ImageIcon, Plus } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { MediaSort } from '../domain/batch';
 import type { MediaItem } from '../domain/models';
@@ -87,6 +87,8 @@ export function MediaStrip({
   activeId,
   onSelect,
   onImport,
+  onImportFolder,
+  importing,
   onSelectAll,
   onSelectUnedited,
   onSelectErrors,
@@ -100,6 +102,8 @@ export function MediaStrip({
   activeId: string | null;
   onSelect: (item: MediaItem, ctrl: boolean, shift: boolean) => void;
   onImport: () => void;
+  onImportFolder: () => void;
+  importing: boolean;
   onSort: (order: MediaSort) => void;
   onSelectAll: () => void;
   onSelectUnedited: () => void;
@@ -112,7 +116,9 @@ export function MediaStrip({
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const observer = new ResizeObserver(() => setViewport((p) => ({ ...p, width: element.clientWidth })));
+    const updateViewport = () => setViewport({ left: element.scrollLeft, width: element.clientWidth });
+    updateViewport();
+    const observer = new ResizeObserver(updateViewport);
     observer.observe(element);
     return () => observer.disconnect();
   }, [open]);
@@ -123,7 +129,8 @@ export function MediaStrip({
     const left = index * CELL;
     if (left < element.scrollLeft) element.scrollLeft = left;
     else if (left + CELL > element.scrollLeft + element.clientWidth) element.scrollLeft = left + CELL - element.clientWidth;
-  }, [activeId, items]);
+    setViewport({ left: element.scrollLeft, width: element.clientWidth });
+  }, [activeId, items, open]);
   const first = Math.max(0, Math.floor(viewport.left / CELL) - 3),
     last = Math.min(items.length, Math.ceil((viewport.left + viewport.width) / CELL) + 3);
   return (
@@ -166,8 +173,11 @@ export function MediaStrip({
             <option value="unedited">Sem edição</option>
             <option value="errors">Com erro / ausente</option>
           </select>
-          <Button variant="ghost" onClick={onImport}>
-            <Plus size={13} /> Importar
+          <Button variant="primary" disabled={importing} onClick={onImportFolder}>
+            <FolderOpen size={13} /> Importar pasta
+          </Button>
+          <Button variant="ghost" disabled={importing} onClick={onImport}>
+            <Plus size={13} /> Arquivos
           </Button>
         </div>
       </div>

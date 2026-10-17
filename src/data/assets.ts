@@ -78,6 +78,22 @@ export class AssetManager {
   private pending = new Map<string, Promise<string>>();
   private fonts = new Map<string, FontFace>();
   private disposed = false;
+  private leases = 0;
+  private liveAssets = new Set<string>();
+  /** Imports resolve URLs before their assets enter workspace/history. */
+  retain(): (committedIds?: Iterable<string>) => void {
+    if (this.disposed) throw new Error('Carregamento de assets encerrado.');
+    this.leases++;
+    let released = false;
+    return (committedIds = []) => {
+      if (released) return;
+      released = true;
+      this.leases--;
+      if (this.disposed) return;
+      for (const id of committedIds) this.liveAssets.add(id);
+      this.releaseUnused(this.liveAssets);
+    };
+  }
   async resolve(asset: AssetRef): Promise<string> {
     const cached = this.urls.get(asset.id);
     if (cached) return cached;
@@ -124,6 +140,8 @@ export class AssetManager {
     }
   }
   releaseUnused(assetIds: Set<string>): void {
+    this.liveAssets = new Set(assetIds);
+    if (this.leases && !this.disposed) return;
     for (const [id, url] of this.urls) {
       if (assetIds.has(id)) continue;
       if (url.startsWith('blob:')) URL.revokeObjectURL(url);

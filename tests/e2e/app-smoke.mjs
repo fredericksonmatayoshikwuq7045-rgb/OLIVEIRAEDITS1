@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { chromium } from 'playwright';
 
 const url = process.env.OE_TEST_URL || 'http://127.0.0.1:3001';
@@ -81,19 +82,71 @@ try {
   await page.getByText('Seu próximo post começa aqui', { exact: true }).waitFor();
   assert.equal(await page.getByText('fixture.png', { exact: true }).count(), 0);
   results.push('Contas isolam os projetos');
-  const bulkChooser = page.waitForEvent('filechooser');
-  await page.getByRole('button', { name: 'Importar arquivos', exact: true }).first().click();
-  await (
-    await bulkChooser
-  ).setFiles(
-    Array.from({ length: 501 }, (_, index) => ({
-      name: `bulk-${index}.png`,
-      mimeType: 'image/png',
-      buffer: Buffer.from(fixture, 'base64'),
-    })),
+  const folderButton = page.getByRole('button', { name: 'Importar pasta', exact: true }).first();
+  const cancelChooser = page.waitForEvent('filechooser');
+  await folderButton.click();
+  await cancelChooser;
+  assert.equal(await folderButton.isDisabled(), true);
+  await page.locator('input[type="file"][webkitdirectory]').dispatchEvent('cancel');
+  await page.waitForFunction(() => !document.querySelector('button[aria-label="Importar pasta"]')?.disabled);
+  assert.equal(await page.locator('input[type="file"][webkitdirectory]').count(), 0);
+  results.push('Cancelar seleção de pasta libera a próxima importação');
+
+  const bulkDirectory = resolve(directory, 'pasta-com-501-midias');
+  await mkdir(bulkDirectory, { recursive: true });
+  await Promise.all(
+    Array.from({ length: 501 }, (_, index) => writeFile(`${bulkDirectory}/bulk-${index + 1}.png`, Buffer.from(fixture, 'base64'))),
   );
+  await writeFile(`${bulkDirectory}/bulk-2-corrupt.png`, 'Arquivo com extensão PNG, mas sem imagem válida.');
+  await writeFile(`${bulkDirectory}/ignorar.txt`, 'Um arquivo não suportado não deve impedir o restante do lote.');
+  let chooserCount = 0;
+  const countChooser = () => chooserCount++;
+  page.on('filechooser', countChooser);
+  const bulkChooser = page.waitForEvent('filechooser');
+  // Two clicks in the same task exercise the lock before React disables the buttons.
+  await folderButton.evaluate((button) => {
+    button.click();
+    button.click();
+  });
+  const bulkPicker = await bulkChooser;
+  assert.equal(chooserCount, 1, 'Cliques repetidos abriram mais de um seletor');
+  for (const button of await page.getByRole('button', { name: 'Importar pasta', exact: true }).all()) {
+    assert.equal(await button.isDisabled(), true);
+  }
+  await bulkPicker.setFiles(bulkDirectory);
   await page.getByText('Mídias do projeto (501)', { exact: true }).waitFor({ timeout: 60000 });
+  await page.getByText('501 mídia(s) importada(s); 1 com falha, 1 ignorado(s). Confira os avisos.', { exact: true }).waitFor();
+  assert.equal(chooserCount, 1, 'O lote abriu um seletor adicional');
+  page.off('filechooser', countChooser);
+  assert.equal(await folderButton.isDisabled(), false);
   assert.ok((await page.locator('[role="listbox"] [role="option"]').count()) < 40, 'Grid não está virtualizado');
+  const strip = page.getByRole('listbox', { name: 'Mídias importadas' });
+  const dimensions = await strip.evaluate((element) => ({ width: element.clientWidth, total: element.scrollWidth }));
+  const seen = new Map();
+  for (let left = 0; left < dimensions.total; left += Math.max(1, dimensions.width * 0.75)) {
+    const cards = await strip.evaluate(async (element, offset) => {
+      element.scrollLeft = offset;
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+      return [...element.querySelectorAll('[role="option"]')].map((card) => ({
+        title: card.getAttribute('title'),
+        slot: Number(card.querySelector('.media-slot-index')?.textContent),
+      }));
+    }, left);
+    assert.ok(cards.length < 40, 'A rolagem deixou de virtualizar as mídias');
+    for (const card of cards) seen.set(card.slot, card.title);
+  }
+  assert.deepEqual(
+    [...seen].sort((a, b) => a[0] - b[0]),
+    Array.from({ length: 501 }, (_, i) => [i + 1, `bulk-${i + 1}.png`]),
+  );
+  await page.locator('.media-slot[title="bulk-501.png"]').click();
+  await page.getByRole('button', { name: 'Recolher mídias', exact: true }).click();
+  await page.getByRole('button', { name: 'Expandir mídias', exact: true }).click();
+  await page.locator('.media-slot.active[title="bulk-501.png"]').waitFor();
+  assert.ok((await strip.getByRole('option').count()) > 0);
+  results.push('Uma pasta: 501 mídias em ordem natural e slots contínuos; corrupto e texto isolados, sem reabrir seletor');
+  results.push('Reabrir o grid após rolar ao fim mantém cartões e mídia ativa visíveis');
   await page.getByLabel('Selecionar mídias').selectOption('all');
   await page.getByText('501 selecionadas', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
@@ -122,7 +175,9 @@ try {
   results.push('Backup .oeprofile com assets importa como conta independente');
   await page.screenshot({ path: `${directory}/editor.png` });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: 'passed', checks: results, pageErrors: errors }, null, 2));
+  const report = JSON.stringify({ status: 'passed', checks: results, pageErrors: errors }, null, 2);
+  await writeFile(`${directory}/report.json`, report);
+  console.log(report);
 } catch (error) {
   await page.screenshot({ path: `${directory}/failure.png` });
   await writeFile(`${directory}/failure.txt`, (await page.locator('body').innerText()) + '\n' + errors.join('\n'));
