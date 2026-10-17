@@ -6,6 +6,10 @@
   MSVC, Windows SDK e WebView2 executável. Os sidecars Windows foram baixados e
   tiveram SHA-256 verificado, mas isso não valida o instalador. Use o workflow
   manual `.github/workflows/windows.yml` ou os comandos do README em Windows.
+- **Confirmar ausência de consoles auxiliares no Windows.** Todos os subprocessos
+  usam `CREATE_NO_WINDOW`; o código e o teste específico foram compilados para
+  Windows. A execução do teste `GetConsoleWindow` e a importação em massa no
+  WebView2 ainda dependem de uma máquina Windows.
 - **GPU real e ações de energia Windows.** O teste nativo exercita falha do QSV
   e fallback para libx264. NVENC/QSV/AMF bem-sucedidos exigem drivers/hardware.
   Desligar/hibernar está implementado, desativado por padrão, com confirmação;

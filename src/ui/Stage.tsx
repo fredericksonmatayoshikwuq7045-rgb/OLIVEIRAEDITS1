@@ -1,4 +1,3 @@
-import { Film, Upload } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
 import type { MediaItem } from '../domain/models';
 import { cropSelectionGeometry, cropSourceDelta } from '../render/crop';
@@ -6,7 +5,7 @@ import { snapMediaPan, snapRect } from '../render/snap';
 import { RenderCanvas } from '../render/RenderCanvas';
 import type { Rect } from '../render/types';
 import { mediaUrl } from '../services/native';
-import { Button, EmptyState } from './Primitives';
+import { StageEmpty } from './StageEmpty';
 import type { Drag, StageProps } from './stageTypes';
 import { usePinch } from './usePinch';
 
@@ -24,6 +23,8 @@ export function Stage({
   safeZone,
   activeLayerId,
   onImport,
+  onImportFolder,
+  importing,
   resolveSource,
   notify,
   onDropFiles,
@@ -273,20 +274,7 @@ export function Stage({
           )}
         </div>
       ) : (
-        <EmptyState
-          icon={<Film size={28} />}
-          title={draft?.status === 'missing' ? 'Arquivo não encontrado' : 'Seu próximo post começa aqui'}
-          description={
-            draft?.status === 'missing'
-              ? 'O arquivo original foi movido ou está indisponível. Re-vincule a mídia para continuar.'
-              : draft?.error || 'Importe vídeos ou imagens e deixe o enquadramento, os templates e a exportação com a sua identidade.'
-          }
-          action={
-            <Button variant="primary" onClick={onImport}>
-              <Upload /> Importar arquivos
-            </Button>
-          }
-        />
+        <StageEmpty item={draft} onImport={onImport} onImportFolder={onImportFolder} importing={importing} />
       )}
       {valid && (
         <span className="stage-caption">

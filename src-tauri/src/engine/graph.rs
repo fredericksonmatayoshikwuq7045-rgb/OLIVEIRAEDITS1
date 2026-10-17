@@ -39,7 +39,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
         let real = input_path(path)?;
         let index = next_input; next_input += 1;
         if video { inputs.extend(["-stream_loop".into(),"-1".into()]); }
-        else { inputs.extend(["-loop".into(),"1".into()]); }
+        else { inputs.extend(super::probe::image_loop_args(&real).map(str::to_owned)); }
         inputs.extend(["-i".into(),real.to_string_lossy().into_owned()]);
         Ok(index)
     };

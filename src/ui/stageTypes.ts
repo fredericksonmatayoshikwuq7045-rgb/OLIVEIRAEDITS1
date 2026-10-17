@@ -19,6 +19,8 @@ export type StageProps = {
   safeZone: boolean;
   activeLayerId: string | null;
   onImport: () => void;
+  onImportFolder: () => void;
+  importing: boolean;
   resolveSource: (source: string) => string;
   notify: (message: string) => void;
   onDropFiles: (files: File[]) => void;

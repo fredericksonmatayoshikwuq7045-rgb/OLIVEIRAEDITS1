@@ -1,5 +1,6 @@
 import { Copy, FolderOpen, Pause, Play, RefreshCw, Square } from 'lucide-react';
-import { cancelExport, openPath, pauseExport, resumeExport, startExport, type ItemState, type JobState } from '../services/native';
+import { cancelExport, openPath, pauseExport, resumeExport, type ItemState, type JobState } from '../services/native';
+import { exportTotals, jobOutputDirectories } from '../services/exportReport';
 import { Button, humanBytes } from './Primitives';
 import type { ExportDialogContext } from './useExportDialog';
 
@@ -29,13 +30,15 @@ function reportText(jobs: JobState[]) {
 }
 
 export function QueueReport({ model }: { model: ExportDialogContext }) {
-  const { jobs, imageResults, notify, setError, action, profile } = model;
+  const { jobs, imageResults, notify, setError, action, retryFailures } = model;
+  const totals = exportTotals(jobs, imageResults);
   return (
     <div className="stack">
       <div className="row-between">
         <div className="queue-summary">
-          <span>{jobs.flatMap((job) => job.items).filter((i) => i.status === 'ok').length} concluídos</span>
-          <span>{jobs.flatMap((job) => job.items).filter((i) => i.status === 'error').length} falhas</span>
+          <span>{totals.completed} concluídos</span>
+          <span>{totals.failed} falhas</span>
+          {totals.skipped > 0 && <span>{totals.skipped} pulados</span>}
         </div>
         <Button
           onClick={() =>
@@ -43,7 +46,17 @@ export function QueueReport({ model }: { model: ExportDialogContext }) {
               .writeText(
                 reportText(jobs) +
                   '\n' +
-                  imageResults.map((image) => [image.filename, image.status, image.bytes ?? '', image.error ?? ''].join('\t')).join('\n'),
+                  imageResults
+                    .map((image) =>
+                      [
+                        image.path || image.filename,
+                        image.status,
+                        '',
+                        image.bytes === undefined ? '' : humanBytes(image.bytes),
+                        image.error ?? '',
+                      ].join('\t'),
+                    )
+                    .join('\n'),
               )
               .then(() => notify('Relatório copiado.'))
               .catch((reason) => setError(String(reason)))
@@ -91,17 +104,7 @@ export function QueueReport({ model }: { model: ExportDialogContext }) {
                 </>
               )}
               {job.items.some((i) => i.status === 'error') && (
-                <Button
-                  onClick={() =>
-                    void action(() =>
-                      startExport({
-                        ...job.request,
-                        finishAction: 'none',
-                        items: job.request.items.filter((i) => job.items.some((state) => state.id === i.id && state.status === 'error')),
-                      }),
-                    )
-                  }
-                >
+                <Button onClick={() => void retryFailures(job)}>
                   <RefreshCw /> Repetir falhas
                 </Button>
               )}
@@ -178,9 +181,11 @@ export function QueueReport({ model }: { model: ExportDialogContext }) {
               </div>
             ))}
           </div>
-          <Button onClick={() => void openPath(profile.exportSettings.outputDir).catch((reason) => setError(String(reason)))}>
-            <FolderOpen /> Abrir pasta de saída
-          </Button>
+          {jobOutputDirectories(job).map((directory) => (
+            <Button key={directory} title={directory} onClick={() => void openPath(directory).catch((reason) => setError(String(reason)))}>
+              <FolderOpen /> Abrir pasta de saída · {directory}
+            </Button>
+          ))}
         </div>
       ))}
     </div>

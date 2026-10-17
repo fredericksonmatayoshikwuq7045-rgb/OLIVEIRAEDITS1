@@ -1,6 +1,16 @@
 import { isNative, nativeCall } from './backend';
+import { mediaExtensions as extensions, mediaKind } from '../domain/mediaFormats';
 
-const extensions = ['mp4', 'mov', 'mkv', 'avi', 'webm', 'm4v', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'tif', 'tiff'];
+let mediaPickerOpen = false;
+async function pickMedia(select: () => Promise<string[] | File[]>): Promise<string[] | File[]> {
+  if (mediaPickerOpen) return [];
+  mediaPickerOpen = true;
+  try {
+    return await select();
+  } finally {
+    mediaPickerOpen = false;
+  }
+}
 function browserFiles(folder: boolean): Promise<File[]> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
@@ -8,8 +18,14 @@ function browserFiles(folder: boolean): Promise<File[]> {
     input.multiple = true;
     input.accept = 'image/*,video/*';
     if (folder) input.setAttribute('webkitdirectory', '');
-    input.addEventListener('change', () => resolve(Array.from(input.files ?? [])), { once: true });
-    input.addEventListener('cancel', () => resolve([]), { once: true });
+    input.hidden = true;
+    const finish = (files: File[]) => {
+      input.remove();
+      resolve(files);
+    };
+    input.addEventListener('change', () => finish(Array.from(input.files ?? [])), { once: true });
+    input.addEventListener('cancel', () => finish([]), { once: true });
+    document.body.appendChild(input);
     input.click();
   });
 }
@@ -18,23 +34,27 @@ async function authorize(paths: string[]): Promise<string[]> {
   return paths;
 }
 export async function chooseMediaFiles(): Promise<string[] | File[]> {
-  if (!isNative()) return browserFiles(false);
-  const { open } = await import('@tauri-apps/plugin-dialog');
-  const result = await open({ multiple: true, title: 'Importar vídeos e imagens', filters: [{ name: 'Mídias', extensions }] });
-  return authorize(result ? (Array.isArray(result) ? result : [result]) : []);
+  return pickMedia(async () => {
+    if (!isNative()) return browserFiles(false);
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    const result = await open({ multiple: true, title: 'Importar vídeos e imagens', filters: [{ name: 'Mídias', extensions }] });
+    return authorize(result ? (Array.isArray(result) ? result : [result]) : []);
+  });
 }
 export async function chooseMediaFolder(): Promise<string[] | File[]> {
-  if (!isNative()) return browserFiles(true);
-  const { open } = await import('@tauri-apps/plugin-dialog');
-  const path = await open({ directory: true, title: 'Importar pasta de mídias' });
-  if (!path || Array.isArray(path)) return [];
-  await authorize([path]);
-  const { readDir } = await import('@tauri-apps/plugin-fs');
-  const entries = await readDir(path);
-  return entries
-    .filter((entry) => entry.isFile && extensions.includes(entry.name.split('.').at(-1)?.toLowerCase() ?? ''))
-    .sort((left, right) => left.name.localeCompare(right.name, 'pt-BR', { numeric: true }))
-    .map((entry) => `${path.replace(/[\\/]$/, '')}/${entry.name}`);
+  return pickMedia(async () => {
+    if (!isNative()) return browserFiles(true);
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    const path = await open({ directory: true, title: 'Importar pasta de mídias' });
+    if (!path || Array.isArray(path)) return [];
+    await authorize([path]);
+    const { readDir } = await import('@tauri-apps/plugin-fs');
+    const entries = await readDir(path);
+    return entries
+      .filter((entry) => entry.isFile && mediaKind(entry.name))
+      .sort((left, right) => left.name.localeCompare(right.name, 'pt-BR', { numeric: true }))
+      .map((entry) => `${path.replace(/[\\/]$/, '')}/${entry.name}`);
+  });
 }
 export async function chooseOutputDirectory(initial?: string): Promise<string | null> {
   if (!isNative()) throw new Error('No navegador, imagens são salvas por download. Escolha de pasta exige o aplicativo desktop.');

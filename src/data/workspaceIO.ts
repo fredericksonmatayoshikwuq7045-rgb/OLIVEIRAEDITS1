@@ -60,7 +60,7 @@ export function dehydrateWorkspace(workspace: Workspace, assets: AssetManager): 
         const { runtimeUrl: _url, thumbnailUrl, ...record } = item;
         const render = stableRender(record.render);
         render.media.source = item.assetId ? `asset:${item.assetId}` : (item.sourcePath ?? render.media.source);
-        return { ...record, ...(thumbnailUrl && !thumbnailUrl.startsWith('blob:') ? { thumbnailUrl } : {}), render };
+        return { ...record, ...(thumbnailUrl?.startsWith('data:image/') ? { thumbnailUrl } : {}), render };
       }),
     })),
   };
@@ -109,6 +109,8 @@ export async function hydrateWorkspace(workspace: Workspace, manager: AssetManag
     for (const project of result.projects.filter((project) => project.profileId === profile.id)) {
       for (const item of project.items) {
         if (item.status === 'empty') continue;
+        // Native cache URLs can outlive the cache. Only embedded browser previews survive a reload.
+        if (!item.thumbnailUrl?.startsWith('data:image/')) item.thumbnailUrl = undefined;
         if (item.assetId) item.runtimeUrl = urls.get(item.assetId);
         else if (item.sourcePath && isNative()) {
           try {
@@ -140,11 +142,16 @@ export async function hydrateWorkspace(workspace: Workspace, manager: AssetManag
           }
         }
         item.render.media.source = item.runtimeUrl ?? '';
-        if (item.kind === 'video' && item.status === 'ready' && !item.thumbnailUrl) {
-          item.thumbnailUrl = await generateThumbnail(
-            item,
-            item.sourcePath ?? profile.assets.find((asset) => asset.id === item.assetId)?.source,
-          );
+        if (item.kind === 'video' && item.status === 'ready' && (isNative() || !item.thumbnailUrl)) {
+          try {
+            item.thumbnailUrl = await generateThumbnail(
+              item,
+              item.sourcePath ?? profile.assets.find((asset) => asset.id === item.assetId)?.source,
+            );
+          } catch (error) {
+            item.thumbnailUrl = undefined;
+            console.warn('Miniatura indisponível:', error);
+          }
         }
         if ('source' in item.render.background) item.render.background.source = resolve(item.render.background.source);
         item.render.layers = item.render.layers.map((layer) => ('source' in layer ? { ...layer, source: resolve(layer.source) } : layer));

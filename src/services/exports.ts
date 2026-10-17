@@ -118,6 +118,7 @@ export async function exportImage(item: MediaItem, profile?: Profile, index = 0)
   return { id: item.id, title: item.title, filename: name, status: 'download', bytes: blob.size };
 }
 export async function exportItems(profile: Profile, items: MediaItem[], options: ExportOptions = {}): Promise<string> {
+  resetImageExportReport();
   if (!items.length) throw new Error('Selecione ao menos uma mídia para exportar.');
   const videos = items.filter((item) => item.kind === 'video');
   if (videos.length && !isNative()) throw new Error('Vídeos precisam do aplicativo desktop com FFmpeg. No navegador, exporte imagens.');
@@ -125,12 +126,13 @@ export async function exportItems(profile: Profile, items: MediaItem[], options:
     const health = await getFfmpegInfo();
     if (!health.available) throw new Error(health.warnings.join('\n') || 'FFmpeg indisponível. Confira Configurações.');
   }
-  resetImageExportReport();
+  let imageFailed = false;
   for (const [index, item] of items.entries())
     if (item.kind === 'image') {
       try {
         recordImageExport(await exportImage(item, profile, index));
       } catch (error) {
+        imageFailed = true;
         recordImageExport({ id: item.id, title: item.title, filename: item.title, status: 'error', error: String(error) });
       }
     }
@@ -139,7 +141,7 @@ export async function exportItems(profile: Profile, items: MediaItem[], options:
   for (const [index, item] of videos.entries()) prepared.push(await prepareExportItem(item, profile, index, options));
   return startExport({
     items: prepared,
-    finishAction: options.finishAction,
+    finishAction: imageFailed ? 'none' : options.finishAction,
     concurrency: options.concurrency ?? (profile.exportSettings.preset === 'nvenc' ? 2 : 1),
   });
 }

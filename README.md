@@ -28,6 +28,17 @@ templates/textos e confira conta, pasta e nomes antes de exportar. Ctrl+clique e
 Shift+clique selecionam mídias; Ctrl+Z / Ctrl+Shift+Z desfazem e refazem. `?` abre
 os atalhos. A pausa age entre arquivos; cancelar interrompe FFmpeg e limpa partes.
 
+Para importar em massa, clique em **Importar pasta**, escolha a pasta uma vez e
+aguarde o contador. Os arquivos compatíveis entram em ordem natural, preenchendo
+os slots livres. Um arquivo inválido gera aviso e o restante do lote continua.
+O aplicativo Windows mantém FFmpeg/FFprobe em segundo plano durante a leitura.
+As [correções de 17/10/2026](docs/bugfixes-2026-10-17.md) estão em `refactor/v2`.
+
+Se você usa um ZIP antigo, baixe o código atualizado dessa branch e extraia em
+uma pasta nova. Execute `npm ci` e os comandos de preparação/build Windows abaixo,
+depois instale o novo executável. O aplicativo já instalado não se atualiza ao
+alterar os arquivos do código-fonte; preserve os dados e backups dos seus perfis.
+
 ## Verificação
 
 ```bash

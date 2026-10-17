@@ -14,7 +14,7 @@ pub fn validate(action: &str) -> Result<(), String> {
 pub fn schedule(action: &str) -> Result<(), String> {
     let Some(args) = arguments(action)? else { return Ok(()) };
     validate(action)?;
-    let result = std::process::Command::new("shutdown.exe").args(args).output().map_err(|error| error.to_string())?;
+    let result = super::process::background_command("shutdown.exe").args(args).output().map_err(|error| error.to_string())?;
     if result.status.success() { Ok(()) } else { Err(String::from_utf8_lossy(&result.stderr).into_owned()) }
 }
 

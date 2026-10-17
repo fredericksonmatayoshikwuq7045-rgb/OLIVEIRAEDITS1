@@ -12,6 +12,7 @@ export function EditorCenter({ model }: { model: EditorContext }) {
     active,
     project,
     importing,
+    importProgress,
     importMedia,
     engine,
     previewBusy,
@@ -48,13 +49,17 @@ export function EditorCenter({ model }: { model: EditorContext }) {
           <span className="truncate tiny" style={{ maxWidth: 190 }}>
             {active?.title || project.name}
           </span>
-          {importing && <span className="muted tiny">Importando…</span>}
+          {importing && (
+            <span className="muted tiny" role="status">
+              {importProgress ? `Importando ${importProgress.completed}/${importProgress.total}…` : 'Selecionando mídias…'}
+            </span>
+          )}
         </div>
         <div className="row">
-          <IconButton label="Importar arquivos" onClick={() => void importMedia()}>
+          <IconButton label="Importar arquivos" disabled={importing} onClick={() => void importMedia()}>
             <Upload size={15} />
           </IconButton>
-          <IconButton label="Importar pasta" onClick={() => void importMedia(true)}>
+          <IconButton label="Importar pasta" disabled={importing} onClick={() => void importMedia(true)}>
             <FolderOpen size={15} />
           </IconButton>
           {active?.kind === 'video' && (
@@ -82,9 +87,13 @@ export function EditorCenter({ model }: { model: EditorContext }) {
           safeZone={safeZone}
           activeLayerId={step === 3 ? layerId : null}
           onImport={() => void importMedia()}
+          onImportFolder={() => void importMedia(true)}
+          importing={importing}
           resolveSource={resolveSource}
           notify={notify}
-          onDropFiles={(files) => void importFiles(files)}
+          onDropFiles={(files) => {
+            if (!isNative()) void importFiles(files);
+          }}
         />
       </PanelBoundary>
       {active?.kind === 'video' && active.status === 'ready' && (
@@ -160,6 +169,8 @@ export function EditorCenter({ model }: { model: EditorContext }) {
         activeId={active?.id || null}
         onSelect={select}
         onImport={() => void importMedia()}
+        onImportFolder={() => void importMedia(true)}
+        importing={importing}
         onSelectAll={() => setSelectedIds(items.map((item) => item.id))}
         onSelectUnedited={() =>
           setSelectedIds(

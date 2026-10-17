@@ -3,10 +3,11 @@ import { copyFraming, rangeSelection } from '../domain/batch';
 import type { MediaItem, Profile, Project, TemplateCategory } from '../domain/models';
 import { applyTemplate } from '../domain/templates';
 import type { RenderTextLayer } from '../render/types';
-import { chooseMediaFiles, chooseMediaFolder, isNative, mediaUrl, renderPreview } from '../services/native';
+import { mediaUrl, renderPreview } from '../services/native';
 import type { WorkspaceStore } from './Dashboard';
 import type { UiSettings } from './Settings';
 import type { EngineState } from './useEngine';
+import { useMediaImport } from './useMediaImport';
 export function useEditor({
   store,
   engine,
@@ -33,7 +34,6 @@ export function useEditor({
     [batch, setBatch] = useState(false),
     [exporting, setExporting] = useState(false),
     [metadata, setMetadata] = useState(false),
-    [importing, setImporting] = useState(false),
     [preview, setPreview] = useState<string | null>(null),
     [previewBusy, setPreviewBusy] = useState(false);
   const [saveName, setSaveName] = useState(''),
@@ -61,46 +61,7 @@ export function useEditor({
     (updated: MediaItem) => store.updateProject((p) => ({ ...p, items: p.items.map((item) => (item.id === updated.id ? updated : item)) })),
     [store],
   );
-  const importFiles = useCallback(
-    async (files: File[] | string[]) => {
-      if (!files.length) return;
-      setImporting(true);
-      try {
-        await store.importFiles(files);
-        notify(`${files.length} arquivo(s) analisado(s). Confira os avisos de importação.`);
-      } catch (error) {
-        notify(String(error));
-      } finally {
-        setImporting(false);
-      }
-    },
-    [store, notify],
-  );
-  const importMedia = async (folder = false) => {
-    try {
-      await importFiles(await (folder ? chooseMediaFolder() : chooseMediaFiles()));
-    } catch (error) {
-      notify(String(error));
-    }
-  };
-  useEffect(() => {
-    if (!isNative()) return;
-    let stop: (() => void) | undefined,
-      disposed = false;
-    void import('@tauri-apps/api/webview')
-      .then(async ({ getCurrentWebview }) => {
-        const unlisten = await getCurrentWebview().onDragDropEvent((event) => {
-          if (event.payload.type === 'drop') void importFiles(event.payload.paths);
-        });
-        if (disposed) unlisten();
-        else stop = unlisten;
-      })
-      .catch((error) => notify(String(error)));
-    return () => {
-      disposed = true;
-      stop?.();
-    };
-  }, [profile?.id, importFiles, notify]);
+  const { importing, importProgress, importFiles, importMedia } = useMediaImport(store, notify);
   const select = useCallback(
     (item: MediaItem, ctrl: boolean, shift: boolean) => {
       setActiveId(item.id);
@@ -222,7 +183,7 @@ export function useEditor({
     metadata,
     setMetadata,
     importing,
-    setImporting,
+    importProgress,
     preview,
     setPreview,
     previewBusy,

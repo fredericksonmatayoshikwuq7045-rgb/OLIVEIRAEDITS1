@@ -2,6 +2,12 @@
 
 Data: 16/10/2026. Branch: `refactor/v2`. Plataforma de execução: Linux x86_64.
 
+Revisão de bugs em 17/10/2026: importação por pasta e janelas de subprocessos
+Windows corrigidas, junto de slots, revinculação, cache e relatório de exportação.
+Esta rodada passou com 91 testes frontend/dados, 35 testes Rust, importação real
+de pasta com 501 imagens, integração Tauri Linux e build pelo CLI.
+Evidências e limites: [correções de 17/10/2026](docs/bugfixes-2026-10-17.md).
+
 ## Resultado e revisão do plano
 
 As onze fases receberam implementação ou justificativa verificável. O editor
