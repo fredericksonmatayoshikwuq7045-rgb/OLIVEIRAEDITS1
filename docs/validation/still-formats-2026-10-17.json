@@ -1,0 +1,248 @@
+{
+  "status": "passed",
+  "formats": [
+    "gif",
+    "avif"
+  ],
+  "job": {
+    "cacheDir": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/engine",
+    "concurrency": 1,
+    "id": "78011-1792270544010-0",
+    "items": [
+      {
+        "durationMs": 309,
+        "error": null,
+        "id": "still-gif",
+        "logPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/engine/logs/78011-1792270544010-0/78011-1792270544282-2.log",
+        "metadata": {
+          "after": {
+            "format.compatible_brands": "isomiso2avc1mp41",
+            "format.major_brand": "isom",
+            "format.minor_version": "512",
+            "stream0.encoder": "Lavc libx264",
+            "stream0.handler_name": "VideoHandler",
+            "stream0.language": "und",
+            "stream0.vendor_id": "[0][0][0][0]"
+          },
+          "before": {},
+          "exiftoolUsed": false,
+          "removed": [],
+          "sensitiveRemaining": []
+        },
+        "outputPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/gif.mp4",
+        "outputSize": 4886,
+        "progress": {
+          "etaSeconds": 0.007507477477477477,
+          "fps": 0.0,
+          "itemId": "still-gif",
+          "jobId": "78011-1792270544010-0",
+          "outSizeBytes": 4886,
+          "percent": 100.0,
+          "speed": 11.1
+        },
+        "sourcePath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.gif",
+        "status": "ok"
+      },
+      {
+        "durationMs": 242,
+        "error": null,
+        "id": "still-avif",
+        "logPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/engine/logs/78011-1792270544010-0/78011-1792270544602-4.log",
+        "metadata": {
+          "after": {
+            "format.compatible_brands": "isomiso2avc1mp41",
+            "format.major_brand": "isom",
+            "format.minor_version": "512",
+            "stream0.encoder": "Lavc libx264",
+            "stream0.handler_name": "VideoHandler",
+            "stream0.language": "und",
+            "stream0.vendor_id": "[0][0][0][0]"
+          },
+          "before": {
+            "format.compatible_brands": "avifmif1miafMA1B",
+            "format.major_brand": "avif",
+            "format.minor_version": "0",
+            "stream0.title": "Color"
+          },
+          "exiftoolUsed": false,
+          "removed": [
+            "format.compatible_brands",
+            "format.major_brand",
+            "format.minor_version",
+            "stream0.title"
+          ],
+          "sensitiveRemaining": []
+        },
+        "outputPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/avif.mp4",
+        "outputSize": 2254,
+        "progress": {
+          "etaSeconds": 0.002246172506738544,
+          "fps": 0.0,
+          "itemId": "still-avif",
+          "jobId": "78011-1792270544010-0",
+          "outSizeBytes": 2254,
+          "percent": 100.0,
+          "speed": 37.1
+        },
+        "sourcePath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.avif",
+        "status": "ok"
+      }
+    ],
+    "request": {
+      "concurrency": 1,
+      "finishAction": "none",
+      "items": [
+        {
+          "cleanMetadata": true,
+          "conflict": "overwrite",
+          "deepClean": false,
+          "encoder": null,
+          "fps": 24.0,
+          "id": "still-gif",
+          "mode": "render",
+          "moveOriginal": false,
+          "outputPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/gif.mp4",
+          "overlays": [],
+          "preset": "fast",
+          "render": {
+            "background": {
+              "angle": null,
+              "audio": "mute",
+              "color": null,
+              "from": null,
+              "opacity": 1.0,
+              "radius": null,
+              "source": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.gif",
+              "to": null,
+              "type": "image"
+            },
+            "canvas": {
+              "height": 180,
+              "width": 320
+            },
+            "geometry": {
+              "bounds": {
+                "height": 180.0,
+                "width": 180.0,
+                "x": 70.0,
+                "y": 0.0
+              },
+              "drawRect": {
+                "height": 180.0,
+                "width": 180.0,
+                "x": 70.0,
+                "y": 0.0
+              },
+              "matrix": [
+                2.8125,
+                0.0,
+                0.0,
+                2.8125,
+                70.0,
+                0.0
+              ],
+              "sourceCrop": {
+                "height": 64.0,
+                "width": 64.0,
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "layers": [],
+            "media": {
+              "flipH": false,
+              "flipV": false,
+              "height": 64.0,
+              "mask": "none",
+              "opacity": 1.0,
+              "rotation": 0.0,
+              "width": 64.0,
+              "zIndex": 10
+            }
+          },
+          "silentAudio": false,
+          "sourcePath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.gif",
+          "speed": 1.0,
+          "trim": null
+        },
+        {
+          "cleanMetadata": true,
+          "conflict": "overwrite",
+          "deepClean": false,
+          "encoder": null,
+          "fps": 24.0,
+          "id": "still-avif",
+          "mode": "render",
+          "moveOriginal": false,
+          "outputPath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/avif.mp4",
+          "overlays": [],
+          "preset": "fast",
+          "render": {
+            "background": {
+              "angle": null,
+              "audio": "mute",
+              "color": null,
+              "from": null,
+              "opacity": 1.0,
+              "radius": null,
+              "source": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.avif",
+              "to": null,
+              "type": "image"
+            },
+            "canvas": {
+              "height": 180,
+              "width": 320
+            },
+            "geometry": {
+              "bounds": {
+                "height": 180.0,
+                "width": 180.0,
+                "x": 70.0,
+                "y": 0.0
+              },
+              "drawRect": {
+                "height": 180.0,
+                "width": 180.0,
+                "x": 70.0,
+                "y": 0.0
+              },
+              "matrix": [
+                2.8125,
+                0.0,
+                0.0,
+                2.8125,
+                70.0,
+                0.0
+              ],
+              "sourceCrop": {
+                "height": 64.0,
+                "width": 64.0,
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "layers": [],
+            "media": {
+              "flipH": false,
+              "flipV": false,
+              "height": 64.0,
+              "mask": "none",
+              "opacity": 1.0,
+              "rotation": 0.0,
+              "width": 64.0,
+              "zIndex": 10
+            }
+          },
+          "silentAudio": false,
+          "sourcePath": "/workspace/OLIVEIRAEDITS1/.artifacts/media-2026-10-17/still-formats/still.avif",
+          "speed": 1.0,
+          "trim": null
+        }
+      ]
+    },
+    "status": "completed",
+    "warnings": [
+      "ExifTool opcional ausente: a limpeza usa FFmpeg e verifica as tags vis\u00edveis pelo FFprobe."
+    ]
+  }
+}

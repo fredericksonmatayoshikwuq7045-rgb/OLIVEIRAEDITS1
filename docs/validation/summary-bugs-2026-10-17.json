@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-17",
+  "platform": "Linux x86_64",
+  "branch": "refactor/v2",
+  "unitTests": {
+    "frontend": 91,
+    "frontendFiles": 13,
+    "rust": 35
+  },
+  "passed": [
+    "npm test",
+    "npm run lint",
+    "npm run format:check",
+    "npm run check:files",
+    "npm run build",
+    "cargo test --manifest-path src-tauri/Cargo.toml --no-default-features",
+    "cargo check --manifest-path src-tauri/Cargo.toml --no-default-features --tests --target x86_64-pc-windows-msvc",
+    "npm run test:e2e (Chromium, pasta real 501 PNG + 1 corrompido + TXT)",
+    "npm run test:migration",
+    "node tests/e2e/export-regressions.mjs (Canvas real, IPC simulado)",
+    "npm run test:media (20 exports reais e erros/cancelamento)",
+    "harness Rust com FFmpeg real para origem/fundo GIF e AVIF",
+    "npm run test:native (Tauri Linux real, 8 verificações)",
+    "npm run tauri build -- --debug --no-bundle",
+    "bash /workspace/.cloud-onboarding/oliveira-edits/install.sh (reexecução no ambiente atual)"
+  ],
+  "notRun": [
+    "Execução do app/NSIS no Windows",
+    "Execução Windows do teste GetConsoleWindow",
+    "GPU real e ações de energia",
+    "Restauração do novo snapshot em outra tarefa"
+  ]
+}

@@ -53,7 +53,7 @@ Os arquivos e bibliotecas preparados pertencem ao workspace/snapshot atual;
 nenhum processo de teste é requisito persistente. Não foi verificada restauração
 em uma tarefa nova. Os commits de implementação foram enviados ao GitHub na
 branch `refactor/v2`. Use essa branch ao obter o código atualizado: `main` mantém
-a versão anterior. Preserve o workspace/snapshot para as ferramentas e bibliotecas
+a versão anterior às correções de 17/10/2026. Preserve o workspace/snapshot para as ferramentas e bibliotecas
 privadas preparadas durante esta tarefa.
 
 O build do instalador exige Windows, MSVC/SDK e WebView2. Os resultados e os

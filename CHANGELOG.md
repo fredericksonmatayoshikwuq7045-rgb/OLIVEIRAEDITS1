@@ -1,5 +1,23 @@
 # Changelog
 
+## Correções — 2026-10-17
+
+- FFmpeg/FFprobe, miniaturas e ferramentas auxiliares deixam de criar consoles
+  visíveis no Windows; captura de progresso, logs e cancelamento são preservados.
+- Importação por pasta em um único seletor, bloqueio de cliques duplicados,
+  progresso e resumo real de arquivos importados, ignorados e com falha.
+- Slots vazios reutilizados sem lacunas por arquivos inválidos; lotes concorrentes
+  recebem números distintos e mantêm o projeto de destino após navegação.
+- URLs de assets em importação ficam protegidas até a confirmação; revincular
+  renova a miniatura, preserva edições e recusa trocar o tipo da mídia.
+- Miniaturas nativas são revalidadas ao carregar após a limpeza do cache;
+  recolher/expandir a faixa virtualizada volta a revelar a mídia ativa.
+- Relatório conta imagens, abre os destinos reais dos lotes e mostra o novo lote
+  ao repetir falhas. Falhas de imagens impedem a ação final de energia.
+- Seletores e importação aceitam a mesma lista de formatos; GIF/AVIF têm
+  classificação e repetição compatíveis com o FFmpeg.
+- Evidências e limites em [docs/bugfixes-2026-10-17.md](docs/bugfixes-2026-10-17.md).
+
 ## 0.2.0 — 2026-10-16
 
 - Corrigida incompatibilidade que bloqueava `tauri build`: API JavaScript
