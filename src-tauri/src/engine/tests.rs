@@ -52,3 +52,27 @@ fn queue_recovers_backup_and_never_erases_corrupt_state(){
     drop(engine);
     fs::remove_file(dir.join("queue.json.bak")).unwrap();assert!(Engine::new(dir.clone(),Arc::new(|_,_|{})).is_err());fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn gif_and_avif_with_no_duration_render_as_images_and_use_supported_loops() {
+    let dir = scratch();
+    for extension in ["GIF", "avif"] {
+        let mut item = fixture(&dir);
+        let source = dir.join(format!("still.{extension}"));
+        fs::write(&source, b"fixture").unwrap();
+        item.source_path = source.to_string_lossy().into_owned();
+        item.trim = None;
+        let info = super::probe::parse_probe(&item.source_path, &serde_json::json!({
+            "streams": [{"codec_type": "video", "width": 320, "height": 180}]
+        }), 0).unwrap();
+        assert!(info.is_image);
+        assert_eq!(arguments::duration(&item, &info).unwrap(), 1.0);
+        let background = &mut item.render.as_mut().unwrap().background;
+        background.kind = "image".into();
+        background.source = Some(item.source_path.clone());
+        let args = arguments::build(&item, &info, &dir.join("out.mp4.part"), false).unwrap();
+        assert!(!args.iter().any(|arg| arg == "-loop"));
+        assert_eq!(args.windows(2).filter(|args| args[0] == "-stream_loop" && args[1] == "-1").count(), 2);
+    }
+    fs::remove_dir_all(dir).unwrap();
+}

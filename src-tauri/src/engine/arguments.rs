@@ -49,7 +49,7 @@ pub fn build(item:&ExportItem, info:&MediaInfo, partial:&Path, fallback:bool) ->
     let metadata_only=item.mode=="metadata";
     let mut args=vec!["-nostdin".into(),"-hide_banner".into(),"-y".into(),"-progress".into(),"pipe:1".into(),"-nostats".into(),"-threads".into(),"2".into(),"-filter_complex_threads".into(),"1".into()];
     if let Some(trim)=&item.trim { if !metadata_only { args.extend(["-ss".into(),trim.start.to_string()]); } }
-    if info.is_image && !metadata_only { args.extend(["-loop".into(),"1".into()]); }
+    if info.is_image && !metadata_only { args.extend(probe::image_loop_args(Path::new(&item.source_path)).map(str::to_owned)); }
     args.extend(["-i".into(),item.source_path.clone()]);
     if metadata_only && !item.deep_clean && !info.is_image {
         args.extend(["-map".into(),"0:v:0".into(),"-map".into(),"0:a?".into(),"-c".into(),"copy".into()]);

@@ -144,7 +144,7 @@ pub fn authorize_native_drop(app: &AppHandle, paths: &[PathBuf]) -> Result<(), S
         let canonical = path.canonicalize().map_err(|error| error.to_string())?;
         if !canonical.is_file() { continue; }
         let extension = canonical.extension().and_then(|value| value.to_str()).unwrap_or("").to_lowercase();
-        if !["mp4","m4v","mov","mkv","avi","webm","wmv","mpg","mpeg","png","jpg","jpeg","webp","gif","bmp","tiff","tif","avif"].contains(&extension.as_str()) { continue; }
+        if !["mp4","m4v","mov","mkv","avi","webm","wmv","mpg","mpeg","mts","m2ts","png","jpg","jpeg","webp","gif","bmp","tiff","tif","avif"].contains(&extension.as_str()) { continue; }
         let grant = PathGrant { path: canonical, directory: false };
         install_scope(app, &grant)?;
         grants.push(grant);

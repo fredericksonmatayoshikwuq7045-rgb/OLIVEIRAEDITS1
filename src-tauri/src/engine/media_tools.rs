@@ -1,5 +1,5 @@
-use std::{collections::hash_map::DefaultHasher, fs, hash::{Hash, Hasher}, path::Path, process::Command};
-use super::probe;
+use std::{collections::hash_map::DefaultHasher, fs, hash::{Hash, Hasher}, path::Path};
+use super::{probe, process::background_command};
 
 pub fn thumbnail(source: &str, cache: &Path) -> Result<String, String> {
     let input = probe::input_path(source)?;
@@ -13,7 +13,7 @@ pub fn thumbnail(source: &str, cache: &Path) -> Result<String, String> {
     let info = probe::probe(source)?;
     let time = if info.is_image { 0.0 } else { (info.duration / 2.0).min(1.0) };
     let binary = probe::binary("ffmpeg").ok_or("FFmpeg indisponível para gerar miniatura.")?;
-    let result = Command::new(binary).args(["-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-ss", &time.to_string(), "-i"])
+    let result = background_command(binary).args(["-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-ss", &time.to_string(), "-i"])
         .arg(&input).args(["-vf", "scale=160:-2", "-frames:v", "1", "-threads", "1"]).arg(&output).output()
         .map_err(|error| error.to_string())?;
     if !result.status.success() {

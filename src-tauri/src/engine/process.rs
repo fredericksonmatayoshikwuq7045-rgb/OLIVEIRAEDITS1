@@ -3,9 +3,23 @@ use std::{collections::HashMap, fs::OpenOptions, io::{BufRead,BufReader,Write}, 
 
 pub type Children = Arc<Mutex<HashMap<String,Arc<Mutex<Child>>>> >;
 
+/// Keep console tools invisible in the Windows desktop app while preserving
+/// their standard streams, exit status, and handles used for cancellation.
+pub(super) fn background_command(program: impl AsRef<std::ffi::OsStr>) -> Command {
+    let command = Command::new(program);
+    #[cfg(windows)]
+    let command = {
+        use std::os::windows::process::CommandExt;
+        let mut command = command;
+        command.creation_flags(0x08000000); // CREATE_NO_WINDOW
+        command
+    };
+    command
+}
+
 pub fn kill(child:&mut Child) {
-    #[cfg(windows)] { let _=Command::new("taskkill").args(["/PID",&child.id().to_string(),"/T","/F"]).stdout(Stdio::null()).stderr(Stdio::null()).status(); }
-    #[cfg(unix)] { let _=Command::new("kill").args(["-TERM","--",&format!("-{}",child.id())]).stdout(Stdio::null()).stderr(Stdio::null()).status(); }
+    #[cfg(windows)] { let _=background_command("taskkill").args(["/PID",&child.id().to_string(),"/T","/F"]).stdout(Stdio::null()).stderr(Stdio::null()).status(); }
+    #[cfg(unix)] { let _=background_command("kill").args(["-TERM","--",&format!("-{}",child.id())]).stdout(Stdio::null()).stderr(Stdio::null()).status(); }
     let _=child.kill(); let _=child.wait();
 }
 
@@ -15,10 +29,9 @@ pub fn run(args:&[String], key:&str, duration:f64, log:&Path, children:&Children
 }
 
 pub fn run_binary(binary:&Path,args:&[String],key:&str,duration:f64,log:&Path,children:&Children,cancelled:&Arc<AtomicBool>,progress:impl Fn(super::model::Progress)+Send+'static)->Result<(),String>{
-    let mut command=Command::new(binary);
+    let mut command=background_command(binary);
     command.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
     #[cfg(unix)] { use std::os::unix::process::CommandExt; command.process_group(0); }
-    #[cfg(windows)] { use std::os::windows::process::CommandExt; command.creation_flags(0x08000000); }
     let mut child=command.spawn().map_err(|e|format!("Falha ao iniciar FFmpeg: {e}"))?;
     let stdout=child.stdout.take().ok_or("FFmpeg não abriu progresso.")?;
     let stderr=child.stderr.take().ok_or("FFmpeg não abriu log.")?;
@@ -56,7 +69,7 @@ pub fn run_binary(binary:&Path,args:&[String],key:&str,duration:f64,log:&Path,ch
 pub fn crop_detect(path:&str) -> Result<Option<super::model::Rect>,String> {
     let input=probe::input_path(path)?;
     let ffmpeg=probe::binary("ffmpeg").ok_or("FFmpeg ausente.")?;
-    let output=Command::new(ffmpeg).args(["-nostdin","-hide_banner","-i"]).arg(input).args(["-t","10","-vf","cropdetect=24:16:0","-an","-f","null","-"]).output().map_err(|e|e.to_string())?;
+    let output=background_command(ffmpeg).args(["-nostdin","-hide_banner","-i"]).arg(input).args(["-t","10","-vf","cropdetect=24:16:0","-an","-f","null","-"]).output().map_err(|e|e.to_string())?;
     if !output.status.success() { return Err("Não foi possível detectar as barras pretas.".into()); }
     let logs=String::from_utf8_lossy(&output.stderr);
     let result=logs.lines().rev().find_map(|line|line.rsplit_once("crop=").and_then(|(_,crop)| {
@@ -64,4 +77,45 @@ pub fn crop_detect(path:&str) -> Result<Option<super::model::Rect>,String> {
         if values.len()==4 { Some(super::model::Rect {width:values[0],height:values[1],x:values[2],y:values[3]}) }else{None}
     }));
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::background_command;
+
+    #[test]
+    fn background_process_preserves_stdout_stderr_and_exit_status() {
+        #[cfg(unix)]
+        let output = background_command("sh")
+            .args(["-c", "printf stdout-marker; printf stderr-marker >&2; exit 7"])
+            .output().unwrap();
+        #[cfg(windows)]
+        let output = background_command("cmd.exe")
+            .args(["/d", "/c", "echo stdout-marker & echo stderr-marker 1>&2 & exit /b 7"])
+            .output().unwrap();
+        assert_eq!(output.status.code(), Some(7));
+        assert_eq!(String::from_utf8_lossy(&output.stdout).trim(), "stdout-marker");
+        assert_eq!(String::from_utf8_lossy(&output.stderr).trim(), "stderr-marker");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn background_process_does_not_create_a_console() {
+        let output = background_command(std::env::current_exe().unwrap())
+            .args(["--exact", "engine::process::tests::windows_child_has_no_console", "--nocapture"])
+            .env("OLIVEIRA_TEST_BACKGROUND_CHILD", "1")
+            .output().unwrap();
+        assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stdout));
+        assert!(String::from_utf8_lossy(&output.stdout).contains("no-console-marker"));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_child_has_no_console() {
+        if std::env::var_os("OLIVEIRA_TEST_BACKGROUND_CHILD").is_none() { return; }
+        #[link(name = "kernel32")]
+        extern "system" { fn GetConsoleWindow() -> *mut std::ffi::c_void; }
+        assert!(unsafe { GetConsoleWindow() }.is_null());
+        println!("no-console-marker");
+    }
 }
