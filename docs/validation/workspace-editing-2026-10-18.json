@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "checks": [
+    "Foto recortada salva com a conta, com confirmação antes de criar",
+    "Tema, fonte, idioma e autor funcionam; animação fica somente na abertura",
+    "Alças e comparação visual, um desfazer por gesto, menu contextual e três layouts",
+    "Timeline com oito quadros reais, corte acessível, split sem copiar a origem e desfazer",
+    "Recorte encontra a cena e ignora o título branco na moldura, em duas mídias",
+    "OCR local real encontra o mesmo texto em posições diferentes e aplica coberturas individuais",
+    "Exportação PNG real da mídia com recorte e cobertura aplicados"
+  ],
+  "pageErrors": []
+}

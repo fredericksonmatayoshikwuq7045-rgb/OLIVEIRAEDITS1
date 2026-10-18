@@ -10,6 +10,7 @@ export function TimelineTrack({
   item,
   profile,
   onReorder,
+  onContextMenu,
   duration,
   step,
   time,
@@ -22,6 +23,7 @@ export function TimelineTrack({
   item: MediaItem;
   profile: Profile;
   onReorder: (id: string) => void;
+  onContextMenu?: (event: React.MouseEvent) => void;
   duration: number;
   step: number;
   time: number;
@@ -57,6 +59,7 @@ export function TimelineTrack({
     <div
       className={`timeline-track-row ${selected ? 'active' : ''}`}
       data-track-id={track.id}
+      onContextMenu={onContextMenu}
       onDragOver={(event) => {
         if (track.id !== BACKGROUND_TRACK) event.preventDefault();
       }}

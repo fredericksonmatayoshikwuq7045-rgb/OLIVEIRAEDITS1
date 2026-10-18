@@ -1,0 +1,88 @@
+{
+  "status": "unstable",
+  "platform": "Linux x86_64, private WebKitGTK/GStreamer, Xvfb/proot, software rendering",
+  "successfulRuns": 1,
+  "failedRuns": 4,
+  "latestRunStatus": "failed",
+  "resolved": false,
+  "attempts": [
+    {
+      "status": "passed",
+      "checks": [
+        "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths",
+        "Production WebKit imports a File video template through managed assets and native probe, and previews the timed/offset layer",
+        "UI export produces a real MP4: template absent before/after its interval and correct blue source frame inside",
+        "Separate image area exports a real PNG at the chosen animated-template frame and preserves both media kinds",
+        "Production UI creates a 3s video intro before a 1s meme and exports the complete 4s sequence with correct frames"
+      ],
+      "url": "tauri://localhost",
+      "sequenceOutput": "/workspace/shared/oliveira-native-test/data-0.6.0/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01_2.mp4",
+      "videoOutput": "/workspace/shared/oliveira-native-test/data-0.6.0/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01.mp4",
+      "imageOutput": "/workspace/shared/oliveira-native-test/data-0.6.0/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01.png",
+      "stage": "first complete run before follow-up fixes"
+    },
+    {
+      "status": "failed",
+      "checks": [
+        "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths"
+      ],
+      "url": "tauri://localhost",
+      "error": "{\"value\":{\"error\":\"unknown error\",\"message\":\"Could not parse script result\",\"stacktrace\":\"\"}}",
+      "stage": "repeat before static posters"
+    },
+    {
+      "status": "failed",
+      "checks": [
+        "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths",
+        "Production WebKit imports a File video template through managed assets and native probe, and previews the timed/offset layer",
+        "UI export produces a real MP4: template absent before/after its interval and correct blue source frame inside",
+        "Separate image area exports a real PNG at the chosen animated-template frame and preserves both media kinds"
+      ],
+      "url": "tauri://localhost",
+      "error": "{\"value\":{\"error\":\"unknown error\",\"message\":\"Could not parse script result\",\"stacktrace\":\"\"}}",
+      "stage": "repeat with diagnostic GStreamer logging"
+    },
+    {
+      "status": "failed",
+      "checks": [
+        "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths"
+      ],
+      "url": "tauri://localhost",
+      "error": "Timed out: oe\noliveira.edits\nPadrão\nConta ativa\nSalvo\nBOAS-VINDAS AO SEU ESTÚDIO\nO caminho mais seguro para não ser muito infeliz é não esperar ser muito feliz.\nArthur SchopenhauerSobre a frase\n×\nProjeto atual\nLote\nExportar\nMídias\nTemplates\nTexto\nMais\nTodas\n2\nVídeos\n1\nImagens\n1\nMídias do projeto (2)\nImportar\n01\nclip.mp4\n320×180 · 0:06\n02\nphoto.png\n320×180\nPlayer\nclip.mp4\n1080 × 1920 · 17% · Arraste para mover\n0:00 / 0:06\nMídia · clip.mp4\nBásico\nTempo\nÁudio\nFormato e ajuste\nProporção de saída\nAjuste da mídia\nZoom\n1×\nPosição X (%)\nPosição Y (%)\nRecorte visual\nTransformação\nAplicar em lote\nTimeline\nCamada / ordem\n0s1s2s3s4s5s6s\nMídia · clip.mp4\nPRINCIPAL\nMídia · clip.mp40.00s — 6.00s\nPadrão · 2 mídias no projeto\nMotor FFmpeg disponível\nCtrl + Z desfazer · ? atalhos",
+      "body": "oe\noliveira.edits\nPadrão\nConta ativa\nSalvo\nBOAS-VINDAS AO SEU ESTÚDIO\nO caminho mais seguro para não ser muito infeliz é não esperar ser muito feliz.\nArthur SchopenhauerSobre a frase\n×\nProjeto atual\nLote\nExportar\nMídias\nTemplates\nTexto\nMais\nTodas\n2\nVídeos\n1\nImagens\n1\nMídias do projeto (2)\nImportar\n01\nclip.mp4\n320×180 · 0:06\n02\nphoto.png\n320×180\nPlayer\nclip.mp4\n1080 × 1920 · 17% · Arraste para mover\n0:00 / 0:06\nMídia · clip.mp4\nBásico\nTempo\nÁudio\nFormato e ajuste\nProporção de saída\nAjuste da mídia\nZoom\n1×\nPosição X (%)\nPosição Y (%)\nRecorte visual\nTransformação\nAplicar em lote\nTimeline\nCamada / ordem\n0s1s2s3s4s5s6s\nMídia · clip.mp4\nPRINCIPAL\nMídia · clip.mp40.00s — 6.00s\nPadrão · 2 mídias no projeto\nMotor FFmpeg disponível\nCtrl + Z desfazer · ? atalhos",
+      "policyViolations": [],
+      "videoDiagnostics": [
+        {
+          "duration": null,
+          "http": true,
+          "error": "",
+          "code": 4,
+          "ready": 0
+        }
+      ],
+      "canvas": {
+        "width": 1080,
+        "height": 1920,
+        "busy": "true",
+        "pixel": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stage": "static posters with experimental compositing/DMABUF disabled",
+      "stderrObserved": "double free or corruption (out)"
+    },
+    {
+      "status": "failed",
+      "checks": [
+        "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths"
+      ],
+      "url": "tauri://localhost",
+      "error": "{\"value\":{\"error\":\"unknown error\",\"message\":\"Could not parse script result\",\"stacktrace\":\"\"}}",
+      "stage": "final code with baseline software test flags"
+    }
+  ],
+  "interpretation": "One complete run exported MP4/PNG and a 3s intro + 1s main. Repeated WebKit renderer exits persisted, including before templates. Static posters reduce decoders but did not prove resolution. Experimental compositing flags were not kept. Windows/WebView2/NSIS are untested."
+}

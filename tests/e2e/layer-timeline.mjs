@@ -2,7 +2,23 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
-import { fixtures, choose, stored, currentItem, number, range, selectTrack, color, exportPng, pngPixel } from './layer-helpers.mjs';
+import {
+  fixtures,
+  choose,
+  stored,
+  currentItem,
+  number,
+  range,
+  selectTrack,
+  color,
+  exportPng,
+  pngPixel,
+  resource,
+  inspector,
+  templateType,
+  templateAction,
+  trackAction,
+} from './layer-helpers.mjs';
 const directory = resolve(process.env.OE_LAYERS_DIR || '.artifacts/layer-timeline');
 await mkdir(directory, { recursive: true });
 const browser = await chromium.launch({
@@ -31,9 +47,10 @@ try {
   await page.getByText('Mídias do projeto (2)', { exact: true }).waitFor();
   await page.getByRole('tab', { name: /Vídeos/ }).click();
   await page.getByText('Vídeos do projeto (1)', { exact: true }).waitFor();
+  await resource(page, 'Templates');
   const library = page.locator('.library');
   await library.getByRole('button', { name: 'Marca', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption('video');
+  await templateType(page, 'video');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.stamp);
   await page.getByText('Template adicionado à biblioteca da conta.', { exact: true }).waitFor();
   await library.locator('.template-card').filter({ hasText: 'stamp.mp4' }).click();
@@ -49,11 +66,11 @@ try {
   await color(page, 0.79, 0.12875, -1);
   await range(page, 'Posição na composição', 1.2);
   await color(page, 0.79, 0.12875, 2);
-  await page.getByTitle('Duplicar camada', { exact: true }).click();
+  await trackAction(page, 'Duplicar camada');
   item = await currentItem(page, 'clip.mp4');
   const copy = item.render.layers.find((layer) => layer.type === 'video' && layer.id !== original.id);
   assert.equal(copy.source, original.source);
-  await range(page, 'X', 0.05);
+  await number(page, 'Posição X (%)', 5);
   await selectTrack(page, copy.id);
   await number(page, 'Começar no segundo do template', 1.5);
   await range(page, 'Posição na composição', 1.2);
@@ -74,17 +91,17 @@ try {
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
   assert.equal((await currentItem(page, 'clip.mp4')).render.layers.find((layer) => layer.id === original.id).enable.start, 1);
   await library.getByRole('button', { name: 'Borda', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption('image');
+  await templateType(page, 'image');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.border);
   await library.locator('.template-card').filter({ hasText: 'border.png' }).click();
   await library.getByRole('button', { name: 'Headline', exact: true }).click();
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.headline);
-  await page.getByRole('button', { name: 'Editar template headline.png', exact: true }).click();
+  await templateAction(page, 'headline.png', 'Editar template');
   await page.getByLabel('Headline padrão', { exact: true }).fill('Headline teste');
   await page.getByRole('button', { name: 'Salvar template', exact: true }).click();
   await library.locator('.template-card').filter({ hasText: 'headline.png' }).click();
   await library.getByRole('button', { name: 'Fundo', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption('video');
+  await templateType(page, 'video');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.stamp);
   await library.locator('.template-card').filter({ hasText: 'stamp.mp4' }).click();
   item = await currentItem(page, 'clip.mp4');
@@ -107,18 +124,22 @@ try {
     'Borda, marca, headline visual, texto da headline, cópia e fundo aparecem na timeline; arrastar gera um desfazer e fundo respeita janela e fase',
   );
   await library.getByRole('button', { name: 'Marca', exact: true }).click();
-  await page.getByRole('button', { name: 'Editar template stamp.mp4', exact: true }).click();
+  await templateAction(page, 'stamp.mp4', 'Editar template');
   await page.getByRole('switch', { name: 'Disponível nas alas de vídeos e imagens', exact: true }).check();
   await page.getByRole('button', { name: 'Salvar template', exact: true }).click();
   await library.getByRole('combobox', { name: /^Grupo/ }).selectOption({ label: 'Vídeos' });
+  await resource(page, 'Mídias');
   await page.getByRole('tab', { name: /Imagens/ }).click();
+  await resource(page, 'Templates');
   assert.equal(await library.getByRole('combobox', { name: /^Grupo/ }).inputValue(), '');
+  await resource(page, 'Mídias');
   await page.getByText('Imagens do projeto (1)', { exact: true }).waitFor();
   assert.equal(await page.locator('.video-timeline').count(), 0);
-  await page.getByRole('region', { name: 'Composição da imagem', exact: true }).waitFor();
-  await page.getByRole('button', { name: /2.*Enquadrar/ }).click();
+  await page.locator('.player-transport').waitFor();
+  await selectTrack(page, '@media');
   await range(page, 'Zoom', 1.2);
   assert.equal(Number(await page.getByRole('slider', { name: 'Zoom', exact: true }).inputValue()), 1.2);
+  await resource(page, 'Templates');
   await library.locator('.template-card').filter({ hasText: 'stamp.mp4' }).click();
   item = await currentItem(page, 'photo.png');
   const imageLayer = item.render.layers.find((layer) => layer.type === 'video');
@@ -147,6 +168,7 @@ try {
   const preserved = structuredClone(project.items);
   await page.reload();
   await page.getByRole('button', { name: 'Abrir editor de Camadas', exact: true }).click();
+  await resource(page, 'Mídias');
   await page.getByRole('tab', { name: /Imagens/ }).click();
   assert.equal((await currentItem(page, 'photo.png')).imageTime, 2);
   await page.getByRole('tab', { name: /Vídeos/ }).click();

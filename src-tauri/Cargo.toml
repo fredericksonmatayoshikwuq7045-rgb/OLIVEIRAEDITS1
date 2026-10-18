@@ -1,6 +1,6 @@
 [package]
 name = "oliveira-edits"
-version = "0.5.0"
+version = "0.6.0"
 description = "Editor local de vídeos e imagens em lote com perfis e FFmpeg"
 authors = ["Oliveira Edits"]
 edition = "2021"

@@ -1,10 +1,11 @@
-import { Check, Layers, Plus, Save, Settings2, Trash2, Type, Upload } from 'lucide-react';
+import { Check, Layers, Plus, Save, Trash2, Type, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { AccountTemplate, MediaItem, MediaKind, TemplateCategory } from '../domain/models';
 import { mediaKind } from '../data/mediaImport';
 import { removeTemplateReferences } from '../domain/templates';
 import type { WorkspaceStore } from './Dashboard';
 import { TemplateEditor } from './TemplateEditor';
+import { TemplateCard } from './TemplateCard';
 import { Button, Field, IconButton } from './Primitives';
 const labels: Record<TemplateCategory, string> = { border: 'Borda', watermark: 'Marca', headline: 'Headline', background: 'Fundo' };
 export function Library({
@@ -16,6 +17,8 @@ export function Library({
   onSavePreset,
   notify,
   kind = 'video',
+  view,
+  embedded = false,
 }: {
   store: WorkspaceStore;
   item: MediaItem | null;
@@ -25,14 +28,17 @@ export function Library({
   onSavePreset: () => void;
   notify: (message: string) => void;
   kind?: MediaKind;
+  view?: 'templates' | 'presets' | 'fonts';
+  embedded?: boolean;
 }) {
-  const [tab, setTab] = useState<'templates' | 'presets' | 'fonts'>('templates');
+  const [internalTab, setTab] = useState<'templates' | 'presets' | 'fonts'>('templates');
   const [category, setCategory] = useState<TemplateCategory>('border');
   const [group, setGroup] = useState('');
   const [editing, setEditing] = useState<AccountTemplate | null>(null);
   const [sourceType, setSourceType] = useState<'all' | MediaKind>('all');
   const templateInput = useRef<HTMLInputElement>(null),
     fontInput = useRef<HTMLInputElement>(null);
+  const tab = view || internalTab;
   const profile = store.profile;
   if (!profile) return null;
   const targetKind = item?.kind || kind;
@@ -42,18 +48,20 @@ export function Library({
     (t) => t.category === category && (!effectiveGroup || t.groupId === effectiveGroup) && (t.shared || t.type === targetKind),
   );
   return (
-    <aside className="library">
-      <nav className="library-tabs" aria-label="Biblioteca">
-        <button className={tab === 'templates' ? 'active' : ''} onClick={() => setTab('templates')}>
-          Templates
-        </button>
-        <button className={tab === 'presets' ? 'active' : ''} onClick={() => setTab('presets')}>
-          Presets
-        </button>
-        <button className={tab === 'fonts' ? 'active' : ''} onClick={() => setTab('fonts')}>
-          Fontes
-        </button>
-      </nav>
+    <aside className={`library ${embedded ? 'embedded-library' : ''}`}>
+      {!embedded && (
+        <nav className="library-tabs" aria-label="Biblioteca">
+          <button className={tab === 'templates' ? 'active' : ''} onClick={() => setTab('templates')}>
+            Templates
+          </button>
+          <button className={tab === 'presets' ? 'active' : ''} onClick={() => setTab('presets')}>
+            Presets
+          </button>
+          <button className={tab === 'fonts' ? 'active' : ''} onClick={() => setTab('fonts')}>
+            Fontes
+          </button>
+        </nav>
+      )}
       <div className="library-content">
         {tab === 'templates' && (
           <div className="stack">
@@ -104,55 +112,35 @@ export function Library({
                 Sem {labels[category].toLocaleLowerCase('pt-BR')}
               </button>
               {templates.map((template) => (
-                <div className="row" key={template.id}>
-                  <button
-                    className={`template-card ${item?.templates[category] === template.id ? 'selected' : ''}`}
-                    disabled={!item}
-                    onClick={() => onApplyTemplate(template.id, category)}
-                  >
-                    {(template.mediaType || mediaKind(template.name)) === 'video' ? (
-                      <div className="template-thumb row" style={{ justifyContent: 'center' }}>
-                        <Layers size={17} />
-                      </div>
-                    ) : (
-                      <img className="template-thumb" src={template.runtimeUrl || template.source} alt="" />
-                    )}
-                    <span className="truncate">
-                      {template.name}
-                      {template.mediaType === 'video' && (
-                        <small className="template-video-tag">Vídeo · {template.sourceDuration?.toFixed(1) || '—'}s</small>
-                      )}
-                    </span>
-                  </button>
-                  <IconButton label={`Editar template ${template.name}`} onClick={() => setEditing(template)}>
-                    <Settings2 size={12} />
-                  </IconButton>
-                  {item && category !== 'background' && onAppendTemplate && (
-                    <IconButton label={`Adicionar camada de ${template.name}`} onClick={() => onAppendTemplate(template.id, category)}>
-                      <Plus size={12} />
-                    </IconButton>
-                  )}
-                  <IconButton
-                    label={`Excluir template ${template.name}`}
-                    onClick={() => {
-                      if (!window.confirm(`Remover o template “${template.name}” desta conta?`)) return;
-                      store.updateProfile({ templates: profile.templates.filter((t) => t.id !== template.id) });
-                      store.updateProject((p) => ({ ...p, items: p.items.map((i) => removeTemplateReferences(i, template.id)) }));
-                    }}
-                  >
-                    <Trash2 size={12} />
-                  </IconButton>
-                </div>
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  selected={item?.templates[category] === template.id}
+                  disabled={!item}
+                  onApply={() => onApplyTemplate(template.id, category)}
+                  onAppend={
+                    item && category !== 'background' && onAppendTemplate ? () => onAppendTemplate(template.id, category) : undefined
+                  }
+                  onEdit={() => setEditing(template)}
+                  onRemove={() => {
+                    if (!window.confirm(`Remover o template “${template.name}” desta conta?`)) return;
+                    store.updateProfile({ templates: profile.templates.filter((t) => t.id !== template.id) });
+                    store.updateProject((p) => ({ ...p, items: p.items.map((i) => removeTemplateReferences(i, template.id)) }));
+                  }}
+                />
               ))}
             </div>
             {templates.length === 0 && <small>Adicione uma imagem ou vídeo com a identidade da sua página.</small>}
-            <Field label="Tipo de template">
-              <select value={sourceType} onChange={(event) => setSourceType(event.target.value as typeof sourceType)}>
-                <option value="all">Imagem ou vídeo</option>
-                <option value="image">Template em imagem</option>
-                <option value="video">Template em vídeo</option>
-              </select>
-            </Field>
+            <details className="resource-details">
+              <summary>Opções de importação</summary>{' '}
+              <Field label="Tipo de template">
+                <select value={sourceType} onChange={(event) => setSourceType(event.target.value as typeof sourceType)}>
+                  <option value="all">Imagem ou vídeo</option>
+                  <option value="image">Template em imagem</option>
+                  <option value="video">Template em vídeo</option>
+                </select>
+              </Field>
+            </details>
             <Button onClick={() => templateInput.current?.click()}>
               <Upload /> Adicionar {labels[category].toLocaleLowerCase('pt-BR')}
               {sourceType === 'video' ? ' em vídeo' : ''}

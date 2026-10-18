@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "checks": [
+    "Tema claro mantém menus e avisos legíveis; destaque branco/preto adapta a cor do texto; divisória responde em 1100px",
+    "Tamanho da fonte altera controles reais; layout cabe em 1100px; tema do sistema reage e movimento reduzido oculta a animação"
+  ],
+  "pageErrors": []
+}

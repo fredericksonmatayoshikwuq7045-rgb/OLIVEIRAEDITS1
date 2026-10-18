@@ -59,6 +59,7 @@ export function useClipActions({
     const handle = (event: KeyboardEvent) => {
       if (
         !active ||
+        event.repeat ||
         (event.target instanceof HTMLElement &&
           event.target.closest('input,textarea,select,[contenteditable="true"],[role="dialog"],[role="menu"]'))
       )

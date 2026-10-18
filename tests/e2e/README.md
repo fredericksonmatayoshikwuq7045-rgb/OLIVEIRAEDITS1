@@ -204,3 +204,19 @@ depois de cada intervalo; `OE_SEQUENCE_EXPORT_DIR` altera o diretório.
 O teste `native-layer-timeline.py` também monta a abertura pela UI do binário de
 produção e valida o MP4 de 4s com chamada de 3s e meme de 1s. Requer diretórios de
 dados/cache descartáveis e driver novo, como descrito acima.
+
+## Workspace contextual 0.6.0
+
+`npm run test:studio`, com `OE_TEST_URL` apontando ao Vite, confere o editor com
+vídeo/imagem/texto reais: um player e um inspetor, tempos, undo/redo, Delete na
+camada selecionada, split bloqueado na borda sem dividir o principal, contexto,
+menu/Escape/foco, categoria preservada, timeline inferior ajustável e layouts
+central/direita/foco de 1100×700 a 1920×1080. Também verifica a divisória das
+propriedades no layout à direita, menus dentro da janela, tema claro e áudio.
+Relatório e screenshots ficam em `.artifacts/studio-layout`.
+
+Os helpers em `layer-helpers.mjs` abrem recursos, abas e menus conforme o fluxo
+real. Campos de tempos ficam em Tempo; offset/fim/loop em Ajuste preciso.
+Aparar o original fica em Tempo quando o principal está selecionado. O assistente
+fica em Ações em lote e as ferramentas da leva em Opções das mídias. Essas
+mudanças de navegação também foram aplicadas aos testes de produção WebKit.

@@ -1,3 +1,4 @@
+import { resource, inspector, selectTrack, mediaMenu, layout, assistant } from './layer-helpers.mjs';
 import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -39,7 +40,7 @@ try {
   await (await chooser).setFiles({ name: 'fixture.png', mimeType: 'image/png', buffer: Buffer.from(fixture, 'base64') });
   await page.getByText('Mídias do projeto (1)', { exact: true }).waitFor();
   results.push('Criar conta e importar imagem');
-  await page.getByRole('button', { name: /2.*Enquadrar/ }).click();
+  await selectTrack(page, '@media');
   const stage = await page.locator('.stage-preview').boundingBox();
   const touch = await page.context().newCDPSession(page);
   const center = { x: stage.x + stage.width / 2, y: stage.y + stage.height / 2 };
@@ -55,7 +56,7 @@ try {
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
   assert.equal(Number(await zoom.inputValue()), 1);
   results.push('Pinça com dois dedos amplia e gera uma única edição desfeita');
-  await page.getByRole('button', { name: /3.*Templates/ }).click();
+  await resource(page, 'Texto');
   await page.getByRole('button', { name: 'Adicionar texto', exact: true }).click();
   await page.getByLabel('Texto da camada').fill('Teste de exportação');
   await page.getByRole('button', { name: 'Exportar', exact: true }).click();
@@ -71,8 +72,8 @@ try {
   await page.reload();
   await page.getByRole('button', { name: 'Abrir editor de Conta A' }).click();
   await page.getByText('Mídias do projeto (1)', { exact: true }).waitFor();
-  await page.getByRole('button', { name: /3.*Templates/ }).click();
-  await page.getByRole('button', { name: 'Teste de exportação', exact: true }).waitFor();
+  await resource(page, 'Texto');
+  await page.locator('.timeline-track-name').filter({ hasText: 'Teste de exportação' }).waitFor();
   results.push('Recarregar preserva imagem e camadas');
   await page.getByRole('button', { name: 'Voltar às contas', exact: true }).click();
   await page.getByRole('button', { name: 'Nova conta', exact: true }).click();
@@ -118,14 +119,16 @@ try {
   await page.getByText('501 mídia(s) importada(s); 1 com falha, 1 ignorado(s). Confira os avisos.', { exact: true }).waitFor();
   assert.equal(chooserCount, 1, 'O lote abriu um seletor adicional');
   page.off('filechooser', countChooser);
+  await mediaMenu(page);
   assert.equal(await folderButton.isDisabled(), false);
+  await page.keyboard.press('Escape');
   assert.ok((await page.locator('[role="listbox"] [role="option"]').count()) < 40, 'Grid não está virtualizado');
   const strip = page.getByRole('listbox', { name: 'Mídias importadas' });
-  const dimensions = await strip.evaluate((element) => ({ width: element.clientWidth, total: element.scrollWidth }));
+  const dimensions = await strip.evaluate((element) => ({ width: element.clientHeight, total: element.scrollHeight }));
   const seen = new Map();
   for (let left = 0; left < dimensions.total; left += Math.max(1, dimensions.width * 0.75)) {
     const cards = await strip.evaluate(async (element, offset) => {
-      element.scrollLeft = offset;
+      element.scrollTop = offset;
       await new Promise(requestAnimationFrame);
       await new Promise(requestAnimationFrame);
       return [...element.querySelectorAll('[role="option"]')].map((card) => ({
@@ -141,13 +144,17 @@ try {
     Array.from({ length: 501 }, (_, i) => [i + 1, `bulk-${i + 1}.png`]),
   );
   await page.locator('.media-slot[title="bulk-501.png"]').click();
+  await mediaMenu(page);
   await page.getByRole('button', { name: 'Recolher mídias', exact: true }).click();
+  await mediaMenu(page);
   await page.getByRole('button', { name: 'Expandir mídias', exact: true }).click();
   await page.locator('.media-slot.active[title="bulk-501.png"]').waitFor();
   assert.ok((await strip.getByRole('option').count()) > 0);
   results.push('Uma pasta: 501 mídias em ordem natural e slots contínuos; corrupto e texto isolados, sem reabrir seletor');
   results.push('Reabrir o grid após rolar ao fim mantém cartões e mídia ativa visíveis');
+  await mediaMenu(page);
   await page.getByLabel('Selecionar mídias').selectOption('all');
+  await page.keyboard.press('Escape');
   await page.getByText('501 selecionadas', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
   await page.getByText('Seu próximo post começa aqui', { exact: true }).waitFor();

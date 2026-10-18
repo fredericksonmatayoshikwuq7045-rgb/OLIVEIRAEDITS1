@@ -1,55 +1,62 @@
-import { ArrowLeft, Download, Redo2, Undo2 } from 'lucide-react';
-import { Button, IconButton } from './Primitives';
+import { ArrowLeft, ChevronDown, Download, LayoutPanelLeft, Redo2, Undo2 } from 'lucide-react';
+import { ActionMenu } from './ActionMenu';
+import { Button, Field, IconButton } from './Primitives';
 import type { EditorContext } from './useEditor';
-
 export function EditorToolbar({ model }: { model: EditorContext }) {
-  const { onBack, step, setStep, openExport, store, items } = model;
+  const { active, items, store } = model;
+  const sequence = () => {
+    if (active)
+      model.setCopy({
+        source: structuredClone(active),
+        ids: items.filter((item) => item.id !== active.id && item.status === 'ready').map((item) => item.id),
+        sequence: true,
+      });
+  };
   return (
-    <div className="workflow-bar">
+    <div className="workflow-bar studio-toolbar">
       <div className="row">
-        <IconButton label="Voltar às contas" onClick={onBack}>
+        <IconButton label="Voltar às contas" onClick={model.onBack}>
           <ArrowLeft size={17} />
         </IconButton>
-        <div className="workflow-steps">
-          {['Mídias', 'Enquadrar', 'Templates / Texto', 'Exportar'].map((label, index) => (
-            <div className="row" key={label}>
-              <button
-                className={`workflow-step ${step === index + 1 ? 'active' : ''}`}
-                onClick={() => {
-                  setStep(index + 1);
-                  if (index === 3) openExport();
-                }}
-              >
-                <span>{index + 1}</span>
-                {label}
-              </button>
-              {index !== 3 && <i className="workflow-divider" />}
-            </div>
-          ))}
-        </div>
+        <strong className="project-title truncate">{model.project.name}</strong>
       </div>
       <div className="row">
-        <Button disabled={!items.length} onClick={() => model.setAutomation(true)}>
-          Assistente em lote
-        </Button>
-        <select
-          aria-label="Layout do editor"
-          value={model.settings.layout || 'classic'}
-          onChange={(event) => model.onSettings?.({ ...model.settings, layout: event.target.value as 'classic' | 'right' | 'focus' })}
-          style={{ width: 130 }}
-        >
-          <option value="classic">Player central</option>
-          <option value="right">Player à direita</option>
-          <option value="focus">Modo foco</option>
-        </select>
         <IconButton label="Desfazer (Ctrl + Z)" disabled={!store.canUndo} onClick={store.undo}>
           <Undo2 size={16} />
         </IconButton>
         <IconButton label="Refazer (Ctrl + Shift + Z)" disabled={!store.canRedo} onClick={store.redo}>
           <Redo2 size={16} />
         </IconButton>
-        <Button variant="primary" disabled={!items.length} onClick={() => openExport()}>
-          <Download /> Exportar
+        <span className="toolbar-separator" />
+        <ActionMenu label="Visualização do editor" icon={<LayoutPanelLeft size={17} />}>
+          <Field label="Layout do editor">
+            <select
+              aria-label="Layout do editor"
+              value={model.settings.layout || 'classic'}
+              onChange={(event) => model.onSettings?.({ ...model.settings, layout: event.target.value as 'classic' | 'right' | 'focus' })}
+            >
+              <option value="classic">Player central</option>
+              <option value="right">Player à direita</option>
+              <option value="focus">Modo foco</option>
+            </select>
+          </Field>
+        </ActionMenu>
+        <ActionMenu label="Ações em lote" text="Lote" icon={<ChevronDown size={14} />}>
+          <Button disabled={!items.length} onClick={() => model.setAutomation(true)}>
+            Assistente em lote
+          </Button>
+          <Button disabled={!model.selected.length} onClick={() => model.setBatch(true)}>
+            Editar seleção em lote
+          </Button>
+          <Button disabled={!active || items.length < 2} onClick={sequence}>
+            Aplicar sequência em massa
+          </Button>
+          <Button disabled={!items.length} onClick={() => model.openExport(true)}>
+            Só limpar metadados
+          </Button>
+        </ActionMenu>
+        <Button variant="primary" disabled={!items.length} onClick={() => model.openExport()}>
+          <Download size={15} /> Exportar
         </Button>
       </div>
     </div>

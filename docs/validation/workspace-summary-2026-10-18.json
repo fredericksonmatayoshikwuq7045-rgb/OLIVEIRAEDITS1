@@ -1,0 +1,110 @@
+{
+  "version": "0.6.0",
+  "date": "2026-10-18",
+  "status": "implemented_with_validation_limits",
+  "branch": "refactor/v2",
+  "frontend": {
+    "files": 22,
+    "testsPassed": 129
+  },
+  "rust": {
+    "testsPassed": 42
+  },
+  "quality": {
+    "lint": "passed",
+    "format": "passed",
+    "max300Lines": "passed",
+    "typescriptVite": "passed",
+    "gitDiffCheck": "passed"
+  },
+  "browser": {
+    "status": "passed",
+    "checkGroups": 43,
+    "suites": {
+      "ui": {
+        "status": "passed",
+        "groups": 3
+      },
+      "sequence": {
+        "status": "passed",
+        "groups": 6
+      },
+      "layers": {
+        "status": "passed",
+        "groups": 4
+      },
+      "editing": {
+        "status": "passed",
+        "groups": 7
+      },
+      "appearance": {
+        "status": "passed",
+        "groups": 2
+      },
+      "reference": {
+        "status": "passed",
+        "groups": 2
+      },
+      "clear": {
+        "status": "passed",
+        "groups": 3
+      },
+      "import": {
+        "status": "passed",
+        "groups": 10
+      },
+      "migration": {
+        "status": "passed",
+        "groups": 3
+      },
+      "export-regressions": {
+        "status": "passed",
+        "groups": 3
+      }
+    },
+    "sizes": [
+      [
+        1100,
+        700
+      ],
+      [
+        1366,
+        768
+      ],
+      [
+        1600,
+        1000
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "realFolderImport": {
+      "validImages": 501,
+      "corruptImage": 1,
+      "unsupportedFile": 1,
+      "chooserCount": 1
+    }
+  },
+  "desktopBuild": {
+    "status": "passed",
+    "platform": "Linux x86_64",
+    "command": "tauri build --debug --no-bundle",
+    "embeddedProductionAssets": true
+  },
+  "nativeIntegration": {
+    "status": "unstable",
+    "successfulRuns": 1,
+    "failedRuns": 4,
+    "latestRunStatus": "failed",
+    "details": "workspace-native-2026-10-18.json"
+  },
+  "windowsNsisWebview2": "not executed",
+  "renderEngineAndSchema": "unchanged",
+  "knownLimits": [
+    "Repeated WebKit Linux renderer crashes in the headless native validation remain unresolved.",
+    "No Windows runtime/NSIS validation.",
+    "No fresh cloud snapshot restoration test."
+  ]
+}

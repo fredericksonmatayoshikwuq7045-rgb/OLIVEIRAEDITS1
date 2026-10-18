@@ -9,17 +9,21 @@ export function MediaContextMenu({
   menu,
   onClose,
   onAction,
+  entries,
+  title,
 }: {
   menu: MediaMenu;
   onClose: () => void;
   onAction: (action: string, item: MediaItem) => void;
+  entries?: { id: string; label: string; disabled?: boolean }[];
+  title?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null),
     closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
     const node = ref.current;
-    node?.querySelector('button')?.focus();
+    node?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
     const close = (event: PointerEvent) => {
       if (!node?.contains(event.target as Node)) closeRef.current();
     };
@@ -27,7 +31,7 @@ export function MediaContextMenu({
       if (event.key === 'Escape') closeRef.current();
       if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
-      const buttons = [...(node?.querySelectorAll('button') || [])];
+      const buttons = [...(node?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') || [])];
       const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
       const next =
         event.key === 'Home'
@@ -47,30 +51,37 @@ export function MediaContextMenu({
       window.removeEventListener('resize', resized);
     };
   }, []);
+  const top = Math.max(8, Math.min(menu.y, window.innerHeight - 275));
   return (
     <div
       ref={ref}
       className="media-context-menu"
       role="menu"
-      aria-label={`Ações de ${menu.item.title}`}
-      style={{ left: Math.max(8, Math.min(menu.x, window.innerWidth - 260)), top: Math.max(8, Math.min(menu.y, window.innerHeight - 275)) }}
+      aria-label={title || `Ações de ${menu.item.title}`}
+      style={{
+        left: Math.max(8, Math.min(menu.x, window.innerWidth - 260)),
+        top,
+        maxHeight: window.innerHeight - top - 8,
+        overflowY: 'auto',
+      }}
     >
       {(
-        [
-          ['export', 'Exportar esta mídia'],
-          ['duplicate', 'Duplicar'],
-          ['copy-all', 'Aplicar edição a todos…'],
-          ['copy-selected', 'Aplicar à seleção…'],
-          ['relink', 'Revincular arquivo'],
-          ['remove', 'Remover do projeto'],
-        ] as const
-      ).map(([action, label]) => (
+        entries || [
+          { id: 'export', label: 'Exportar esta mídia' },
+          { id: 'duplicate', label: 'Duplicar' },
+          { id: 'copy-all', label: 'Aplicar edição a todos…' },
+          { id: 'copy-selected', label: 'Aplicar à seleção…' },
+          { id: 'relink', label: 'Revincular arquivo' },
+          { id: 'remove', label: 'Remover do projeto' },
+        ]
+      ).map(({ id, label, disabled }) => (
         <button
           role="menuitem"
-          key={action}
-          className={action === 'remove' ? 'danger-text' : ''}
+          key={id}
+          disabled={disabled}
+          className={id === 'remove' ? 'danger-text' : ''}
           onClick={() => {
-            onAction(action, menu.item);
+            onAction(id, menu.item);
             onClose();
           }}
         >

@@ -6,10 +6,10 @@ export function Help({ onClose }: { onClose: () => void }) {
     ['Ctrl + A', 'Selecionar todas as mídias'],
     ['Ctrl + ← / →', 'Navegar entre mídias'],
     ['Ctrl + E', 'Abrir exportação'],
-    ['S', 'Dividir vídeo no cursor da timeline'],
-    ['Ctrl + D', 'Duplicar mídia'],
-    ['Delete', 'Remover mídia do projeto (preserva o original)'],
-    ['Botão direito', 'Ações rápidas do slot ou player'],
+    ['S', 'Dividir o clipe selecionado no cursor'],
+    ['Ctrl + D', 'Duplicar a camada ou mídia selecionada'],
+    ['Delete', 'Remover a camada ou mídia selecionada (Ctrl + Z desfaz)'],
+    ['Botão direito', 'Ações rápidas do slot, player ou faixa da timeline'],
     ['Alças no player', 'Redimensionar e girar a seleção'],
     ['Setas', 'Mover enquadramento em 1 pixel'],
     ['Shift + Setas', 'Mover enquadramento em 10 pixels'],
@@ -19,6 +19,10 @@ export function Help({ onClose }: { onClose: () => void }) {
   ];
   return (
     <Modal title="Atalhos e ajuda" onClose={onClose}>
+      <p>
+        Mídias, Templates e Texto ficam na biblioteca. Selecione um clipe no player ou na timeline e use Básico, Tempo ou Áudio no painel
+        lateral. Importar pasta e Limpar todas ficam no menu das mídias; o assistente fica em Lote.
+      </p>
       <p className="muted">Os atalhos de edição respeitam campos de texto. Arraste a mídia para mover; use a roda do mouse para ampliar.</p>
       <dl className="shortcuts">
         {shortcuts.map(([key, label]) => (

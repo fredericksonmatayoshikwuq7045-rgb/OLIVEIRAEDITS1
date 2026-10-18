@@ -1,9 +1,10 @@
-import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, FolderOpen, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, Check, Film, Image as ImageIcon } from 'lucide-react';
 import { memo, useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { MediaSort } from '../domain/batch';
 import type { MediaItem } from '../domain/models';
 import type { ItemState } from '../services/contracts';
-import { Button, IconButton, timecode } from './Primitives';
+import { timecode } from './Primitives';
+import { MediaTools } from './MediaTools';
 const CELL = 115;
 const Card = memo(function Card({
   item,
@@ -143,7 +144,7 @@ export function MediaStrip({
     const element = ref.current;
     if (index < 0 || !element) return;
     if (grid) {
-      const columns = Math.max(1, Math.floor(element.clientWidth / CELL)),
+      const columns = Math.max(1, Math.floor(element.clientWidth / 110)),
         top = Math.floor(index / columns) * 145;
       if (top < element.scrollTop) element.scrollTop = top;
       else if (top + 145 > element.scrollTop + element.clientHeight) element.scrollTop = top + 145 - element.clientHeight;
@@ -154,70 +155,27 @@ export function MediaStrip({
     }
     setViewport({ left: element.scrollLeft, width: element.clientWidth, top: element.scrollTop, height: element.clientHeight });
   }, [activeId, items, open, grid]);
-  const columns = Math.max(1, Math.floor(viewport.width / CELL));
+  const columns = Math.max(1, Math.floor(viewport.width / 110));
   const first = grid ? Math.max(0, (Math.floor(viewport.top / 145) - 1) * columns) : Math.max(0, Math.floor(viewport.left / CELL) - 3),
     last = grid
       ? Math.min(items.length, (Math.ceil((viewport.top + viewport.height) / 145) + 1) * columns)
       : Math.min(items.length, Math.ceil((viewport.left + viewport.width) / CELL) + 3);
   return (
     <section className="media-strip" aria-label="Biblioteca de mídias">
-      <div className="media-strip-heading">
-        <div className="row">
-          <IconButton label={open ? 'Recolher mídias' : 'Expandir mídias'} onClick={() => setOpen((v) => !v)}>
-            {open ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-          </IconButton>
-          <h3>
-            {kind === 'image' ? 'Imagens do projeto' : kind === 'video' ? 'Vídeos do projeto' : 'Mídias do projeto'}{' '}
-            <span className="muted">({items.filter((item) => item.status !== 'empty').length})</span>
-          </h3>
-        </div>
-        <div className="row">
-          <select
-            aria-label="Ordenar mídias"
-            defaultValue=""
-            onChange={(event) => {
-              if (event.target.value) onSort(event.target.value as MediaSort);
-            }}
-            style={{ width: 100, fontSize: 10 }}
-          >
-            <option value="">Ordenar…</option>
-            <option value="name">Nome</option>
-            <option value="date">Data</option>
-            <option value="size">Tamanho</option>
-          </select>
-          <select
-            aria-label="Selecionar mídias"
-            value=""
-            onChange={(e) => {
-              if (e.target.value === 'all') onSelectAll();
-              if (e.target.value === 'unedited') onSelectUnedited();
-              if (e.target.value === 'errors') onSelectErrors();
-            }}
-            style={{ width: 140, fontSize: 10, padding: '5px 7px' }}
-          >
-            <option value="">Selecionar…</option>
-            <option value="all">Todas</option>
-            <option value="unedited">Sem edição</option>
-            <option value="errors">Com erro / ausente</option>
-          </select>
-          <Button variant="primary" disabled={importing} onClick={onImportFolder}>
-            <FolderOpen size={13} /> Importar pasta
-          </Button>
-          <Button variant="ghost" disabled={importing} onClick={onImport}>
-            <Plus size={13} /> Arquivos
-          </Button>
-          <Button
-            variant="ghost"
-            className="danger-text"
-            aria-label="Limpar todas as mídias"
-            disabled={importing || clearingDisabled || !clearCount}
-            title={clearingDisabled ? 'Aguarde a prévia terminar.' : 'Esvaziar os slots para começar uma nova leva'}
-            onClick={onClear}
-          >
-            <Trash2 size={13} /> Limpar todas
-          </Button>
-        </div>
-      </div>
+      <MediaTools
+        title={`${kind === 'image' ? 'Imagens do projeto' : kind === 'video' ? 'Vídeos do projeto' : 'Mídias do projeto'} (${items.filter((item) => item.status !== 'empty').length})`}
+        open={open}
+        onToggle={() => setOpen((value) => !value)}
+        importing={importing}
+        onImport={onImport}
+        onImportFolder={onImportFolder}
+        onClear={onClear}
+        clearDisabled={importing || clearingDisabled || !clearCount}
+        onSort={onSort}
+        onSelectAll={onSelectAll}
+        onSelectUnedited={onSelectUnedited}
+        onSelectErrors={onSelectErrors}
+      />
       {children}
       {open && (
         <div
@@ -248,7 +206,7 @@ export function MediaStrip({
                 key={item.id}
                 style={{
                   position: 'absolute',
-                  left: grid ? ((first + offset) % columns) * CELL : (first + offset) * CELL,
+                  left: grid ? ((first + offset) % columns) * 110 : (first + offset) * CELL,
                   top: grid ? Math.floor((first + offset) / columns) * 145 : 0,
                   width: 105,
                 }}

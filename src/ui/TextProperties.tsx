@@ -1,9 +1,10 @@
-import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Copy } from 'lucide-react';
 import type { MediaItem, Profile } from '../domain/models';
-import { createTextLayer, type RenderLayer, type RenderTextLayer } from '../render/types';
-import { Button, Field, IconButton, Section, Slider, Toggle } from './Primitives';
-import { BACKGROUND_TRACK, reorderTrack, timelineTracks, trackName } from '../domain/timeline';
+import { type RenderLayer, type RenderTextLayer } from '../render/types';
+import { Button, Field, Section, Slider, Toggle } from './Primitives';
+import { BACKGROUND_TRACK, reorderTrack, timelineTracks } from '../domain/timeline';
 import { BackgroundProperties } from './BackgroundProperties';
+import { LayerList } from './LayerList';
 export function TextProperties({
   item,
   profile,
@@ -12,6 +13,7 @@ export function TextProperties({
   onChange,
   onApplyText,
   onSaveStyle,
+  compact = false,
 }: {
   item: MediaItem;
   profile: Profile;
@@ -20,6 +22,7 @@ export function TextProperties({
   onChange: (item: MediaItem) => void;
   onApplyText: () => void;
   onSaveStyle: (layer: RenderTextLayer) => void;
+  compact?: boolean;
 }) {
   const layers = item.render.layers;
   const selected = layers.find((layer) => layer.id === selectedId);
@@ -35,49 +38,7 @@ export function TextProperties({
   };
   return (
     <>
-      <Section title="Camadas">
-        <Button
-          variant="primary"
-          onClick={() => {
-            const layer = createTextLayer();
-            layer.text = 'Seu texto aqui';
-            replace([...layers, layer]);
-            onSelect(layer.id);
-          }}
-        >
-          <Plus /> Adicionar texto
-        </Button>
-        <div className="stack" style={{ gap: 6 }}>
-          <div className={`layer-row ${selectedId === BACKGROUND_TRACK ? 'active' : ''}`}>
-            <button aria-label="Selecionar fundo nas propriedades" onClick={() => onSelect(BACKGROUND_TRACK)}>
-              {trackName(item, BACKGROUND_TRACK, profile)}
-            </button>
-          </div>
-          {[...layers]
-            .sort((a, b) => b.zIndex - a.zIndex)
-            .map((layer) => (
-              <div className={`layer-row ${layer.id === selectedId ? 'active' : ''}`} key={layer.id}>
-                <button onClick={() => onSelect(layer.id)}>{trackName(item, layer.id, profile)}</button>
-                <IconButton
-                  label="Mostrar ou ocultar camada"
-                  onClick={() => replace(layers.map((l) => (l.id === layer.id ? { ...l, visible: !l.visible } : l)))}
-                >
-                  {layer.visible ? <Eye size={12} /> : <EyeOff size={12} />}
-                </IconButton>
-                <IconButton
-                  label="Remover camada"
-                  onClick={() => {
-                    replace(layers.filter((l) => l.id !== layer.id));
-                    if (selectedId === layer.id) onSelect(null);
-                  }}
-                >
-                  <Trash2 size={12} />
-                </IconButton>
-              </div>
-            ))}
-        </div>
-        {layers.length === 0 && <small>Adicione um texto ou escolha um template na biblioteca.</small>}
-      </Section>
+      {!compact && <LayerList item={item} profile={profile} selectedId={selectedId} onSelect={onSelect} onReplace={replace} />}
       {selectedId === BACKGROUND_TRACK && <BackgroundProperties item={item} onChange={onChange} />}
       {text && (
         <>
@@ -193,7 +154,7 @@ export function TextProperties({
               }
             />
           </Section>
-          <Section title="Estilos e aplicação">
+          <Section title="Estilos e aplicação" defaultOpen={false}>
             <Button onClick={() => onSaveStyle(text)}>Salvar estilo na conta</Button>
             {profile.textStyles.length > 0 && (
               <Field label="Estilo salvo">
@@ -224,7 +185,7 @@ export function TextProperties({
           </Section>
         </>
       )}
-      {selected && (
+      {selected && !compact && (
         <Section title="Posição e ordem">
           <Slider
             label="X"

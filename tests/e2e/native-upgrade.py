@@ -99,6 +99,7 @@ try:
     invoke('storage_write_json', {'relativePath': f'projects/{project_id}.json', 'contents': json.dumps(project)})
     request('/session/' + SESSION + '/refresh', {})
     until(lambda: execute("const node=document.querySelector('button[aria-label=\"Abrir editor de '+input+'\"]');if(!node)return false;node.click();return true;", profile['name']))
+    execute("document.querySelector('button[aria-label=\"Ações em lote\"]').click();return true;")
     click('Assistente em lote')
     field('O que analisar', 'mark')
     field('Texto da marca antiga', 'MARCA ANTIGA')

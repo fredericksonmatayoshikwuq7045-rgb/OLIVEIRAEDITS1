@@ -1,6 +1,17 @@
 # Relatório de implementação — Oliveira Edits 2
 
-Versão atual: **0.5.0**, com sequência independente, abertura antes do meme,
+Versão atual: **0.6.0**, com biblioteca lateral, player maior, timeline inferior
+redimensionável e propriedades contextuais. As ferramentas anteriores permanecem
+acessíveis por seleção e menus. Navegação e instruções:
+[release 0.6.0](docs/release-0.6.0.md). Evidências desta rodada:
+[resumo](docs/validation/workspace-summary-2026-10-18.json),
+[interface](docs/validation/workspace-ui-2026-10-18.json) e
+[desktop real](docs/validation/workspace-native-2026-10-18.json).
+As repetições nativas também registraram quedas do processo WebKit Linux;
+veja [limites observados](PENDING.md). A execução de NSIS/WebView2 continua
+pendente no Windows.
+
+Histórico da versão **0.5.0**, com sequência independente, abertura antes do meme,
 clipes visuais, ordem/tamanho individual e áudio por vídeo de camada.
 Guia: [release 0.5.0](docs/release-0.5.0.md). Evidências:
 [resumo](docs/validation/sequence-summary-2026-10-18.json),

@@ -2,6 +2,16 @@
 
 ## P1 — validar a plataforma de destino
 
+- **Repetição nativa no WebKit Linux desta nuvem.** Uma rodada completa exportou
+  MP4/PNG e a abertura de 4s, mas outras encerraram o processo WebKit durante a
+  reprodução, com perda da sessão WebDriver e `double free or corruption (out)`.
+  A falha também ocorreu com apenas o vídeo principal, antes dos templates.
+  Miniaturas da biblioteca agora são imagens estáticas sob demanda; isso reduz
+  players e decodificação, sem comprovar a resolução da falha nativa. As flags
+  experimentais de compositing/DMABUF não resolveram e não foram incorporadas
+  ao produto. Os testes Chromium passaram; a execução WebView2 segue necessária.
+  Evidências e resultado da última rodada estão no relatório da 0.6.0.
+
 - **Executar o app e o instalador NSIS em Windows x64.** A nuvem é Linux, sem
   MSVC, Windows SDK e WebView2 executável. Os sidecars Windows foram baixados e
   tiveram SHA-256 verificado, mas isso não valida o instalador. Use o workflow

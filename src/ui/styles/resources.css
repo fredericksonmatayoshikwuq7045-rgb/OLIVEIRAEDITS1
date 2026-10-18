@@ -1,0 +1,192 @@
+.resource-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.resource-panel [hidden] {
+  display: none !important;
+}
+.resource-panel {
+  background: var(--surface);
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.resource-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0 6px;
+  height: 57px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.resource-tabs > button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 0;
+  font-size: 0.769231rem;
+  padding: 6px 2px;
+}
+.resource-tabs > button:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+.resource-tabs > button[aria-pressed='true'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.resource-panel .embedded-library {
+  border: 0;
+  flex: 1;
+  min-height: 0;
+}
+.embedded-library .library-content {
+  padding: 12px;
+}
+.embedded-library .library-title {
+  margin-bottom: 8px;
+}
+.embedded-library .library-title h3 {
+  font-size: 0.846154rem;
+  font-weight: 500;
+}
+.embedded-library .library-footer {
+  display: none;
+}
+.embedded-library .mini-tabs {
+  gap: 2px;
+  flex-wrap: nowrap;
+}
+.embedded-library .mini-tabs > button {
+  border: 0;
+  background: transparent;
+  min-width: 0;
+  padding: 7px 3px;
+  font-size: 0.769231rem;
+  border-radius: 4px;
+}
+.embedded-library .mini-tabs > button.active {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.embedded-library .template-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.template-entry {
+  position: relative;
+  min-width: 0;
+}
+.template-entry .template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: var(--bg);
+  align-items: stretch;
+  height: 117px;
+}
+.template-entry .template-card:hover {
+  border-color: var(--border);
+}
+.template-entry .template-card.selected {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+.template-entry .template-thumb {
+  height: 72px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--surface-hover);
+}
+.template-entry .template-thumb > img,
+.template-entry .template-thumb > video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.template-caption {
+  font-size: 0.769231rem;
+  padding-inline: 3px;
+}
+.template-entry .template-video-tag {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.692308rem;
+  color: var(--muted);
+  padding-inline: 3px;
+  margin: 0;
+}
+.template-options {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  opacity: 0;
+}
+.template-entry:hover .template-options,
+.template-entry:focus-within .template-options {
+  opacity: 1;
+}
+.template-options .action-trigger {
+  min-width: 23px;
+  min-height: 23px;
+  padding: 3px;
+  background: #111d;
+  color: #eee;
+}
+.embedded-library .template-list > .template-card {
+  grid-column: 1/-1;
+  min-height: 33px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  border-color: transparent;
+  background: var(--surface-hover);
+  font-size: 0.769231rem;
+}
+.embedded-library .template-list > .template-card .template-thumb {
+  width: 21px;
+  height: 20px;
+}
+.resource-details {
+  font-size: 0.769231rem;
+  color: var(--muted);
+}
+.resource-details summary {
+  cursor: pointer;
+  padding-block: 3px;
+}
+.resource-details .field {
+  margin-block: 8px;
+}
+.resource-panel .button {
+  min-height: 31px;
+  padding: 7px 10px;
+  font-size: 0.846154rem;
+  border-radius: 5px;
+}
+.resource-panel .field > span {
+  font-size: 0.769231rem;
+}
+.resource-panel select {
+  font-size: 0.846154rem;
+  border-radius: 5px;
+}

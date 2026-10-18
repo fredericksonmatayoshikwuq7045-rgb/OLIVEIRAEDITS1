@@ -1,11 +1,11 @@
-# Oliveira Edits — 0.5.0
+# Oliveira Edits — 0.6.0
 
 Editor local em pt-BR para vídeos e imagens em lote. Cada conta mantém templates,
 fontes, presets, projetos e configurações de exportação próprios.
 
 ## Nova leva de mídias
 
-Na faixa **Mídias do projeto**, clique em **Limpar todas** e confirme a quantidade.
+Na aba **Mídias**, abra **… → Limpar todas** e confirme a quantidade.
 Isso esvazia os slots do projeto atual, preservando originais, foto, templates,
 fontes e configurações. **Ctrl+Z** restaura a leva inteira e suas edições enquanto
 o app estiver aberto. A próxima importação começa no slot 1. O botão fica
@@ -13,20 +13,23 @@ indisponível durante a importação e quando não há mídias.
 
 ## Novidades desta versão
 
-Headlines em vídeo, foto e texto podem ultrapassar a duração da mídia principal.
-**Usar como abertura** posiciona o meme depois da chamada; a saída inclui a
-sequência inteira. **Aplicar sequência em massa** copia a montagem para a leva,
-preservando os arquivos e durações dos destinos.
+Editor reorganizado para dar espaço ao player: biblioteca à esquerda, propriedades
+contextuais e timeline na parte inferior, com altura ajustável. **Mídias, Templates
+e Texto** ficam na biblioteca; **Básico, Tempo e Áudio** ajustam a seleção à direita.
+Controles avançados e ações em lote ficam em menus, sem repetir o mesmo ajuste.
 
-A timeline mostra clipes com miniaturas, régua comum, zoom e rolagem. Arraste
-clipes e pontas no tempo; arraste os nomes para mudar a ordem visual. Cada camada
-tem tamanho/posição próprios e vídeos têm áudio opcional. O botão **+** do template
-adiciona outra camada; duplicar e dividir mantêm os clipes na mesma composição.
+- **Importar** adiciona arquivos; **Mídias → … → Importar pasta** traz a leva inteira.
+- Selecione o clipe na timeline ou no player e ajuste tamanho, posição e tempo.
+- **Tempo → Usar como abertura** mantém a chamada antes do meme, mesmo mais longa.
+- **Lote → Aplicar sequência em massa** distribui a montagem entre as mídias.
+- O botão **…** de cada template permite editar, adicionar outra camada ou excluir.
+- O ícone de visualização no topo escolhe player central, à direita ou modo foco.
 
-As alas **Todas / Vídeos / Imagens** mantêm as ferramentas. Fotos exportam o quadro
-escolhido em PNG/JPG/WebP. Veja o passo a passo e os limites na
-[release 0.5.0](docs/release-0.5.0.md). As funções da
-[0.4.0](docs/release-0.4.0.md) e [0.3.0](docs/release-0.3.0.md) continuam disponíveis.
+Headlines longas, camadas independentes, áudio por vídeo, foto de perfil, frases,
+personalização, assistentes e exportação continuam disponíveis. Na biblioteca,
+**Todas / Vídeos / Imagens** filtram os slots; fotos exportam o quadro escolhido.
+Veja a [release 0.6.0](docs/release-0.6.0.md) e a
+[prévia do editor](docs/validation/workspace-editor-2026-10-18.png).
 As novidades estão em `refactor/v2`; baixe essa branch para obter esta versão.
 
 ## Requisitos e início
@@ -78,6 +81,8 @@ npm test
 npm run build
 npm run lint
 npm run check:files
+# Com Vite ativo:
+OE_TEST_URL=http://127.0.0.1:3000 npm run test:studio
 cargo test --manifest-path src-tauri/Cargo.toml --no-default-features
 cargo check --manifest-path src-tauri/Cargo.toml
 npm run tauri build -- --debug --no-bundle

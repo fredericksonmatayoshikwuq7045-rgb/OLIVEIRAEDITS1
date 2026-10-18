@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronUp, Minus, Plus } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Minus, Plus, ScanLine } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { MediaItem, Profile } from '../domain/models';
 import {
   BACKGROUND_TRACK,
@@ -17,7 +17,7 @@ import {
 } from '../domain/timeline';
 import { Button, IconButton } from './Primitives';
 import { TimelineTrack } from './TimelineTrack';
-import { TrackInspector } from './TrackInspector';
+import { ActionMenu } from './ActionMenu';
 export function LayerTimeline({
   item,
   profile,
@@ -26,7 +26,9 @@ export function LayerTimeline({
   onSelect,
   onChange,
   onTime,
-  onApply,
+  actions,
+  expand,
+  onContextMenu,
 }: {
   item: MediaItem;
   profile: Profile;
@@ -35,17 +37,37 @@ export function LayerTimeline({
   onSelect: (id: string) => void;
   onChange: (item: MediaItem) => void;
   onTime: (time: number) => void;
-  onApply: () => void;
+  actions: ReactNode;
+  expand: ReactNode;
+  onContextMenu: (event: React.MouseEvent, id: string) => void;
 }) {
   const [open, setOpen] = useState(true),
     [zoom, setZoom] = useState(70),
-    [extra, setExtra] = useState(0);
+    [extra, setExtra] = useState(0),
+    [fit, setFit] = useState(true),
+    [viewWidth, setViewWidth] = useState(1000),
+    [showBackground, setShowBackground] = useState(false);
+  const scroll = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = scroll.current;
+    if (!node) return;
+    const observer = new ResizeObserver(() => setViewWidth(node.clientWidth));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [open]);
   const duration = compositionDuration(item),
-    tracks = timelineTracks(item, profile),
+    tracks = timelineTracks(item, profile).filter(
+      (track) =>
+        track.id !== BACKGROUND_TRACK ||
+        showBackground ||
+        selectedId === BACKGROUND_TRACK ||
+        item.render.background.type !== 'solid' ||
+        item.render.background.color !== '#111111' ||
+        !!item.render.background.enable,
+    ),
     elapsed = outputTime(item, time);
-  const horizon = Math.min(MAX_TIME, duration + Math.max(2, duration * 0.15) + extra),
-    width = Math.min(200000, Math.max(480, horizon * zoom));
-  const selected = tracks.find((track) => track.id === (selectedId || MEDIA_TRACK));
+  const horizon = Math.min(MAX_TIME, duration + Math.min(2, duration * 0.1) + extra),
+    width = Math.min(200000, Math.max(120, fit ? viewWidth - 164 : horizon * zoom));
   const latest = useRef(item);
   latest.current = item;
   const step = 1 / (item.probe?.fps || 30),
@@ -60,31 +82,58 @@ export function LayerTimeline({
     <section className="layer-timeline" aria-label="Timeline das camadas">
       <div className="row-between timeline-tools">
         <div className="row">
-          <IconButton label={open ? 'Recolher camadas da timeline' : 'Expandir camadas da timeline'} onClick={() => setOpen(!open)}>
-            {open ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-          </IconButton>
-          <h3>Camadas ({tracks.length})</h3>
-          <small>{duration.toFixed(2)}s</small>
+          <h3>Timeline</h3>
+          <span className="toolbar-separator" />
+          {actions}
         </div>
-        <div className="row">
-          <IconButton label="Diminuir zoom da timeline" disabled={zoom <= 10} onClick={() => setZoom((value) => Math.max(10, value / 1.5))}>
-            <Minus size={14} />
+        <div className="row timeline-view-tools">
+          <IconButton label="Ajustar timeline à janela" aria-pressed={fit} onClick={() => setFit(true)}>
+            <ScanLine size={14} />
           </IconButton>
           <IconButton
+            label="Diminuir zoom da timeline"
+            disabled={!fit && zoom <= 10}
+            onClick={() => {
+              setFit(false);
+              setZoom((value) => Math.max(10, (fit ? width / horizon : value) / 1.5));
+            }}
+          >
+            <Minus size={14} />
+          </IconButton>
+          <input
+            aria-label="Zoom da timeline"
+            type="range"
+            min={10}
+            max={2000}
+            step={5}
+            value={Math.max(10, Math.min(2000, fit ? width / horizon : zoom))}
+            onChange={(event) => {
+              setFit(false);
+              setZoom(Number(event.target.value));
+            }}
+          />
+          <IconButton
             label="Aumentar zoom da timeline"
-            disabled={zoom >= 400}
-            onClick={() => setZoom((value) => Math.min(400, value * 1.5))}
+            disabled={!fit && zoom >= 2000}
+            onClick={() => {
+              setFit(false);
+              setZoom((value) => Math.min(2000, (fit ? width / horizon : value) * 1.5));
+            }}
           >
             <Plus size={14} />
           </IconButton>
-          <Button onClick={() => setExtra((value) => value + 5)}>+5s de espaço</Button>
-          <Button onClick={onApply}>Aplicar sequência em massa</Button>
+          <ActionMenu label="Opções da timeline">
+            <Button onClick={() => setExtra((value) => value + 5)}>+5s de espaço</Button>
+            <Button onClick={() => setShowBackground((value) => !value)}>{showBackground ? 'Ocultar' : 'Mostrar'} fundo sólido</Button>
+            <Button onClick={() => onSelect(BACKGROUND_TRACK)}>Editar fundo</Button>
+            <Button onClick={() => setOpen((value) => !value)}>{open ? 'Recolher' : 'Expandir'} camadas da timeline</Button>
+          </ActionMenu>
+          {expand}
         </div>
       </div>
       {open && (
         <>
-          <small>Arraste os clipes e suas pontas. Arraste os nomes para mudar a ordem visual; a camada de cima aparece na frente.</small>
-          <div className="timeline-scroll" aria-label="Faixas da composição">
+          <div className="timeline-scroll" ref={scroll} aria-label="Faixas da composição">
             <div style={{ width: width + 164 }}>
               <div className="timeline-ruler-row">
                 <span className="timeline-label">Camada / ordem</span>
@@ -125,6 +174,7 @@ export function LayerTimeline({
                     duration={horizon}
                     step={step}
                     time={elapsed}
+                    onContextMenu={(event) => onContextMenu(event, track.id)}
                     selected={track.id === (selectedId || MEDIA_TRACK)}
                     onSelect={() => select(track)}
                     onVisible={() => onChange(patchTrack(latest.current, track.id, { visible: track.visible === false }))}
@@ -137,9 +187,6 @@ export function LayerTimeline({
               </div>
             </div>
           </div>
-          {selected && (
-            <TrackInspector item={item} profile={profile} selected={selected} time={elapsed} onChange={onChange} onSelect={onSelect} />
-          )}
         </>
       )}
     </section>

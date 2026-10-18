@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checks": [
+    "Um player e um inspetor; tempos, menu contextual, duplicação e Delete atuam na camada selecionada",
+    "Biblioteca conserva a categoria; três layouts e timeline redimensionável cabem de 1100×700 a 1920×1080",
+    "Tema claro e menus ficam dentro da janela; controles de áudio permanecem no inspetor contextual"
+  ],
+  "pageErrors": []
+}

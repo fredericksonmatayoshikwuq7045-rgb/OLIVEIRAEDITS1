@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.0 — 2026-10-18
+
+- Biblioteca lateral com Mídias/Templates/Texto e menu para fontes/presets.
+- Player maior e uma única barra de reprodução, sem controles duplicados.
+- Timeline inferior em toda a largura, altura ajustável e zoom inicial que cabe na janela.
+- Inspetor contextual Básico/Tempo/Áudio; ajustes avançados recolhidos por padrão.
+- Menus de lote, mídias, templates e camadas preservam as ações existentes.
+- Categoria da biblioteca e rolagem das mídias preservadas ao alternar recursos.
+- Seleção volta ao principal ao clicar no slot; desfazer não deixa camada inexistente selecionada.
+- Atalhos no editor respeitam a camada selecionada; divisão indisponível não divide a mídia por engano.
+- Painéis ajustáveis nos layouts central/direita; menus cabem na janela e pulam ações desativadas pelo teclado.
+- Tamanho de fonte personalizado aplicado aos novos controles; temas e três layouts preservados.
+- Miniaturas estáticas de templates em vídeo geradas quando visíveis, evitando players extras na biblioteca.
+- Assistente carregado ao abrir, reduzindo o JavaScript inicial sem dependências novas.
+- Regressões de sequência, camadas, 501 arquivos, limpeza, backup, migração, OCR e MP4/PNG no desktop Linux.
+  Guia e evidências: [release 0.6.0](docs/release-0.6.0.md).
+
 ## 0.5.0 — 2026-10-18
 
 - Duração independente das camadas, incluindo headlines maiores que vídeo/foto.

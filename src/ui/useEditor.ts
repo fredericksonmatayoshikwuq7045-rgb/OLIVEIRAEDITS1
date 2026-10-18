@@ -10,6 +10,7 @@ import type { UiSettings } from './Settings';
 import type { EngineState } from './useEngine';
 import { useMediaImport } from './useMediaImport';
 import { useClipActions } from './useClipActions';
+import { useEditorPanels } from './useEditorPanels';
 export function useEditor({
   store,
   engine,
@@ -25,6 +26,8 @@ export function useEditor({
   notify: (message: string) => void;
   onSettings?: (settings: UiSettings) => void;
 }) {
+  const panels = useEditorPanels(),
+    { setInspectorTab } = panels;
   const [step, setStep] = useState(1),
     [activeId, setActiveId] = useState<string | null>(null),
     [selectedIds, setSelectedIds] = useState<string[]>([]),
@@ -63,6 +66,9 @@ export function useEditor({
   useEffect(() => {
     setLayerId(null);
   }, [active?.id, active?.trim.in]);
+  useEffect(() => {
+    if (layerId && layerId !== '@background' && !active?.render.layers.some((layer) => layer.id === layerId)) setLayerId(null);
+  }, [active, layerId]);
   const changeItem = useCallback(
     (updated: MediaItem) => store.updateProject((p) => ({ ...p, items: p.items.map((item) => (item.id === updated.id ? updated : item)) })),
     [store],
@@ -73,6 +79,9 @@ export function useEditor({
   const select = useCallback(
     (item: MediaItem, ctrl: boolean, shift: boolean) => {
       setActiveId(item.id);
+      setLayerId(null);
+      setInspectorTab('basic');
+      setCropMode(false);
       if (shift && anchor.current)
         setSelectedIds(
           rangeSelection(
@@ -85,7 +94,7 @@ export function useEditor({
       else setSelectedIds([item.id]);
       if (!shift) anchor.current = item.id;
     },
-    [items],
+    [items, setInspectorTab],
   );
   const applyUpdated = (updated: MediaItem[]) => {
     const lookup = new Map(updated.map((item) => [item.id, item]));
@@ -186,6 +195,7 @@ export function useEditor({
     }
   };
   return {
+    ...panels,
     allItems,
     workspaceKind,
     setWorkspaceKind,

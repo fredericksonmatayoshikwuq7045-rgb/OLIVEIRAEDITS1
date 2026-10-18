@@ -14,6 +14,7 @@ export function VideoTimeline({
   onChange,
   onSplit,
   performance = false,
+  sourceOnly = false,
 }: {
   item: MediaItem;
   profile: Profile;
@@ -24,6 +25,7 @@ export function VideoTimeline({
   onChange: (item: MediaItem) => void;
   onSplit: () => void;
   performance?: boolean;
+  sourceOnly?: boolean;
 }) {
   const [frames, setFrames] = useState<SampleFrame[]>([]),
     [trim, setTrim] = useState(item.trim),
@@ -66,28 +68,32 @@ export function VideoTimeline({
   };
   return (
     <section className="video-timeline" aria-label="Timeline do vídeo">
-      <div className="row-between">
-        <div className="row">
-          <IconButton label={playing ? 'Pausar prévia' : 'Reproduzir prévia'} onClick={onPlay}>
-            {playing ? 'Ⅱ' : <Play size={16} />}
-          </IconButton>
-          <span className="mono">
-            {timecode(Math.max(0, outputTime(item, time)))} / {timecode(compositionDuration(item))}
-          </span>
-        </div>
-        <Button disabled={time <= item.trim.in + step / 2 || time >= item.trim.out - step / 2} onClick={onSplit}>
-          <Scissors size={14} /> Dividir no cursor (S)
-        </Button>
-      </div>
-      <input
-        aria-label="Posição na composição"
-        type="range"
-        min={0}
-        max={compositionDuration(item) - 0.001}
-        step={step / item.speed}
-        value={Math.max(0, outputTime(item, time))}
-        onChange={(event) => onTime(playerTime(item, Number(event.target.value)))}
-      />
+      {!sourceOnly && (
+        <>
+          <div className="row-between">
+            <div className="row">
+              <IconButton label={playing ? 'Pausar prévia' : 'Reproduzir prévia'} onClick={onPlay}>
+                {playing ? 'Ⅱ' : <Play size={16} />}
+              </IconButton>
+              <span className="mono">
+                {timecode(Math.max(0, outputTime(item, time)))} / {timecode(compositionDuration(item))}
+              </span>
+            </div>
+            <Button disabled={time <= item.trim.in + step / 2 || time >= item.trim.out - step / 2} onClick={onSplit}>
+              <Scissors size={14} /> Dividir no cursor (S)
+            </Button>
+          </div>
+          <input
+            aria-label="Posição na composição"
+            type="range"
+            min={0}
+            max={compositionDuration(item) - 0.001}
+            step={step / item.speed}
+            value={Math.max(0, outputTime(item, time))}
+            onChange={(event) => onTime(playerTime(item, Number(event.target.value)))}
+          />
+        </>
+      )}
       <details className="source-trim">
         <summary>Aparar arquivo original · {((trim.out - trim.in) / item.speed).toFixed(2)}s</summary>
         <div

@@ -1,3 +1,4 @@
+import { resource, inspector, selectTrack, mediaMenu, layout, assistant } from './layer-helpers.mjs';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -41,7 +42,10 @@ page.setDefaultTimeout(20000);
 const checks = [],
   errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
-const clearButton = () => page.getByRole('button', { name: 'Limpar todas as mídias', exact: true });
+const clearButton = async () => {
+  await mediaMenu(page);
+  return page.getByRole('button', { name: 'Limpar todas as mídias', exact: true });
+};
 const count = (value) => page.getByText(`Mídias do projeto (${value})`, { exact: true }).waitFor();
 const saved = () => page.waitForFunction(() => document.querySelector('.save-status')?.textContent === 'Salvo');
 async function stored() {
@@ -100,7 +104,7 @@ try {
   await writeFile(photo, bytes);
   await writeFile(logo, bytes);
   await page.getByRole('button', { name: 'Abrir editor de Padrão', exact: true }).click();
-  assert.equal(await clearButton().isDisabled(), true);
+  assert.equal(await (await clearButton()).isDisabled(), true);
   await page.getByRole('button', { name: 'Voltar às contas' }).click();
   await account('Outra conta');
   await importFiles(photo);
@@ -109,28 +113,32 @@ try {
   await account('Nova leva', photo);
   await importFiles([photo, logo, video]);
   await count(3);
+  await resource(page, 'Templates');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(logo);
   await page.getByText('Template adicionado à biblioteca da conta.', { exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Fontes', exact: true }).click();
+  await page.getByRole('button', { name: 'Mais recursos', exact: true }).click();
+  await page.getByRole('button', { name: 'Fontes da conta', exact: true }).click();
   await page
     .getByLabel('Importar fonte', { exact: true })
     .setInputFiles(process.env.OE_TEST_FONT || '/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf');
   await page.getByText('Fonte carregada e salva no perfil.', { exact: true }).waitFor();
-  await page.getByRole('button', { name: /3.*Templates/ }).click();
+  await resource(page, 'Texto');
   await page.getByRole('button', { name: 'Adicionar texto', exact: true }).click();
   await page.getByLabel('Texto da camada').fill('Edição preservada ao desfazer');
+  await resource(page, 'Mídias');
   await page.locator('.media-slot[title="clip.mp4"]').click();
+  await inspector(page, 'Tempo');
   await page.locator('.video-timeline').waitFor();
   const snapshot = await stored(),
     id = snapshot.activeProjectByProfile[snapshot.activeProfileId];
   const originalItems = snapshot.projects.find((project) => project.id === id).items;
   const otherProject = snapshot.projects.find((project) => project.profileId !== snapshot.activeProfileId && project.items.length);
   const preferences = await page.evaluate(() => localStorage.getItem('oe_ui_v2'));
-  await clearButton().click();
+  await (await clearButton()).click();
   await page.getByRole('dialog', { name: 'Limpar todas as mídias?', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await count(3);
-  await clearButton().click();
+  await (await clearButton()).click();
   await page.keyboard.press('Escape');
   await count(3);
   assert.deepEqual(
@@ -138,7 +146,7 @@ try {
     snapshot.projects.find((project) => project.id === id),
   );
   checks.push('Botão desativado no projeto vazio; cancelar ou Escape preservam a leva e suas edições');
-  await clearButton().click();
+  await (await clearButton()).click();
   await page.getByRole('button', { name: 'Limpar 3 mídias', exact: true }).evaluate((button) => {
     button.click();
     button.click();
@@ -146,7 +154,7 @@ try {
   await count(0);
   await page.getByText('Seu próximo post começa aqui', { exact: true }).waitFor();
   assert.equal(await page.locator('.video-timeline').count(), 0);
-  assert.equal(await clearButton().isDisabled(), true);
+  assert.equal(await (await clearButton()).isDisabled(), true);
   let state = await stored();
   assert.deepEqual(state.projects.find((project) => project.id === id).items, []);
   assert.deepEqual(state.profiles, snapshot.profiles);
@@ -167,17 +175,17 @@ try {
   const picker = page.waitForEvent('filechooser');
   await page.getByRole('button', { name: 'Importar pasta', exact: true }).first().click();
   await picker;
-  assert.equal(await clearButton().isDisabled(), true);
+  assert.equal(await (await clearButton()).isDisabled(), true);
   await page.locator('input[type="file"][webkitdirectory]').dispatchEvent('cancel');
   await importFiles(logo);
   await count(1);
   state = await stored();
   assert.equal(state.projects.find((project) => project.id === id).items[0].slot, 1);
-  await page.getByRole('combobox', { name: 'Layout do editor' }).selectOption('right');
+  await layout(page, 'right');
   await page.setViewportSize({ width: 1100, height: 800 });
-  const buttonBox = await clearButton().boundingBox();
+  const buttonBox = await (await clearButton()).boundingBox();
   assert.ok(buttonBox.x >= 0 && buttonBox.x + buttonBox.width <= 1100);
-  await clearButton().click();
+  await (await clearButton()).click();
   await page.getByRole('button', { name: 'Limpar 1 mídia', exact: true }).click();
   await count(0);
   await saved();

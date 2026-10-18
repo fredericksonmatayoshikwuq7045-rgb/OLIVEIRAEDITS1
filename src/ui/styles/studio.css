@@ -1,0 +1,213 @@
+.studio-toolbar {
+  min-height: 44px;
+  height: 44px;
+  padding: 5px 14px;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.studio-toolbar > .row {
+  flex-wrap: nowrap;
+  gap: 5px;
+}
+.studio-toolbar .button {
+  min-height: 30px;
+  padding: 6px 13px;
+  font-size: 0.923077rem;
+  border-radius: 6px;
+}
+.project-title {
+  max-width: 280px;
+  font-size: 0.923077rem;
+  font-weight: 500;
+}
+.toolbar-separator {
+  display: inline-block;
+  width: 1px;
+  height: 17px;
+  margin: 0 7px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.studio-editor {
+  grid-template-columns: clamp(220px, var(--library-width, 240px), 30vw) 4px minmax(0, 1fr) 4px clamp(
+      250px,
+      var(--details-width, 285px),
+      32vw
+    );
+  grid-template-rows: minmax(0, 1fr) minmax(136px, min(var(--timeline-height, 220px), calc(100% - 280px)));
+  overflow: hidden;
+}
+.studio-editor > .resource-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+.studio-editor > .editor-center {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  min-height: 0;
+}
+.studio-editor > .properties {
+  grid-column: 5;
+  grid-row: 1;
+}
+.studio-editor > .panel-resize {
+  grid-row: 1;
+  background: transparent;
+  border-inline: 1px solid var(--border);
+}
+.studio-editor > .panel-resize:hover {
+  background: var(--accent);
+}
+.studio-editor > .composition-timeline {
+  grid-column: 1/-1;
+  grid-row: 2;
+}
+.studio-editor.layout-right {
+  grid-template-columns: clamp(220px, var(--library-width, 240px), 30vw) 4px clamp(250px, var(--details-width, 285px), 32vw) 4px minmax(
+      0,
+      1fr
+    );
+}
+.studio-editor.layout-right > .properties {
+  grid-column: 3;
+}
+.studio-editor.layout-right > .editor-center {
+  grid-column: 5;
+}
+.studio-editor.layout-focus {
+  grid-template-columns: minmax(0, 1fr);
+}
+.studio-editor.layout-focus > .resource-panel,
+.studio-editor.layout-focus > .properties,
+.studio-editor.layout-focus > .panel-resize {
+  display: none;
+}
+.studio-editor.layout-focus > .editor-center {
+  grid-column: 1;
+}
+.studio-editor .stage-toolbar {
+  min-height: 32px;
+  height: 32px;
+  padding: 5px 12px;
+  gap: 16px;
+  flex-shrink: 0;
+  border: 0;
+}
+.studio-editor .stage-toolbar > :last-child {
+  max-width: 65%;
+  font-size: 0.769231rem;
+  color: var(--muted);
+}
+.studio-editor .stage-area {
+  min-height: 0;
+  padding: 16px;
+  background: #08090b;
+  background-image: none;
+}
+.studio-editor .stage-preview {
+  box-shadow: 0 2px 20px #0006;
+}
+.studio-editor .stage-caption {
+  font-size: 0.692308rem;
+  bottom: 7px;
+  left: 12px;
+}
+.player-transport {
+  flex-shrink: 0;
+  background: var(--surface);
+  padding: 0 12px 6px;
+}
+.player-scrubber {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.transport-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  height: 34px;
+}
+.transport-line > .row {
+  justify-self: end;
+  gap: 1px;
+}
+.transport-time {
+  color: var(--text);
+  font-size: 0.769231rem;
+  white-space: nowrap;
+}
+.transport-time > span {
+  color: var(--muted);
+}
+.transport-play {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.transport-play .icon-button {
+  width: 28px;
+  height: 28px;
+}
+.action-trigger {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 5px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 28px;
+  min-height: 28px;
+  cursor: pointer;
+  font-size: 0.923077rem;
+}
+.action-trigger:hover,
+.action-trigger[aria-expanded='true'] {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.action-trigger-text {
+  padding: 7px 10px;
+}
+.action-popover {
+  position: fixed;
+  z-index: 1200;
+  width: 240px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised, var(--surface));
+  box-shadow: 0 12px 36px #0005;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.action-popover > .button {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+  padding: 9px 10px;
+  min-height: 33px;
+  border-radius: 5px;
+  font-size: 0.923077rem;
+}
+.action-popover > .button:hover {
+  background: var(--surface-hover);
+}
+.action-popover > .field {
+  padding: 7px 10px;
+}
+.action-popover select {
+  width: 100%;
+}

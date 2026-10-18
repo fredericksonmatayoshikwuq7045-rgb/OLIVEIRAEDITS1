@@ -1,3 +1,4 @@
+import { resource, inspector, selectTrack, mediaMenu, layout, assistant } from './layer-helpers.mjs';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
@@ -59,8 +60,8 @@ try {
   await page.reload();
   await page.getByRole('button', { name: 'Abrir editor de Padrão', exact: true }).click();
   await page.locator('[role="option"]').filter({ hasText: 'original.png' }).click();
-  await page.getByRole('button', { name: /3.*Templates/ }).click();
-  await page.getByRole('button', { name: 'TEXTO LEGADO', exact: true }).waitFor();
+  await resource(page, 'Texto');
+  await page.locator('.timeline-track-name').filter({ hasText: 'TEXTO LEGADO' }).waitFor();
   const actual = await page.evaluate(async () => {
     const keys = Object.fromEntries(['oe_videos', 'oe_images', 'oe_groups', 'oe_templates'].map((key) => [key, localStorage.getItem(key)]));
     const read = (name, store, key) =>

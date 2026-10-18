@@ -77,13 +77,15 @@ export function FramingProperties({
             ))}
           </select>
         </Field>
-        <div className="property-modes">
-          {fits.map(([fit, label]) => (
-            <button key={fit} className={media.fit === fit ? 'active' : ''} onClick={() => patch({ fit })}>
-              {label}
-            </button>
-          ))}
-        </div>
+        <Field label="Ajuste da mídia">
+          <select aria-label="Ajuste da mídia" value={media.fit} onChange={(event) => patch({ fit: event.target.value as FitMode })}>
+            {fits.map(([fit, label]) => (
+              <option key={fit} value={fit}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </Field>
         {media.fit === 'stretch' && <small className="notice">Esticar pode deformar a imagem.</small>}
         <Slider label="Zoom" value={media.zoom} min={0.1} max={5} step={0.01} suffix="×" onChange={(zoom) => patch({ zoom })} />
         <div className="form-grid">
@@ -109,7 +111,7 @@ export function FramingProperties({
           </Field>
         </div>
       </Section>
-      <Section title="Recorte visual">
+      <Section title="Recorte visual" defaultOpen={false}>
         <Toggle label="Editar caixa de recorte" checked={cropMode} onChange={onCropMode} />
         <Toggle
           label="Travar proporção do recorte"
@@ -126,7 +128,7 @@ export function FramingProperties({
         {detection && <small role="status">{detection}</small>}
         <Button onClick={() => patch({ crop: { x: 0, y: 0, width: 1, height: 1 } })}>Limpar recorte</Button>
       </Section>
-      <Section title="Transformação">
+      <Section title="Transformação" defaultOpen={false}>
         <Slider label="Rotação" value={media.rotation} min={-180} max={180} suffix="°" onChange={(rotation) => patch({ rotation })} />
         <div className="property-buttons">
           <Button title="Girar 90 graus" onClick={() => patch({ rotation: (media.rotation + 90) % 360 })}>
@@ -161,7 +163,7 @@ export function FramingProperties({
           <RotateCcw /> Resetar enquadramento
         </Button>
       </Section>
-      <Section title="Aplicar em lote">
+      <Section title="Aplicar em lote" defaultOpen={false}>
         <small>O enquadramento é relativo à resolução de cada mídia.</small>
         <Button onClick={() => onApply('selected')}>Aplicar a selecionadas</Button>
         <Button onClick={() => onApply('all')}>Aplicar a todas</Button>

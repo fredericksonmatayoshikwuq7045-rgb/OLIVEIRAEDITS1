@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "checks": [
+    "Referência visual localizada por worker real em posições diferentes; logo transparente recebe placa opaca",
+    "Backup real preserva foto, referências e coberturas; importação remapeia IDs para uma conta independente"
+  ],
+  "pageErrors": []
+}

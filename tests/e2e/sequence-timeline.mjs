@@ -2,7 +2,24 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium } from 'playwright';
-import { fixtures, ffmpeg, choose, stored, currentItem, number, range, selectTrack, color, exportPng, pngPixel } from './layer-helpers.mjs';
+import {
+  fixtures,
+  ffmpeg,
+  choose,
+  stored,
+  currentItem,
+  number,
+  range,
+  selectTrack,
+  color,
+  exportPng,
+  pngPixel,
+  resource,
+  inspector,
+  templateType,
+  templateAction,
+  trackAction,
+} from './layer-helpers.mjs';
 const directory = resolve(process.env.OE_SEQUENCE_DIR || '.artifacts/sequence-timeline');
 await mkdir(directory, { recursive: true });
 const browser = await chromium.launch({
@@ -32,11 +49,13 @@ try {
     files.photo,
   ]);
   await page.getByText('Mídias do projeto (3)', { exact: true }).waitFor();
+  await inspector(page, 'Tempo');
   await page.locator('.source-trim summary').click();
   await page.getByRole('spinbutton', { name: 'Fim do corte', exact: true }).fill('1');
+  await resource(page, 'Templates');
   const library = page.locator('.library');
   await library.getByRole('button', { name: 'Headline', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption('video');
+  await templateType(page, 'video');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.stamp);
   await page.getByText('Template adicionado à biblioteca da conta.', { exact: true }).waitFor();
   await library.locator('.template-card').filter({ hasText: 'stamp.mp4' }).click();
@@ -46,6 +65,7 @@ try {
   assert.equal(layer.enable.end, 3);
   await page.getByRole('button', { name: 'Expandir timeline', exact: true }).click();
   await selectTrack(page, layer.id);
+  await inspector(page);
   await page.getByRole('button', { name: 'Preencher tela', exact: true }).click();
   await number(page, 'Desaparecer em (s)', 8);
   await range(page, 'Posição na composição', 7);
@@ -71,9 +91,9 @@ try {
   await number(page, 'Aparecer em (s)', 0);
   await range(page, 'Posição na composição', 0.7);
   await color(page, 0.5, 0.5, 2);
-  await page.getByRole('button', { name: 'Subir camada', exact: true }).click();
+  await trackAction(page, 'Subir camada');
   await color(page, 0.5, 0.5, -1);
-  await page.getByRole('button', { name: 'Descer camada', exact: true }).click();
+  await trackAction(page, 'Descer camada');
   await color(page, 0.5, 0.5, 2);
   await page
     .locator('[data-track-id="@media"] .timeline-track-heading')
@@ -88,11 +108,12 @@ try {
   await number(page, 'Altura (%)', 50);
   await color(page, 0.2, 0.2, 2);
   await color(page, 0.8, 0.8, -1);
+  await inspector(page);
   await page.getByRole('button', { name: 'Preencher tela', exact: true }).click();
   await selectTrack(page, '@media');
   await number(page, 'Aparecer em (s)', 3);
   const rows = page.locator('.timeline-track-row');
-  assert.equal(await rows.count(), 3);
+  assert.equal(await rows.count(), 2);
   await page.waitForFunction(
     () => [...document.querySelectorAll('.track-filmstrip')].filter((node) => node.querySelectorAll('img').length > 1).length >= 2,
   );
@@ -105,20 +126,21 @@ try {
   checks.push('Reprodução atravessa a abertura; camadas têm miniaturas, zoom, ordem real e largura/altura independentes');
   await selectTrack(page, layer.id);
   await range(page, 'Posição na composição', 1.2);
-  await page.getByRole('button', { name: 'Dividir camada no cursor', exact: true }).click();
+  await trackAction(page, 'Dividir camada no cursor');
   item = await currentItem(page, 'clip.mp4');
   assert.equal(item.render.layers.length, 2);
   assert.equal(item.render.layers[1].enable.start, 1.2);
   assert.equal(item.render.layers[1].sourceOffset, 1.2);
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption('image');
+  await templateType(page, 'image');
   await page.getByLabel('Arquivo do template', { exact: true }).setInputFiles(files.photo);
-  await page.getByRole('button', { name: 'Adicionar camada de photo.png', exact: true }).click();
+  await templateAction(page, 'photo.png', 'Adicionar camada de');
   item = await currentItem(page, 'clip.mp4');
   const photoLayer = item.render.layers.find((value) => value.type === 'image');
   assert.equal(item.render.layers.length, 2);
   await selectTrack(page, photoLayer.id);
   await number(page, 'Desaparecer em (s)', 6);
+  await inspector(page);
   await page.getByRole('button', { name: 'Preencher tela', exact: true }).click();
   await range(page, 'Posição na composição', 5.5);
   await page.waitForFunction(() => {
@@ -128,6 +150,7 @@ try {
   });
   for (let count = 0; count < 3; count++) await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
   checks.push('Headline em foto também dura além do vídeo; adicionar outra camada conserva a headline anterior');
+  await page.getByRole('button', { name: 'Ações em lote', exact: true }).click();
   await page.getByRole('button', { name: 'Aplicar sequência em massa', exact: true }).click();
   await page.getByRole('button', { name: 'Aplicar a 2 mídia(s)', exact: true }).click();
   const data = await stored(page),
@@ -139,6 +162,7 @@ try {
   assert.equal(project.items.find((item) => item.title === 'other.mp4').trim.out, 2);
   assert.equal(project.items.find((item) => item.title === 'photo.png').kind, 'image');
   checks.push('Dividir camada conserva a fase; aplicação em massa mantém arquivos e durações originais dos destinos');
+  await resource(page, 'Mídias');
   await page.getByRole('tab', { name: /Imagens/ }).click();
   await number(page, 'Momento da imagem exportada (s)', 0.7);
   await color(page, 0.5, 0.5, 2);

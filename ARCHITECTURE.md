@@ -107,3 +107,23 @@ Plano estático de texto/imagem e layers dinâmicas mantêm tamanho e ordem.
 Copiar camadas também copia a entrada do principal e sua ordem/áudio, sem trocar
 a fonte ou o corte dos destinos. O esquema permanece 2; campos novos opcionais
 são validados na importação do backup. Imagem continua uma saída estática.
+
+## Organização contextual 0.6.0
+
+`Editor` organiza o grid em recursos, player, propriedades e timeline inferior.
+`useEditorPanels` guarda a navegação local sem alterar o projeto. `ResourcePanel`
+conserva biblioteca e mídias montadas ao alternar abas, mantendo categoria e
+rolagem; `MediaStrip` continua virtualizado. A navegação não altera o esquema 2.
+
+`EditorProperties` mostra apenas as ferramentas da seleção. `TrackInspector`
+cuida de tempos/áudio; `TrackGeometry` e o enquadramento ajustam a geometria.
+`PlayerTransport` concentra reprodução, seek e comparação. `TimelineDock`
+controla altura, comandos e contexto; `LayerTimeline` mantém as faixas, zoom,
+miniaturas e régua comuns. O fundo sólido padrão pode ser exibido pelo menu.
+
+`trackCommands` une os comandos de menu e teclado, incluindo principal e fundo.
+Atalhos de camada consomem ações indisponíveis para impedir que recaiam sobre o
+vídeo principal. Seleções inválidas após undo voltam ao principal. `ActionMenu`
+usa portal, fecha por Escape/clique externo e respeita selects/teclado nativos.
+`AutomationPanel` é carregado sob demanda com Suspense e limite de erro.
+Os contratos de render/export e o motor FFmpeg permanecem os da 0.5.0.

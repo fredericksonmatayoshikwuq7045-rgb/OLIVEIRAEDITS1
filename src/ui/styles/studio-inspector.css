@@ -1,0 +1,138 @@
+.contextual-properties {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.contextual-properties .properties-heading {
+  padding: 7px 10px 7px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  flex-shrink: 0;
+}
+.selection-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+.selection-title > svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.selection-title > strong {
+  font-size: 0.846154rem;
+  font-weight: 500;
+}
+.inspector-tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 18px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+.inspector-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.923077rem;
+  padding: 10px 1px 8px;
+}
+.inspector-tabs button[aria-selected='true'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.inspector-content {
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 12px;
+}
+.inspector-empty {
+  margin: auto;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.923077rem;
+  line-height: 1.6;
+}
+.inspector-empty > svg {
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+.contextual-properties .property-section {
+  border-color: var(--border);
+}
+.contextual-properties .property-section > summary {
+  padding: 12px 14px;
+  font-size: 0.923077rem;
+}
+.contextual-properties .section-body {
+  padding: 0 14px 14px;
+  gap: 12px;
+}
+.contextual-properties input:not([type='range']):not([type='checkbox']):not([type='color']),
+.contextual-properties select,
+.contextual-properties textarea {
+  border-radius: 5px;
+  font-size: 0.923077rem;
+  padding: 7px 8px;
+}
+.contextual-properties .field > span {
+  font-size: 0.769231rem;
+  color: var(--muted);
+}
+.contextual-properties .button {
+  min-height: 30px;
+  padding: 7px 9px;
+  font-size: 0.846154rem;
+  border-radius: 5px;
+}
+.contextual-properties .timeline-geometry,
+.inspector-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 10px;
+  margin: 0;
+  align-items: end;
+}
+.contextual-properties .timeline-geometry .field {
+  min-width: 0;
+}
+.contextual-properties .timeline-geometry > .button {
+  grid-column: 1/-1;
+  margin-top: 3px;
+}
+.contextual-properties .video-timeline {
+  padding: 10px 14px;
+  border: 0;
+}
+.contextual-properties .video-timeline .timeline-trims {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.contextual-properties .timeline-trims input {
+  width: 70px;
+}
+.contextual-properties .source-trim summary {
+  font-size: 0.846154rem;
+  padding: 3px 0;
+}
+.file-path {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+@media (max-height: 780px) {
+  .studio-toolbar {
+    height: 40px;
+    min-height: 40px;
+  }
+  .studio-editor .stage-area {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "boundary": "Chromium real; IPC desktop simulado",
+  "checks": [
+    "Abrir pasta usa cada destino histórico, mesmo com a conta apontando para outra pasta",
+    "Repetir falhas mostra o novo lote e envia somente os arquivos com erro",
+    "Canvas real: imagem válida e imagem corrompida aparecem no resumo, bloqueiam desligamento e avisam o usuário"
+  ]
+}

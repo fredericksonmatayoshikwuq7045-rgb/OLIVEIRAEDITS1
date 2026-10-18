@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "checks": [
+    "Template em vídeo funciona como marca; início/fim, offset e loop têm efeito real; duas ocorrências do mesmo vídeo mantêm quadros independentes",
+    "Borda, marca, headline visual, texto da headline, cópia e fundo aparecem na timeline; arrastar gera um desfazer e fundo respeita janela e fase",
+    "Ala de imagens conserva enquadramento e templates compartilhados; composição reproduz e PNG real respeita o quadro e a janela da camada de vídeo",
+    "Reload e backup real preservam abas compatíveis, tempos de todas as camadas, offset/loop e quadro escolhido, sem perder as mídias da outra ala"
+  ],
+  "pageErrors": []
+}

@@ -1,5 +1,5 @@
 import type { AspectRatio } from '../domain/models';
-import { AutomationPanel } from './AutomationPanel';
+import { lazy, Suspense } from 'react';
 import { CopyAdjustments } from './CopyAdjustments';
 import { ClearMediaDialog } from './ClearMediaDialog';
 import { MediaContextMenu } from './MediaContextMenu';
@@ -8,6 +8,8 @@ import { ExportDialog } from './ExportDialog';
 import { PanelBoundary } from './PanelBoundary';
 import { Button, Field, Modal } from './Primitives';
 import type { EditorContext } from './useEditor';
+
+const AutomationPanel = lazy(() => import('./AutomationPanel').then((module) => ({ default: module.AutomationPanel })));
 
 export function EditorDialogs({ model }: { model: EditorContext }) {
   const {
@@ -36,7 +38,19 @@ export function EditorDialogs({ model }: { model: EditorContext }) {
   return (
     <>
       {model.clearProjectId === model.project.id && <ClearMediaDialog model={model} />}
-      {model.automation && <AutomationPanel model={model} onClose={() => model.setAutomation(false)} />}
+      {model.automation && (
+        <PanelBoundary name="assistente">
+          <Suspense
+            fallback={
+              <Modal title="Assistente em lote" onClose={() => model.setAutomation(false)}>
+                <p>Carregando assistente…</p>
+              </Modal>
+            }
+          >
+            <AutomationPanel model={model} onClose={() => model.setAutomation(false)} />
+          </Suspense>
+        </PanelBoundary>
+      )}
       {model.menu && <MediaContextMenu menu={model.menu} onClose={() => model.setMenu(null)} onAction={model.clipAction} />}
       {model.copy && (
         <CopyAdjustments

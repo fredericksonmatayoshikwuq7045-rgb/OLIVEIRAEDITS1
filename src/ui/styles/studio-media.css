@@ -1,0 +1,138 @@
+.project-media {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.project-media .media-areas {
+  padding: 9px 8px;
+  border: 0;
+  background: transparent;
+  gap: 0;
+}
+.project-media .media-areas > span {
+  display: none;
+}
+.project-media .media-areas [role='tablist'] {
+  flex: 1;
+  gap: 2px;
+}
+.project-media .media-areas button {
+  justify-content: center;
+  flex: 1;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 0;
+  font-size: 0.769231rem;
+  border-radius: 4px;
+}
+.project-media .media-areas button[aria-selected='true'] {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+.project-media .media-areas .badge {
+  padding: 1px 3px;
+  border: 0;
+  background: transparent;
+  font-size: 0.692308rem;
+}
+.project-media .media-areas svg {
+  display: none;
+}
+.project-media .media-strip {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.project-media .media-strip-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0 12px 12px;
+  gap: 8px;
+}
+.media-heading-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+.media-heading-line > h3 {
+  color: var(--muted);
+  font-size: 0.769231rem;
+  font-weight: 400;
+}
+.project-media .media-scroll {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  margin: 0 6px;
+  overflow: auto;
+}
+.project-media .media-scroll-inner {
+  min-height: 100%;
+}
+.project-media .media-slot {
+  border-radius: 5px;
+  height: 126px;
+}
+.project-media .media-slot img,
+.project-media .media-slot-placeholder {
+  height: 88px;
+}
+.project-media .media-slot.selected {
+  box-shadow: none;
+}
+.project-media .media-slot.active {
+  border-width: 1px;
+}
+.project-media .media-slot-index {
+  font-size: 0.692308rem;
+  padding: 1px 3px;
+}
+.project-media .media-slot-check {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+.project-media .batch-bar {
+  flex-wrap: wrap;
+  background: var(--surface-hover);
+  padding: 8px;
+  border: 0;
+  gap: 5px;
+}
+.project-media .batch-bar > strong {
+  font-size: 0.769231rem;
+  color: var(--text);
+}
+.project-media .batch-bar .button {
+  font-size: 0.769231rem;
+  padding: 5px 7px;
+}
+.import-status {
+  padding: 8px 12px;
+  font-size: 0.846154rem;
+  color: var(--muted);
+}
+.text-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 12px;
+  overflow: auto;
+}
+.text-resources h3 {
+  font-size: 0.923077rem;
+  font-weight: 500;
+}
+.text-resources h4 {
+  font-size: 0.846154rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.text-resources p {
+  line-height: 1.6;
+}

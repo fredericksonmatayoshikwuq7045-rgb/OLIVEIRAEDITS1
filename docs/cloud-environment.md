@@ -1,6 +1,6 @@
 # Ambiente de nuvem preparado
 
-Checkout: `/workspace/OLIVEIRAEDITS1`, branch `refactor/v2`, versão 0.5.0. O host é Linux;
+Checkout: `/workspace/OLIVEIRAEDITS1`, branch `refactor/v2`, versão 0.6.0. O host é Linux;
 o produto de destino continua sendo Windows. Não são necessários segredos nem
 serviços externos para editar e validar mídia sintética.
 
@@ -26,7 +26,7 @@ Antes de usar Cargo/Tauri nesta nuvem:
 
 O helper configura a toolchain e os caminhos das bibliotecas privadas.
 `npm ci` também prepara os assets locais de OCR; não exclua `public/vision`
-antes de compilar. Consulte [release 0.5.0](release-0.5.0.md) para a validação.
+antes de compilar. Consulte [release 0.6.0](release-0.6.0.md) para a validação.
 `bash /workspace/.cloud-onboarding/oliveira-edits/install.sh` reexecuta instalação
 das dependências pelo lockfile e os checks principais. A instalação de base e os novos passos de codec/launcher foram verificados
 neste workspace.
@@ -68,3 +68,18 @@ privadas preparadas durante esta tarefa.
 
 O build do instalador exige Windows, MSVC/SDK e WebView2. Os resultados e os
 comandos correspondentes estão em [REPORT.md](../REPORT.md).
+
+## Navegação do editor 0.6.0
+
+Biblioteca: Mídias/Templates/Texto e Mais. Inspetor: Básico/Tempo/Áudio conforme
+seleção. A timeline fica embaixo e pode ser redimensionada. Importar pasta,
+ordenação, seleção e Limpar todas ficam no menu das mídias; o assistente fica
+em Lote. Os testes e2e foram adaptados a esses caminhos. Execute
+`OE_TEST_URL=http://127.0.0.1:3000 npm run test:studio` para conferir composição
+visual, menus, atalhos, divisórias, temas e layouts em diferentes resoluções.
+
+Repetições do teste nativo 0.6.0 registraram encerramentos do processo WebKit,
+com perda da sessão e mensagem de erro de memória, inclusive antes de templates.
+Uma rodada completa passou; os demais resultados constam no relatório, sem
+conclusão de estabilidade. Desativar compositing/DMABUF não resolveu nesta
+nuvem e não integra o produto ou o launcher salvo.

@@ -8,3 +8,10 @@
 @import './styles/timeline.css';
 @import './styles/timeline-clips.css';
 @import './styles/analysis.css';
+
+@import './styles/studio.css';
+@import './styles/resources.css';
+@import './styles/studio-timeline.css';
+
+@import './styles/studio-inspector.css';
+@import './styles/studio-media.css';

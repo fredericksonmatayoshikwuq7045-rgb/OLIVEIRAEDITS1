@@ -1,7 +1,7 @@
 {
   "name": "oliveira-edits",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host",
@@ -30,7 +30,8 @@
     "test:layers": "node tests/e2e/layer-timeline.mjs",
     "test:timing": "python3 tests/e2e/template-timing.py",
     "test:sequence": "node tests/e2e/sequence-timeline.mjs",
-    "test:sequence-export": "python3 tests/e2e/sequence-export.py"
+    "test:sequence-export": "python3 tests/e2e/sequence-export.py",
+    "test:studio": "node tests/e2e/studio-layout.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

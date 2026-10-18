@@ -1,3 +1,4 @@
+import { resource, inspector, selectTrack, mediaMenu, layout, assistant } from './layer-helpers.mjs';
 import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
@@ -79,8 +80,10 @@ try {
   await page.getByRole('button', { name: 'Importar arquivos', exact: true }).first().click();
   await (await chooser).setFiles(fixture.source.map((data, index) => file(`visual-${index}.png`, data)));
   await page.getByText('Mídias do projeto (2)', { exact: true }).waitFor();
+  await mediaMenu(page);
   await page.getByLabel('Selecionar mídias').selectOption('all');
-  await page.getByRole('button', { name: 'Assistente em lote', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await assistant(page);
   await page.getByLabel('O que analisar').selectOption('mark');
   await page.getByLabel('Como localizar a marca antiga').selectOption('image');
   await page.getByLabel('Imagem recortada da marca antiga', { exact: true }).setInputFiles(file('marca-antiga.png', fixture.reference));

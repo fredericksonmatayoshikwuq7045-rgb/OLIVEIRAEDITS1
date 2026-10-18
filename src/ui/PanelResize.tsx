@@ -4,15 +4,22 @@ export function PanelResize({
   value,
   onChange,
   reverse = false,
+  target,
 }: {
   label: string;
   value: number;
   onChange: (value: number) => void;
   reverse?: boolean;
+  target?: string;
 }) {
   const start = useRef<{ x: number; value: number } | null>(null);
   const displayedWidth = (element: HTMLElement) =>
-    (reverse ? element.nextElementSibling : element.previousElementSibling)?.getBoundingClientRect().width ?? value;
+    (target
+      ? element.parentElement?.querySelector(target)
+      : reverse
+        ? element.nextElementSibling
+        : element.previousElementSibling
+    )?.getBoundingClientRect().width ?? value;
   return (
     <div
       className="panel-resize"

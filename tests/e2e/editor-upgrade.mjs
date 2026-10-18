@@ -1,3 +1,4 @@
+import { resource, inspector, selectTrack, mediaMenu, layout, assistant } from './layer-helpers.mjs';
 import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
@@ -154,7 +155,7 @@ try {
   );
   await page.getByText('Mídias do projeto (2)', { exact: true }).waitFor();
   await page.locator('.media-slot[title="avatar.png"]').click();
-  await page.getByRole('button', { name: /2.*Enquadrar/ }).click();
+  await selectTrack(page, '@media');
   const handle = await page.getByRole('button', { name: 'Redimensionar seleção se', exact: true }).boundingBox();
   await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
   await page.mouse.down();
@@ -176,22 +177,24 @@ try {
   await page.getByRole('menuitem', { name: 'Aplicar edição a todos…', exact: true }).click();
   await page.getByRole('dialog', { name: 'Aplicar ajustes' }).waitFor();
   await page.getByRole('button', { name: 'Aplicar a 1 mídia(s)', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Layout do editor' }).selectOption('right');
+  await layout(page, 'right');
   const stage = await page.locator('.stage-area').boundingBox(),
     strip = await page.locator('.media-strip').boundingBox();
   assert.ok(stage.x > strip.x);
   await page.screenshot({ path: `${directory}/layout-right.png` });
-  await page.getByRole('combobox', { name: 'Layout do editor' }).selectOption('focus');
-  assert.equal(await page.locator('.library').isVisible(), false);
-  await page.getByRole('combobox', { name: 'Layout do editor' }).selectOption('classic');
+  await layout(page, 'focus');
+  assert.equal(await page.locator('.resource-panel').isVisible(), false);
+  await layout(page, 'classic');
   checks.push('Alças e comparação visual, um desfazer por gesto, menu contextual e três layouts');
   await chooser(() => page.getByRole('button', { name: 'Importar arquivos', exact: true }).first().click(), clip);
   await page.getByText('Mídias do projeto (3)', { exact: true }).waitFor();
   await page.locator('.media-slot[title="clip.mp4"]').click();
+  await inspector(page, 'Tempo');
   await page.waitForFunction(() => document.querySelectorAll('.filmstrip-frames img').length === 8);
+  await inspector(page, 'Tempo');
   await page.locator('.source-trim summary').click();
   await setRange('Posição de reprodução', 3);
-  await page.getByRole('button', { name: 'Dividir no cursor (S)', exact: true }).click();
+  await page.getByRole('button', { name: 'Dividir mídia em dois slots', exact: true }).click();
   await page.getByText('Mídias do projeto (4)', { exact: true }).waitFor();
   state = await workspace();
   let project = state.projects.find((project) => project.profileId === account.id);
@@ -202,6 +205,8 @@ try {
   assert.equal(pieces[0].trim.out, 3);
   await page.getByRole('button', { name: 'Desfazer (Ctrl + Z)', exact: true }).click();
   await page.getByText('Mídias do projeto (3)', { exact: true }).waitFor();
+  await inspector(page, 'Tempo');
+  if (!(await page.locator('.source-trim').evaluate((node) => node.open))) await page.locator('.source-trim summary').click();
   const left = page.getByRole('slider', { name: 'Arrastar início do corte', exact: true });
   await left.focus();
   await left.press('ArrowRight');
@@ -223,8 +228,10 @@ try {
     fixtures.scenes.map((base64, index) => ({ name: `marca-${index}.png`, mimeType: 'image/png', buffer: Buffer.from(base64, 'base64') })),
   );
   await page.getByText('Mídias do projeto (2)', { exact: true }).waitFor();
+  await mediaMenu(page);
   await page.getByLabel('Selecionar mídias').selectOption('all');
-  await page.getByRole('button', { name: 'Assistente em lote', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await assistant(page);
   await page.getByRole('button', { name: 'Analisar seleção', exact: true }).click();
   await page.getByRole('button', { name: 'Aplicar 2 resultado(s)', exact: true }).waitFor();
   await page.screenshot({ path: `${directory}/crop-review.png` });
@@ -233,7 +240,7 @@ try {
   project = state.projects.find((project) => project.profileId === state.activeProfileId);
   assert.ok(project.items.every((item) => item.render.media.crop.y > 0.2 && item.render.media.crop.height < 0.62));
   checks.push('Recorte encontra a cena e ignora o título branco na moldura, em duas mídias');
-  await page.getByRole('button', { name: 'Assistente em lote', exact: true }).click();
+  await assistant(page);
   await page.getByLabel('O que analisar').selectOption('mark');
   await page.getByLabel('Texto da marca antiga').fill('MARCA ANTIGA');
   await page.getByLabel('Minha marca em texto').fill('MEU ESTÚDIO');

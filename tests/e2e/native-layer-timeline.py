@@ -68,12 +68,17 @@ def click(text):
 
 
 def field(label, value, commit=False):
+    if any(word in label for word in ['Aparecer', 'Desaparecer', 'Começar no segundo', 'Momento da imagem']):
+        tab('Tempo')
+        execute("for(const node of document.querySelectorAll('.inspector-content details'))node.open=true;return true;")
     execute("const label=[...document.querySelectorAll('label')].find(label=>label.querySelector('input,select')&&label.textContent.includes(input.label));if(!label)throw new Error('Missing '+input.label);const node=label.querySelector('input,select');node.focus();Object.getOwnPropertyDescriptor(node.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype,'value').set.call(node,String(input.value));node.dispatchEvent(new Event(node.tagName==='SELECT'?'change':'input',{bubbles:true}));return true;", {'label': label, 'value': value})
     if commit:
         execute("document.activeElement.blur();return true;")
 
 
 def tab(name):
+    if name in ['Vídeos', 'Imagens']:
+        click('Mídias')
     execute("const node=[...document.querySelectorAll('[role=tab]')].find(node=>node.textContent.trim().startsWith(input));if(!node)throw new Error('Missing tab');node.click();return true;", name)
 
 
@@ -144,16 +149,19 @@ try:
     until(lambda: execute("const node=document.querySelector('button[aria-label=\"Abrir editor de '+input+'\"]');if(!node)return false;node.click();return true;", profile['name']))
     until(lambda: execute("const c=document.querySelector('.stage-preview canvas');return c&&c.getAttribute('aria-busy')==='false';"), 60)
     tab('Vídeos')
+    click('Templates')
     click('Marca')
+    execute("document.querySelector('.resource-details').open=true;return true;")
     field('Tipo de template', 'video')
     execute("const bytes=Uint8Array.from(atob(input),char=>char.charCodeAt(0)),file=new File([bytes],'stamp.mp4',{type:'video/mp4'}),transfer=new DataTransfer();transfer.items.add(file);const node=document.querySelector('input[aria-label=\"Arquivo do template\"]');node.files=transfer.files;node.dispatchEvent(new Event('change',{bubbles:true}));return true;", base64.b64encode(stamp.read_bytes()).decode())
     until(lambda: execute("return [...document.querySelectorAll('.library .template-card')].some(node=>node.textContent.includes('stamp.mp4'));"))
     execute("[...document.querySelectorAll('.library .template-card')].find(node=>node.textContent.includes('stamp.mp4')).click();return true;")
+    assert not execute("return !!document.querySelector('.library video');")
     select_layer()
     field('Aparecer em (s)', 1, True)
     field('Desaparecer em (s)', 3, True)
     field('Começar no segundo do template', .5, True)
-    execute("const node=document.querySelector('input[aria-label=\"Posição de reprodução\"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(node,'1.2');node.dispatchEvent(new Event('input',{bubbles:true}));return true;")
+    execute("const node=document.querySelector('input[aria-label=\"Posição na composição\"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(node,'1.2');node.dispatchEvent(new Event('input',{bubbles:true}));return true;")
     until(lambda: execute("const c=document.querySelector('.stage-preview canvas');if(!c||c.getAttribute('aria-busy')==='true')return false;const p=c.getContext('2d').getImageData(853,247,1,1).data;return p[2]>170&&p[0]<100&&p[1]<100;"))
     until(lambda: execute("return document.querySelector('.save-status')?.textContent==='Salvo';"))
     persisted = json.loads(invoke('storage_read_json', {'relativePath': f'profiles/{account}/profile.json'}))
@@ -174,10 +182,12 @@ try:
     color(result['outputPath'], 3.8, -1)
     REPORT['checks'].append('UI export produces a real MP4: template absent before/after its interval and correct blue source frame inside')
     execute("document.querySelector('.modal button[aria-label=Fechar]').click();return true;")
+    execute("document.querySelector('button[aria-label=\"Opções do template stamp.mp4\"]').click();return true;")
     execute("document.querySelector('button[aria-label=\"Editar template stamp.mp4\"]').click();return true;")
     execute("[...document.querySelectorAll('label')].find(node=>node.textContent.includes('Disponível nas alas')).querySelector('input').click();return true;")
     click('Salvar template')
     tab('Imagens')
+    click('Templates')
     execute("[...document.querySelectorAll('.library .template-card')].find(node=>node.textContent.includes('stamp.mp4')).click();return true;")
     select_layer()
     field('Aparecer em (s)', 1, True)
@@ -195,11 +205,16 @@ try:
     REPORT['checks'].append('Separate image area exports a real PNG at the chosen animated-template frame and preserves both media kinds')
     execute("document.querySelector('.modal button[aria-label=Fechar]').click();return true;")
     tab('Vídeos')
+    execute("document.querySelector('[data-track-id=\"@media\"] .timeline-track-name').click();return true;")
+    tab('Tempo')
+    execute("document.querySelector('.source-trim').open=true;return true;")
     execute("const node=document.querySelector('input[aria-label=\"Fim do corte\"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(node,'1');node.dispatchEvent(new Event('input',{bubbles:true}));return true;")
+    click('Templates')
     click('Headline')
     execute("const file=new File([Uint8Array.from(atob(input),char=>char.charCodeAt(0))],'intro.mp4',{type:'video/mp4'}),transfer=new DataTransfer();transfer.items.add(file);const node=document.querySelector('input[aria-label=\"Arquivo do template\"]');node.files=transfer.files;node.dispatchEvent(new Event('change',{bubbles:true}));return true;",base64.b64encode(stamp.read_bytes()).decode())
     until(lambda: execute("const node=[...document.querySelectorAll('.library .template-card')].find(node=>node.textContent.includes('intro.mp4'));if(!node)return false;node.click();return true;"))
     until(lambda: execute("const node=[...document.querySelectorAll('.timeline-track-row')].find(node=>node.textContent.includes('intro.mp4'));if(!node)return false;node.querySelector('.timeline-track-name').click();return true;"))
+    tab('Tempo')
     click('Usar como abertura')
     until(lambda: execute("return document.querySelector('.save-status')?.textContent==='Salvo';"))
     sequence=json.loads(invoke('storage_read_json',{'relativePath':f'projects/{project_id}.json'}))

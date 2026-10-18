@@ -100,7 +100,46 @@ export async function currentItem(page, title) {
     .find((project) => project.id === data.activeProjectByProfile[data.activeProfileId])
     .items.find((item) => item.title === title);
 }
+export async function resource(page, name) {
+  await page.getByRole('navigation', { name: 'Biblioteca', exact: true }).getByRole('button', { name, exact: true }).click();
+}
+export async function inspector(page, name = 'Básico') {
+  await page.getByRole('tab', { name, exact: true }).click();
+}
+export async function details(page, title) {
+  const summary = page.locator('summary').filter({ hasText: title });
+  if (!(await summary.evaluate((node) => node.parentElement.open))) await summary.click();
+}
+export async function templateType(page, kind) {
+  await details(page, 'Opções de importação');
+  await page.getByRole('combobox', { name: 'Tipo de template' }).selectOption(kind);
+}
+export async function templateAction(page, name, action) {
+  await page.getByRole('button', { name: `Opções do template ${name}`, exact: true }).click();
+  await page.getByRole('button', { name: `${action} ${name}`, exact: true }).click();
+}
+export async function trackAction(page, action) {
+  await page.getByRole('button', { name: 'Opções da camada', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Opções da camada', exact: true }).getByRole('button', { name: action, exact: true }).click();
+}
+export async function mediaMenu(page) {
+  await resource(page, 'Mídias');
+  const button = page.getByRole('button', { name: 'Opções das mídias', exact: true });
+  if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
+}
+export async function layout(page, value) {
+  await page.getByRole('button', { name: 'Visualização do editor', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Layout do editor', exact: true }).selectOption(value);
+  await page.keyboard.press('Escape');
+}
+export async function assistant(page) {
+  await page.getByRole('button', { name: 'Ações em lote', exact: true }).click();
+  await page.getByRole('button', { name: 'Assistente em lote', exact: true }).click();
+}
 export async function number(page, label, value) {
+  const timing = /Aparecer|Desaparecer|Duração da camada|Começar no segundo|Momento da imagem/.test(label);
+  await inspector(page, timing ? 'Tempo' : 'Básico');
+  if (/Desaparecer|Começar no segundo/.test(label)) await details(page, 'Ajuste preciso');
   const input = page.getByRole('spinbutton', { name: label, exact: true });
   await input.fill(String(value));
   await input.press('Enter');
