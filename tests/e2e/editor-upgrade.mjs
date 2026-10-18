@@ -189,6 +189,7 @@ try {
   await page.getByText('Mídias do projeto (3)', { exact: true }).waitFor();
   await page.locator('.media-slot[title="clip.mp4"]').click();
   await page.waitForFunction(() => document.querySelectorAll('.filmstrip-frames img').length === 8);
+  await page.locator('.source-trim summary').click();
   await setRange('Posição de reprodução', 3);
   await page.getByRole('button', { name: 'Dividir no cursor (S)', exact: true }).click();
   await page.getByText('Mídias do projeto (4)', { exact: true }).waitFor();

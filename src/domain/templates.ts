@@ -1,12 +1,12 @@
 import { createTextLayer } from '../render/types';
 import type { AccountTemplate, MediaItem, TemplateCategory } from './models';
 
-export function applyTemplate(item: MediaItem, template: AccountTemplate | null, category: TemplateCategory): MediaItem {
+export function applyTemplate(item: MediaItem, template: AccountTemplate | null, category: TemplateCategory, append = false): MediaItem {
   const previous = item.templates[category];
   const prefix = `template:${category}:`;
   const legacyPrefix = `template-${category}-`;
   const layers = item.render.layers.filter(
-    (layer) => !layer.id.startsWith(prefix) && !layer.id.startsWith(legacyPrefix) && layer.id !== previous,
+    (layer) => append || (!layer.id.startsWith(prefix) && !layer.id.startsWith(legacyPrefix) && layer.id !== previous),
   );
   const render = { ...item.render, layers };
   if (category === 'background') {
@@ -25,6 +25,7 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
     return { ...item, templates: { ...item.templates, background: template?.id ?? null }, render };
   }
   if (template) {
+    const layerId = `${prefix}${template.id}${append ? `:copy:${crypto.randomUUID()}` : ''}`;
     const placement = template.placement;
     const source = template.runtimeUrl ?? template.source;
     const sourceWidth = template.sourceWidth ?? item.render.canvas.width;
@@ -39,7 +40,7 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
           : (((placement.width * item.render.canvas.width) / item.render.canvas.height) * sourceHeight) / sourceWidth,
     };
     layers.push({
-      id: `${prefix}${template.id}`,
+      id: layerId,
       type: template.mediaType ?? 'image',
       source,
       rect,
@@ -51,10 +52,14 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
       sourceWidth,
       sourceHeight,
       sourceDuration: template.sourceDuration,
-      loop: true,
+      loop: category !== 'headline',
+      audio: category === 'headline' ? 'mix' : 'mute',
+      ...(category === 'headline' && template.mediaType === 'video' && template.sourceDuration
+        ? { enable: { start: 0, end: template.sourceDuration } }
+        : {}),
     });
     if (category === 'headline' && template.headlineText) {
-      const text = createTextLayer(`${prefix}${template.id}:text`);
+      const text = createTextLayer(`${layerId}:text`);
       layers.push({
         ...text,
         text: item.headlineText ?? template.headlineText,
@@ -64,15 +69,24 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
         color: template.headlineColor || text.color,
         align: template.headlineAlign || text.align,
         zIndex: placement.zIndex + 1,
+        enable: layers[layers.length - 1].enable,
       });
     }
   }
   return { ...item, templates: { ...item.templates, [category]: template?.id ?? null }, render };
 }
 export function removeTemplateReferences(item: MediaItem, templateId: string): MediaItem {
-  let result = item;
+  const templates = { ...item.templates };
   for (const category of ['border', 'watermark', 'headline', 'background'] as const) {
-    if (result.templates[category] === templateId) result = applyTemplate(result, null, category);
+    if (templates[category] === templateId) templates[category] = null;
   }
-  return result;
+  return {
+    ...item,
+    templates,
+    render: {
+      ...item.render,
+      layers: item.render.layers.filter((layer) => !layer.id.includes(templateId)),
+      background: item.templates.background === templateId ? { type: 'solid', color: '#111111' } : item.render.background,
+    },
+  };
 }

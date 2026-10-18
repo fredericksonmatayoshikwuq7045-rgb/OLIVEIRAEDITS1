@@ -35,12 +35,13 @@
 
 ## P3 — opções de produto não incluídas nesta versão
 
-- Intro/outro por perfil, biblioteca global compartilhada e ponto focal manual
-  são opcionais no plano; exigem novos contratos/UX e matriz de render própria.
+- Biblioteca global compartilhada e ponto focal manual continuam opcionais.
+  Abertura/encerramento por camadas e aplicação em massa estão na 0.5.0; um preset
+  de sequência separado, reutilizável entre projetos, permanece opcional.
 - Tradução completa da interface: continua em pt-BR. As frases já têm pt-BR,
   inglês e espanhol; temas claro/escuro/sistema e cores estão implementados.
 - Rastreamento contínuo de marca em movimento, remoção por reconstrução e OCR de
-  todos os frames não fazem parte da 0.4.0. A análise usa até cinco amostras e
+  todos os frames não fazem parte da 0.5.0. A análise usa até cinco amostras e
   exige revisão; resultados ambíguos não ficam selecionados automaticamente.
 - O catálogo de frases é local e pequeno; um autor com uma única frase repete
   esse texto. Frases pessoais ampliam o catálogo. Ilia Topuria está disponível
@@ -64,4 +65,4 @@
 
 - Templates em vídeo sobre imagens exportam um quadro estático. Animação de foto
   para MP4 e faixas independentes de áudio não estão incluídas. O mix de áudio
-  existente do fundo em vídeo permanece disponível e respeita sua janela.
+  do fundo em vídeo e dos templates em vídeo é configurável e respeita as janelas.

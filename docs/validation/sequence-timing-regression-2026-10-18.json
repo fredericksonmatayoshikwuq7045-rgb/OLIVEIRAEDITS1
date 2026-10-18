@@ -1,0 +1,187 @@
+{
+  "status": "passed",
+  "cases": [
+    {
+      "name": "video-windows",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 0.5,
+          "meanAbsoluteChannelError": 1.2985546875,
+          "fractionPixelsAbove35": 0.009166666666666667
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 1.0807421875,
+          "fractionPixelsAbove35": 0.009375
+        },
+        {
+          "time": 2,
+          "meanAbsoluteChannelError": 2.489943576388889,
+          "fractionPixelsAbove35": 0.0180859375
+        },
+        {
+          "time": 3,
+          "meanAbsoluteChannelError": 2.3080815972222224,
+          "fractionPixelsAbove35": 0.012708333333333334
+        },
+        {
+          "time": 3.8,
+          "meanAbsoluteChannelError": 1.2376996527777777,
+          "fractionPixelsAbove35": 0.012708333333333334
+        },
+        {
+          "time": 5.5,
+          "meanAbsoluteChannelError": 0.27958333333333335,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 5.8,
+          "meanAbsoluteChannelError": 0.27958333333333335,
+          "fractionPixelsAbove35": 0.0
+        }
+      ]
+    },
+    {
+      "name": "trim-speed",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 1.0807421875,
+          "fractionPixelsAbove35": 0.009375
+        },
+        {
+          "time": 2.8,
+          "meanAbsoluteChannelError": 2.328823784722222,
+          "fractionPixelsAbove35": 0.012708333333333334
+        }
+      ]
+    },
+    {
+      "name": "freeze-background",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 0.5,
+          "meanAbsoluteChannelError": 1.2985546875,
+          "fractionPixelsAbove35": 0.009166666666666667
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 1.0807421875,
+          "fractionPixelsAbove35": 0.009375
+        },
+        {
+          "time": 2,
+          "meanAbsoluteChannelError": 2.485269097222222,
+          "fractionPixelsAbove35": 0.018138020833333334
+        },
+        {
+          "time": 3,
+          "meanAbsoluteChannelError": 2.303259548611111,
+          "fractionPixelsAbove35": 0.012708333333333334
+        },
+        {
+          "time": 3.8,
+          "meanAbsoluteChannelError": 2.3032552083333333,
+          "fractionPixelsAbove35": 0.012708333333333334
+        },
+        {
+          "time": 5.5,
+          "meanAbsoluteChannelError": 0.27958333333333335,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 5.8,
+          "meanAbsoluteChannelError": 0.27958333333333335,
+          "fractionPixelsAbove35": 0.0
+        }
+      ]
+    },
+    {
+      "name": "gradient-window",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 1.3181336805555555,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.8,
+          "meanAbsoluteChannelError": 0.8004123263888889,
+          "fractionPixelsAbove35": 0.005
+        }
+      ]
+    },
+    {
+      "name": "image-background-window",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 1.4893793402777777,
+          "fractionPixelsAbove35": 0.009166666666666667
+        },
+        {
+          "time": 2.8,
+          "meanAbsoluteChannelError": 0.7985720486111111,
+          "fractionPixelsAbove35": 0.005
+        }
+      ]
+    },
+    {
+      "name": "hidden-blur",
+      "status": "passed",
+      "frames": [
+        {
+          "time": 0.25,
+          "meanAbsoluteChannelError": 0.275,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 1.2,
+          "meanAbsoluteChannelError": 0.4475173611111111,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.8,
+          "meanAbsoluteChannelError": 0.80984375,
+          "fractionPixelsAbove35": 0.005
+        }
+      ]
+    }
+  ],
+  "checks": [
+    "Timed video layers and backgrounds match real Canvas frames, including duplicate source decoders, offsets, loops and exclusive ends",
+    "Trim/speed preserve output-time windows and duration",
+    "Static PNG/text planes preserve their intervals and z order",
+    "Background audio exists only during its visible interval; main audio remains present"
+  ]
+}

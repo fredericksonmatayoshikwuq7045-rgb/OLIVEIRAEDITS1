@@ -11,6 +11,7 @@ import { appearance } from '../domain/preferences';
 import { PanelResize } from './PanelResize';
 import { DailyQuote } from './DailyQuote';
 import { MediaAreas } from './MediaAreas';
+import { applyTemplate } from '../domain/templates';
 import { useEditor, type EditorProps } from './useEditor';
 export function Editor(props: EditorProps) {
   const data = useEditor(props);
@@ -42,6 +43,10 @@ export function Editor(props: EditorProps) {
             store={store}
             item={active}
             onApplyTemplate={onTemplate}
+            onAppendTemplate={(id, category) => {
+              if (active)
+                changeItem(applyTemplate(active, profile.templates.find((template) => template.id === id) || null, category, true));
+            }}
             onApplyPreset={(id) => {
               const preset = profile.framingPresets.find((p) => p.id === id);
               if (preset && active)

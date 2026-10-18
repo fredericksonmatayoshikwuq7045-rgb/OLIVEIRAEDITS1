@@ -2,6 +2,8 @@ import type { MediaItem } from '../domain/models';
 import { computeGeometry } from './geometry';
 import { layoutText } from './text';
 import type { Point, Rect } from './types';
+import { mainRange } from '../domain/timeline';
+import { activeAt } from './playback';
 export function selectionRect(item: MediaItem, layerId: string | null): Rect & { rotation: number } {
   const layer = item.render.layers.find((value) => value.id === layerId);
   const canvas = item.render.canvas;
@@ -79,11 +81,20 @@ export function transformSelection(
 }
 
 export function hitLayer(item: MediaItem, point: Point, elapsed: number): string | null {
+  const main = selectionRect(item, null),
+    angle = (-main.rotation * Math.PI) / 180;
+  const dx = point.x - main.x - main.width / 2,
+    dy = point.y - main.y - main.height / 2;
+  const mainCovers =
+    activeAt({ ...item.render.media, enable: mainRange(item) }, elapsed) &&
+    item.render.media.opacity > 0.01 &&
+    Math.abs(dx * Math.cos(angle) - dy * Math.sin(angle)) <= main.width / 2 &&
+    Math.abs(dx * Math.sin(angle) + dy * Math.cos(angle)) <= main.height / 2;
   for (const layer of [...item.render.layers].sort((a, b) => b.zIndex - a.zIndex)) {
     if (
       !layer.visible ||
       layer.opacity <= 0.01 ||
-      layer.zIndex < item.render.media.zIndex ||
+      (mainCovers && layer.zIndex < item.render.media.zIndex) ||
       (layer.enable && (elapsed < layer.enable.start || elapsed >= layer.enable.end))
     )
       continue;

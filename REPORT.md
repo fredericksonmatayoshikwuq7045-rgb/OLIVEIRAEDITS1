@@ -1,6 +1,17 @@
 # Relatório de implementação — Oliveira Edits 2
 
-Versão atual: **0.4.0**, com camadas temporais, templates em vídeo e ala de imagens.
+Versão atual: **0.5.0**, com sequência independente, abertura antes do meme,
+clipes visuais, ordem/tamanho individual e áudio por vídeo de camada.
+Guia: [release 0.5.0](docs/release-0.5.0.md). Evidências:
+[resumo](docs/validation/sequence-summary-2026-10-18.json),
+[interface e backup](docs/validation/sequence-ui-2026-10-18.json),
+[MP4 e áudio](docs/validation/sequence-export-2026-10-18.json) e
+[desktop real](docs/validation/sequence-native-2026-10-18.json).
+Passaram 129 testes frontend/dados, 42 Rust, qualidade, builds, sequência/lote,
+PNG/backup, 36 quadros novos e 28 de regressão e 20 exports completos.
+A verificação cruzada Windows não executa NSIS/WebView2. A nuvem continua Linux.
+
+Histórico da **0.4.0**, com camadas temporais, templates em vídeo e ala de imagens.
 Guia: [release 0.4.0](docs/release-0.4.0.md). Evidências da rodada de 18/10/2026:
 [resumo](docs/validation/layers-summary-2026-10-18.json),
 [interface e backup](docs/validation/layers-ui-2026-10-18.json) e

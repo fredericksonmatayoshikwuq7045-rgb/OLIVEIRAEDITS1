@@ -1,6 +1,7 @@
 import { copyFraming } from './batch';
 import type { MediaItem } from './models';
 import type { RenderBackground, Timing } from '../render/types';
+import { mainRange } from './timeline';
 function afterSplit<T extends Timing>(value: T, offset: number, video = false): T {
   const media = value as T & { sourceOffset?: number; sourceDuration?: number; loop?: boolean };
   const position = (media.sourceOffset || 0) + Math.max(0, offset - (value.enable?.start || 0));
@@ -26,12 +27,13 @@ export function splitMedia(item: MediaItem, at: number): [MediaItem, MediaItem] 
   const split = Math.round(at / frame) * frame;
   if (!Number.isFinite(split) || split < item.trim.in + frame || split > item.trim.out - frame)
     throw new Error('Posicione o cursor dentro do trecho, deixando ao menos um quadro em cada parte.');
-  const offset = (split - item.trim.in) / item.speed;
+  const offset = mainRange(item).start + (split - item.trim.in) / item.speed;
   const left = structuredClone(item),
     right = duplicateMedia(item);
   left.trim.out = split;
   right.title = `${item.title} · parte 2`;
   right.trim.in = split;
+  right.mediaStart = 0;
   left.render.layers = left.render.layers
     .map((layer) => (layer.enable ? { ...layer, enable: { start: layer.enable.start, end: Math.min(offset, layer.enable.end) } } : layer))
     .filter((layer) => !layer.enable || layer.enable.end > layer.enable.start);
@@ -50,6 +52,10 @@ export function copyAdjustments(source: MediaItem, target: MediaItem, groups: Ad
     result.render.layers = structuredClone(source.render.layers);
     result.templates = { ...source.templates };
     result.headlineText = source.headlineText;
+    result.mediaStart = source.mediaStart;
+    result.render.media.zIndex = source.render.media.zIndex;
+    result.render.media.visible = source.render.media.visible;
+    result.render.media.audio = source.render.media.audio;
   }
   if (groups.includes('speed') && source.kind === 'video' && result.kind === 'video') result.speed = source.speed;
   if (groups.includes('trim') && source.kind === 'video' && result.kind === 'video') {

@@ -112,7 +112,7 @@ function drawBackground(context: CanvasRenderingContext2D, spec: RenderSpec, ass
       context.restore();
     }
   }
-  if (background.type === 'blur' || spec.media.fit === 'blur') {
+  if ((background.type === 'blur' || spec.media.fit === 'blur') && activeAt(spec.media, time)) {
     const radius = background.type === 'blur' ? background.radius : 0.025;
     const asset = assets.get(spec.media.source);
     if (asset) {
@@ -145,7 +145,7 @@ export function drawFrame(context: CanvasRenderingContext2D, spec: RenderSpec, a
   entries.sort((left, right) => left.zIndex - right.zIndex);
   for (const entry of entries) {
     if (entry.layer) drawLayer(context, entry.layer, spec, assets, time);
-    else drawMedia(context, spec, assets);
+    else if (activeAt(spec.media, time)) drawMedia(context, spec, assets);
   }
   context.restore();
 }

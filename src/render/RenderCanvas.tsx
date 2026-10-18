@@ -11,6 +11,7 @@ export interface RenderCanvasProps {
   muted?: boolean;
   playbackRate?: number;
   timeOrigin?: number;
+  duration?: number;
   className?: string;
   style?: CSSProperties;
   resolveSource?: SourceResolver;
@@ -69,16 +70,17 @@ export function RenderCanvas(props: RenderCanvasProps) {
   useEffect(() => {
     if (!assets) return;
     const outputTime = Math.max(0, time - timeOrigin) / playbackRate;
-    if (playing && spec.media.type === 'image' && Math.abs(time - clock.current.reported) > 0.00001)
-      clock.current = { now: performance.now(), time, reported: time };
+    if (playing && Math.abs(time - clock.current.reported) > 0.00001) clock.current = { now: performance.now(), time, reported: time };
     for (const binding of videoBindings(spec)) {
       const asset = assets.get(binding.key);
       if (!(asset instanceof HTMLVideoElement)) continue;
-      const target = binding.main ? Math.min(time, Math.max(0, asset.duration - 0.001)) : bindingTime(binding, outputTime, asset.duration);
+      const target = binding.main
+        ? Math.min(Math.max(timeOrigin + (binding.enable?.start || 0) * playbackRate, time), Math.max(0, asset.duration - 0.001))
+        : bindingTime(binding, outputTime, asset.duration);
       if (asset.loop !== binding.loop) asset.loop = binding.loop;
       const rate = binding.main ? Math.max(0.25, Math.min(4, playbackRate)) : 1;
       if (asset.playbackRate !== rate) asset.playbackRate = rate;
-      const shouldMute = muted || (!binding.main && !binding.audio) || !activeAt(binding, outputTime);
+      const shouldMute = muted || !binding.audio || !activeAt(binding, outputTime);
       if (asset.muted !== shouldMute) asset.muted = shouldMute;
       if (!playing && !asset.paused) asset.pause();
       if (Math.abs(asset.currentTime - target) > (playing ? 0.35 : 0.001)) asset.currentTime = Math.max(0, target);
@@ -92,31 +94,31 @@ export function RenderCanvas(props: RenderCanvasProps) {
     const snapshot = propsRef.current;
     clock.current = { now: performance.now(), time: snapshot.time ?? 0, reported: snapshot.time ?? 0 };
     const main = assets.get(snapshot.spec.media.source);
-    const ended = () => propsRef.current.onEnded?.();
-    if (main instanceof HTMLVideoElement) main.addEventListener('ended', ended);
     const render = (now = performance.now()) => {
       if (cancelled) return;
       const current = propsRef.current;
       const rate = current.playbackRate ?? 1;
-      const currentTime =
-        main instanceof HTMLVideoElement
-          ? main.currentTime
-          : playing
-            ? clock.current.time + (now - clock.current.now) / 1000
-            : (current.time ?? 0);
+      const currentTime = playing ? clock.current.time + ((now - clock.current.now) / 1000) * rate : (current.time ?? 0);
       const outputTime = Math.max(0, currentTime - (current.timeOrigin ?? 0)) / rate;
+      const duration =
+        current.duration ?? (main instanceof HTMLVideoElement ? (main.duration - (current.timeOrigin || 0)) / rate : Infinity);
+      if (playing && outputTime >= duration) {
+        current.onTimeUpdate?.((current.timeOrigin || 0) + duration * rate);
+        current.onEnded?.();
+        return;
+      }
       for (const binding of videoBindings(current.spec)) {
         const asset = assets.get(binding.key);
         if (!(asset instanceof HTMLVideoElement)) continue;
         const active = activeAt(binding, outputTime);
-        const shouldMute = !!current.muted || (!binding.main && !binding.audio) || !active;
+        const shouldMute = !!current.muted || !binding.audio || !active;
         if (asset.muted !== shouldMute) asset.muted = shouldMute;
         if (!playing || !active) {
           if (!asset.paused) asset.pause();
           continue;
         }
-        const target = binding.main ? currentTime : bindingTime(binding, outputTime, asset.duration);
-        if (!binding.main && Math.abs(asset.currentTime - target) > 0.15) asset.currentTime = target;
+        const target = binding.main ? Math.min(currentTime, asset.duration - 0.001) : bindingTime(binding, outputTime, asset.duration);
+        if (Math.abs(asset.currentTime - target) > 0.15) asset.currentTime = Math.max(0, target);
         const atEnd = !binding.loop && asset.currentTime >= asset.duration - 0.02;
         if (asset.paused && !atEnd && !blocked.current.has(asset)) {
           void asset.play().catch((error: unknown) => {
@@ -151,7 +153,6 @@ export function RenderCanvas(props: RenderCanvasProps) {
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
-      if (main instanceof HTMLVideoElement) main.removeEventListener('ended', ended);
       for (const asset of assets.values())
         if (asset instanceof HTMLVideoElement) {
           asset.removeEventListener('seeked', redraw);

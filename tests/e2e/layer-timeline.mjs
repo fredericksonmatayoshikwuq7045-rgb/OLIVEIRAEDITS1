@@ -45,9 +45,9 @@ try {
   await number(page, 'Desaparecer em (s)', 3);
   await number(page, 'Começar no segundo do template', 0.5);
   await page.getByRole('switch', { name: 'Repetir vídeo na camada', exact: true }).uncheck();
-  await range(page, 'Posição de reprodução', 0.25);
+  await range(page, 'Posição na composição', 0.25);
   await color(page, 0.79, 0.12875, -1);
-  await range(page, 'Posição de reprodução', 1.2);
+  await range(page, 'Posição na composição', 1.2);
   await color(page, 0.79, 0.12875, 2);
   await page.getByTitle('Duplicar camada', { exact: true }).click();
   item = await currentItem(page, 'clip.mp4');
@@ -56,7 +56,7 @@ try {
   await range(page, 'X', 0.05);
   await selectTrack(page, copy.id);
   await number(page, 'Começar no segundo do template', 1.5);
-  await range(page, 'Posição de reprodução', 1.2);
+  await range(page, 'Posição na composição', 1.2);
   await color(page, 0.79, 0.12875, 2);
   await color(page, 0.19, 0.14875, 1);
   checks.push(
@@ -89,18 +89,18 @@ try {
   await library.locator('.template-card').filter({ hasText: 'stamp.mp4' }).click();
   item = await currentItem(page, 'clip.mp4');
   assert.equal(item.render.layers.length, 5);
-  assert.equal(await page.locator('.timeline-track-row').count(), 6);
+  assert.equal(await page.locator('.timeline-track-row').count(), 7);
   await selectTrack(page, '@background');
   await number(page, 'Aparecer em (s)', 0.5);
   await number(page, 'Desaparecer em (s)', 5.5);
   await number(page, 'Começar no segundo do template', 0.25);
-  await range(page, 'Posição de reprodução', 0.2);
+  await range(page, 'Posição na composição', 0.2);
   await color(page, 0.5, 0.9, -1);
-  await range(page, 'Posição de reprodução', 1.3);
+  await range(page, 'Posição na composição', 1.3);
   await color(page, 0.5, 0.9, 2);
-  await range(page, 'Posição de reprodução', 3);
+  await range(page, 'Posição na composição', 3);
   await color(page, 0.5, 0.9, 1);
-  await range(page, 'Posição de reprodução', 5.8);
+  await range(page, 'Posição na composição', 5.8);
   await color(page, 0.5, 0.9, -1);
   await page.screenshot({ path: `${directory}/video-tracks.png` });
   checks.push(
@@ -150,7 +150,7 @@ try {
   await page.getByRole('tab', { name: /Imagens/ }).click();
   assert.equal((await currentItem(page, 'photo.png')).imageTime, 2);
   await page.getByRole('tab', { name: /Vídeos/ }).click();
-  assert.equal(await page.locator('.timeline-track-row').count(), 6);
+  assert.equal(await page.locator('.timeline-track-row').count(), 7);
   assert.deepEqual((await stored(page)).projects.find((value) => value.id === project.id).items, preserved);
   await page.getByRole('button', { name: 'Voltar às contas', exact: true }).click();
   await page.getByRole('button', { name: 'Opções de Camadas', exact: true }).click();

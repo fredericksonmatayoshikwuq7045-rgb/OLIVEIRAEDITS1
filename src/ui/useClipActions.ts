@@ -22,7 +22,7 @@ export function useClipActions({
   exportOne: (id: string) => void;
 }) {
   const [menu, setMenu] = useState<MediaMenu | null>(null),
-    [copy, setCopy] = useState<{ source: MediaItem; ids: string[] } | null>(null),
+    [copy, setCopy] = useState<{ source: MediaItem; ids: string[]; sequence?: boolean } | null>(null),
     [compare, setCompare] = useState(false);
   const action = (command: string, item: MediaItem) => {
     try {

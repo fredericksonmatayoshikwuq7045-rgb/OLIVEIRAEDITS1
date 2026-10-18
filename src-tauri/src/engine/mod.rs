@@ -3,6 +3,7 @@ pub mod model;
 pub mod probe;
 pub mod graph;
 pub mod arguments;
+mod audio;
 pub mod progress;
 pub mod media_tools;
 pub mod power;

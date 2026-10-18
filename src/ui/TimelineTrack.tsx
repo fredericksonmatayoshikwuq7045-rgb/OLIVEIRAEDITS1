@@ -1,9 +1,15 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, GripVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { movedRange, trackRange, type Track } from '../domain/timeline';
+import type { MediaItem, Profile } from '../domain/models';
+import { BACKGROUND_TRACK, MEDIA_TRACK } from '../domain/timeline';
+import { TrackFilmstrip } from './TrackFilmstrip';
 import { IconButton } from './Primitives';
 export function TimelineTrack({
   track,
+  item,
+  profile,
+  onReorder,
   duration,
   step,
   time,
@@ -13,12 +19,15 @@ export function TimelineTrack({
   onVisible,
 }: {
   track: Track;
+  item: MediaItem;
+  profile: Profile;
+  onReorder: (id: string) => void;
   duration: number;
   step: number;
   time: number;
   selected: boolean;
   onSelect: () => void;
-  onCommit: (range: { start: number; end: number }) => void;
+  onCommit: (range: { start: number; end: number }, edge: 'start' | 'end' | 'move') => void;
   onVisible: () => void;
 }) {
   const actual = trackRange(track, duration),
@@ -35,17 +44,34 @@ export function TimelineTrack({
   const outside = draft.start >= duration || draft.end <= 0;
   const finish = () => {
     if (!drag.current) return;
+    const edge = drag.current.edge;
     drag.current = null;
-    if (latest.current.start !== actual.start || latest.current.end !== actual.end) onCommit(latest.current);
+    if (latest.current.start !== actual.start || latest.current.end !== actual.end) onCommit(latest.current, edge);
   };
   const key = (event: React.KeyboardEvent<HTMLElement>, edge: 'start' | 'end' | 'move') => {
     if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
-    onCommit(movedRange(actual, (event.key === 'ArrowRight' ? 1 : -1) * step * (event.shiftKey ? 10 : 1), duration, edge, step));
+    onCommit(movedRange(actual, (event.key === 'ArrowRight' ? 1 : -1) * step * (event.shiftKey ? 10 : 1), duration, edge, step), edge);
   };
   return (
-    <div className={`timeline-track-row ${selected ? 'active' : ''}`} data-track-id={track.id}>
-      <div className="timeline-track-heading">
+    <div
+      className={`timeline-track-row ${selected ? 'active' : ''}`}
+      data-track-id={track.id}
+      onDragOver={(event) => {
+        if (track.id !== BACKGROUND_TRACK) event.preventDefault();
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        const id = event.dataTransfer.getData('application/x-oliveira-track');
+        if (id) onReorder(id);
+      }}
+    >
+      <div
+        className="timeline-track-heading"
+        draggable={track.id !== BACKGROUND_TRACK}
+        onDragStart={(event) => event.dataTransfer.setData('application/x-oliveira-track', track.id)}
+      >
+        <GripVertical size={12} aria-hidden="true" />
         <button
           className="timeline-track-name truncate"
           aria-label={`Selecionar camada ${track.name}`}
@@ -56,7 +82,15 @@ export function TimelineTrack({
           {track.name}
         </button>
         <span className="badge">
-          {track.type === 'video' ? 'VÍDEO' : track.type === 'text' ? 'TEXTO' : track.type === 'background' ? 'FUNDO' : 'IMAGEM'}
+          {track.id === MEDIA_TRACK
+            ? 'PRINCIPAL'
+            : track.type === 'video'
+              ? 'VÍDEO'
+              : track.type === 'text'
+                ? 'TEXTO'
+                : track.type === 'background'
+                  ? 'FUNDO'
+                  : 'IMAGEM'}
         </span>
         <IconButton label={`${track.visible === false ? 'Mostrar' : 'Ocultar'} ${track.name}`} onClick={onVisible}>
           {track.visible === false ? <EyeOff size={12} /> : <Eye size={12} />}
@@ -80,7 +114,7 @@ export function TimelineTrack({
               if (event.button !== 0) return;
               event.preventDefault();
               onSelect();
-              const edge = (event.target as HTMLElement).dataset.edge as 'start' | 'end' | undefined;
+              const edge = (event.target as HTMLElement).closest<HTMLElement>('[data-edge]')?.dataset.edge as 'start' | 'end' | undefined;
               drag.current = { x: event.clientX, width: lane.current!.getBoundingClientRect().width, edge: edge || 'move', range: actual };
               event.currentTarget.setPointerCapture(event.pointerId);
             }}
@@ -118,7 +152,9 @@ export function TimelineTrack({
               }}
               className="track-handle start"
             />
-            <span className="truncate">
+            <TrackFilmstrip track={track} item={item} profile={profile} />
+            <span className="track-clip-title truncate">{track.name}</span>
+            <span className="track-clip-time">
               {draft.start.toFixed(2)}s — {draft.end.toFixed(2)}s
             </span>
             <span

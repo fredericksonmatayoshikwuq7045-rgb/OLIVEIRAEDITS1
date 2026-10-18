@@ -9,6 +9,7 @@ import { VideoTimeline } from './VideoTimeline';
 import { LayerTimeline } from './LayerTimeline';
 import { ImageTimeline } from './ImageTimeline';
 import { Stage } from './Stage';
+import { MEDIA_TRACK } from '../domain/timeline';
 import type { EditorContext } from './useEditor';
 
 export function EditorCenter({ model }: { model: EditorContext }) {
@@ -150,10 +151,17 @@ export function EditorCenter({ model }: { model: EditorContext }) {
             time={time}
             selectedId={layerId}
             onSelect={(id) => {
-              model.setLayerId(id);
+              model.setLayerId(id === MEDIA_TRACK ? null : id);
               model.setStep(3);
             }}
             onChange={changeItem}
+            onApply={() =>
+              model.setCopy({
+                source: structuredClone(active),
+                ids: items.filter((item) => item.id !== active.id && item.status === 'ready').map((item) => item.id),
+                sequence: true,
+              })
+            }
             onTime={(value) => {
               setTime(value);
               if (active.kind === 'image') changeItem({ ...active, imageTime: value });

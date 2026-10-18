@@ -1,4 +1,4 @@
-# Oliveira Edits — 0.4.0
+# Oliveira Edits — 0.5.0
 
 Editor local em pt-BR para vídeos e imagens em lote. Cada conta mantém templates,
 fontes, presets, projetos e configurações de exportação próprios.
@@ -13,18 +13,20 @@ indisponível durante a importação e quando não há mídias.
 
 ## Novidades desta versão
 
-Todos os templates, textos e o fundo têm faixas próprias na timeline. Arraste as
-pontas ou defina os segundos exatos de entrada/saída. Templates em vídeo funcionam
-em todas as categorias, com ponto de entrada e repetição por camada. A timeline
-pode ser expandida para editar várias faixas.
+Headlines em vídeo, foto e texto podem ultrapassar a duração da mídia principal.
+**Usar como abertura** posiciona o meme depois da chamada; a saída inclui a
+sequência inteira. **Aplicar sequência em massa** copia a montagem para a leva,
+preservando os arquivos e durações dos destinos.
 
-As alas **Todas / Vídeos / Imagens** organizam o projeto preservando as ferramentas.
-Uma imagem com template animado exporta o quadro escolhido em PNG/JPG/WebP.
-A edição do template permite compartilhá-lo entre vídeos e imagens.
+A timeline mostra clipes com miniaturas, régua comum, zoom e rolagem. Arraste
+clipes e pontas no tempo; arraste os nomes para mudar a ordem visual. Cada camada
+tem tamanho/posição próprios e vídeos têm áudio opcional. O botão **+** do template
+adiciona outra camada; duplicar e dividir mantêm os clipes na mesma composição.
 
-Guia e limites: [release 0.4.0](docs/release-0.4.0.md). Foto de perfil, frases,
-temas, layouts, alças, assistente e demais funções da
-[0.3.0](docs/release-0.3.0.md) continuam disponíveis.
+As alas **Todas / Vídeos / Imagens** mantêm as ferramentas. Fotos exportam o quadro
+escolhido em PNG/JPG/WebP. Veja o passo a passo e os limites na
+[release 0.5.0](docs/release-0.5.0.md). As funções da
+[0.4.0](docs/release-0.4.0.md) e [0.3.0](docs/release-0.3.0.md) continuam disponíveis.
 As novidades estão em `refactor/v2`; baixe essa branch para obter esta versão.
 
 ## Requisitos e início

@@ -70,6 +70,9 @@ pub struct Background {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RenderMedia {
+    pub audio: Option<String>,
+    pub enable: Option<Enable>,
+    #[serde(default = "yes")] pub visible: bool,
     pub width: f64,
     pub height: f64,
     #[serde(default)] pub rotation: f64,
@@ -94,6 +97,7 @@ pub struct RenderSpec {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DynamicLayer {
+    pub audio: Option<String>,
     #[serde(default = "yes", rename = "loop")] pub loop_video: bool,
     pub source_offset: Option<f64>,
     pub source_duration: Option<f64>,
@@ -127,6 +131,7 @@ pub struct ExportItem {
     pub source_path: String,
     pub output_path: String,
     pub trim: Option<Trim>,
+    pub output_duration: Option<f64>,
     pub render: Option<RenderSpec>,
     #[serde(default)] pub overlays: Vec<Overlay>,
     #[serde(default = "standard")] pub preset: String,

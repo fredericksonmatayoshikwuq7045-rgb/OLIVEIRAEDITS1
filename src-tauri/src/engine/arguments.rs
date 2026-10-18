@@ -8,6 +8,7 @@ pub fn validate(item: &ExportItem) -> Result<(),String> {
     if item.encoder.as_ref().is_some_and(|value| !["libx264", "h264_nvenc", "h264_qsv", "h264_amf"].contains(&value.as_str())) { return Err("Encoder não permitido.".into()); }
     if !item.speed.is_finite() || !(0.5..=2.0).contains(&item.speed) || item.fps.is_some_and(|fps|!fps.is_finite() || !(1.0..=120.0).contains(&fps)) { return Err("Velocidade precisa estar entre 0,5× e 2×; FPS entre 1 e 120.".into()); }
     if let Some(trim) = &item.trim { if !trim.start.is_finite() || !trim.duration.is_finite() || trim.start < 0.0 || trim.duration <= 0.0 { return Err("Trim precisa de início não negativo e duração positiva.".into()); } }
+    if item.output_duration.is_some_and(|duration| !duration.is_finite() || duration <= 0.0 || duration > 86400.0) { return Err("Duração da composição inválida.".into()); }
     if item.mode == "render" { graph::validate_render(item.render.as_ref().ok_or("Modelo de renderização ausente.")?)?; }
     let path = Path::new(&item.output_path);
     if !path.is_absolute() || item.output_path.contains('\0') { return Err("Escolha uma pasta de saída por caminho absoluto.".into()); }
@@ -40,7 +41,7 @@ pub fn duration(item: &ExportItem, info: &MediaInfo) -> Result<f64,String> {
     if info.is_image { return Ok(item.trim.as_ref().map(|t|t.duration).unwrap_or(1.0)); }
     let (start,duration)=item.trim.as_ref().map(|t|(t.start,t.duration)).unwrap_or((0.0,info.duration));
     if duration<=0.0 || start>=info.duration || start+duration>info.duration+0.15 { return Err("O trim está fora da duração real do arquivo.".into()); }
-    Ok(duration/item.speed)
+    Ok(if item.mode == "render" { item.output_duration.unwrap_or(duration/item.speed) } else { duration/item.speed })
 }
 
 pub fn build(item:&ExportItem, info:&MediaInfo, partial:&Path, fallback:bool) -> Result<Vec<String>,String> {
@@ -59,21 +60,8 @@ pub fn build(item:&ExportItem, info:&MediaInfo, partial:&Path, fallback:bool) ->
         let graph=graph::build(item,info,duration)?;
         args.extend(graph.inputs);
         let mut filter=graph.filter;
-        if !output_image {
-            if let Some(background)=graph.background_audio {
-                let bg_has_audio=item.render.as_ref().and_then(|r|r.background.source.as_ref()).and_then(|p|probe::probe(p).ok()).is_some_and(|p|p.has_audio);
-                if bg_has_audio {
-                    let bg=&item.render.as_ref().unwrap().background;
-                    let start=bg.enable.as_ref().map_or(0.0,|value|value.start);
-                    let span=(bg.enable.as_ref().map_or(duration,|value|value.end)-start).max(0.0);
-                    let offset=bg.source_offset.unwrap_or(0.0);
-                    filter.push_str(&format!(";[{background}:a]atrim=start={offset},asetpts=PTS-STARTPTS,atrim=duration={span},adelay={}:all=1,apad[bgaudio]",(start*1000.0).round() as u64));
-                    if info.has_audio { filter.push_str(&format!(";[0:a]asetpts=PTS-STARTPTS,atempo={}[mainaudio];[mainaudio][bgaudio]amix=inputs=2:duration=longest:normalize=1[aout]",item.speed)); }
-                    else { filter.push_str(";[bgaudio]anull[aout]"); }
-                    args.extend(["-map".into(),"[aout]".into()]);
-                } else if info.has_audio { args.extend(["-map".into(),"0:a:0".into(),"-af".into(),format!("asetpts=PTS-STARTPTS,atempo={}",item.speed)]); }
-            } else if info.has_audio { args.extend(["-map".into(),"0:a:0".into(),"-af".into(),format!("asetpts=PTS-STARTPTS,atempo={}",item.speed)]); }
-            else if item.silent_audio { filter.push_str(";anullsrc=r=48000:cl=stereo[aout]"); args.extend(["-map".into(),"[aout]".into()]); }
+        if !output_image && super::audio::append(&mut filter,item,info,&graph.audio_inputs,duration) {
+            args.extend(["-map".into(),"[aout]".into()]);
         }
         args.extend(["-filter_complex".into(),filter,"-map".into(),"[outv]".into()]);
     }

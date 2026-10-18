@@ -31,7 +31,7 @@ describe('Timeline de todas as camadas', () => {
     item.trim = { in: 2, out: 8 };
     item.speed = 2;
     for (const value of profile.templates) item = applyTemplate(item, value, value.category);
-    expect(timelineTracks(item, profile)).toHaveLength(5);
+    expect(timelineTracks(item, profile)).toHaveLength(6);
     const timed = patchTrack(item, BACKGROUND_TRACK, { enable: { start: 0.5, end: 2 }, visible: false, sourceOffset: 0.25 });
     expect(timed.render.background).toMatchObject({
       type: 'video',
@@ -75,7 +75,9 @@ describe('Timeline de todas as camadas', () => {
     expect(compositionDuration(item)).toBe(8);
     item.imageDuration = 4;
     item.imageTime = 5;
-    expect(imageFrameTime(item)).toBe(3.999);
+    expect(imageFrameTime(item)).toBe(5);
+    item.imageTime = 9;
+    expect(imageFrameTime(item)).toBe(7.999);
     item.imageTime = Number.NaN;
     expect(imageFrameTime(item)).toBe(0);
   });

@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "checks": [
+    "Authorized loopback stream serves exact byte ranges, rejects foreign origins and refuses ungranted paths",
+    "Production WebKit imports a File video template through managed assets and native probe, and previews the timed/offset layer",
+    "UI export produces a real MP4: template absent before/after its interval and correct blue source frame inside",
+    "Separate image area exports a real PNG at the chosen animated-template frame and preserves both media kinds",
+    "Production UI creates a 3s video intro before a 1s meme and exports the complete 4s sequence with correct frames"
+  ],
+  "url": "tauri://localhost",
+  "sequenceOutput": "/workspace/shared/oliveira-native-test/data-sequence05/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01_2.mp4",
+  "videoOutput": "/workspace/shared/oliveira-native-test/data-sequence05/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01.mp4",
+  "imageOutput": "/workspace/shared/oliveira-native-test/data-sequence05/com.oliveira.masseditor/native-layers/output/Padrão_2026-10-18_01.png"
+}

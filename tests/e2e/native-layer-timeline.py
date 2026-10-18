@@ -193,6 +193,26 @@ try:
     assert next(item for item in persisted['items'] if item['kind'] == 'image')['imageTime'] == 2
     assert len(persisted['items']) == 2
     REPORT['checks'].append('Separate image area exports a real PNG at the chosen animated-template frame and preserves both media kinds')
+    execute("document.querySelector('.modal button[aria-label=Fechar]').click();return true;")
+    tab('Vídeos')
+    execute("const node=document.querySelector('input[aria-label=\"Fim do corte\"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(node,'1');node.dispatchEvent(new Event('input',{bubbles:true}));return true;")
+    click('Headline')
+    execute("const file=new File([Uint8Array.from(atob(input),char=>char.charCodeAt(0))],'intro.mp4',{type:'video/mp4'}),transfer=new DataTransfer();transfer.items.add(file);const node=document.querySelector('input[aria-label=\"Arquivo do template\"]');node.files=transfer.files;node.dispatchEvent(new Event('change',{bubbles:true}));return true;",base64.b64encode(stamp.read_bytes()).decode())
+    until(lambda: execute("const node=[...document.querySelectorAll('.library .template-card')].find(node=>node.textContent.includes('intro.mp4'));if(!node)return false;node.click();return true;"))
+    until(lambda: execute("const node=[...document.querySelectorAll('.timeline-track-row')].find(node=>node.textContent.includes('intro.mp4'));if(!node)return false;node.querySelector('.timeline-track-name').click();return true;"))
+    click('Usar como abertura')
+    until(lambda: execute("return document.querySelector('.save-status')?.textContent==='Salvo';"))
+    sequence=json.loads(invoke('storage_read_json',{'relativePath':f'projects/{project_id}.json'}))
+    assert next(item for item in sequence['items'] if item['kind']=='video')['mediaStart']==3
+    previous={job['id'] for job in invoke('get_queue_state')}
+    click('Exportar');click('Exportar 1 mídias')
+    new_job=until(lambda:next((job for job in invoke('get_queue_state') if job['id'] not in previous and job['status']=='completed'),None),90)
+    sequence_result=new_job['items'][0];assert sequence_result['status']=='ok',sequence_result
+    color(sequence_result['outputPath'],.2,0);color(sequence_result['outputPath'],1.2,2);color(sequence_result['outputPath'],3.5,-1)
+    probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',sequence_result['outputPath']]))
+    assert abs(float(probe['format']['duration'])-4)<.15
+    REPORT['checks'].append('Production UI creates a 3s video intro before a 1s meme and exports the complete 4s sequence with correct frames')
+    REPORT['sequenceOutput']=sequence_result['outputPath']
     REPORT['status'] = 'passed'
     REPORT['videoOutput'] = result['outputPath']
     REPORT['imageOutput'] = str(output)

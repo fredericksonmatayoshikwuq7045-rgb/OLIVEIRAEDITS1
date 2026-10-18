@@ -11,7 +11,8 @@ export type FitMode = 'cover' | 'contain' | 'stretch' | 'original' | 'blur';
 export type AspectRatio = '9:16' | '16:9' | '1:1' | '4:5';
 
 /** All positions are canvas fractions; crop is a fraction of the source. */
-export interface RenderMedia extends Size {
+export interface RenderMedia extends Size, Timing {
+  audio?: 'mute' | 'mix';
   type: 'image' | 'video';
   source: string;
   fit: FitMode;
@@ -67,6 +68,7 @@ export interface RenderImageLayer extends LayerBase {
   sourceOffset?: number;
   sourceDuration?: number;
   loop?: boolean;
+  audio?: 'mute' | 'mix';
 }
 
 /** Font size is a canvas-height fraction; decoration sizes use min(W,H). */

@@ -18,6 +18,8 @@ export function exportIssues(items: MediaItem[], profile: Profile): ExportIssue[
     )
       add('corte ou velocidade inválidos.');
     const { width, height } = item.render.canvas;
+    if (item.mediaStart !== undefined && (!Number.isFinite(item.mediaStart) || item.mediaStart < 0 || item.mediaStart > 86400))
+      add('início da mídia na composição inválido.');
     if (!Number.isFinite(width + height) || width <= 0 || height <= 0 || (item.kind === 'video' && (width % 2 || height % 2)))
       add('dimensões de saída inválidas; vídeos exigem dimensões pares.');
     for (const layer of [item.render.background, ...item.render.layers]) {

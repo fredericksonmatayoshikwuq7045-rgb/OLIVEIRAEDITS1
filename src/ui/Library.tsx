@@ -11,6 +11,7 @@ export function Library({
   store,
   item,
   onApplyTemplate,
+  onAppendTemplate,
   onApplyPreset,
   onSavePreset,
   notify,
@@ -19,6 +20,7 @@ export function Library({
   store: WorkspaceStore;
   item: MediaItem | null;
   onApplyTemplate: (id: string | null, category: TemplateCategory) => void;
+  onAppendTemplate?: (id: string, category: TemplateCategory) => void;
   onApplyPreset: (id: string) => void;
   onSavePreset: () => void;
   notify: (message: string) => void;
@@ -125,6 +127,11 @@ export function Library({
                   <IconButton label={`Editar template ${template.name}`} onClick={() => setEditing(template)}>
                     <Settings2 size={12} />
                   </IconButton>
+                  {item && category !== 'background' && onAppendTemplate && (
+                    <IconButton label={`Adicionar camada de ${template.name}`} onClick={() => onAppendTemplate(template.id, category)}>
+                      <Plus size={12} />
+                    </IconButton>
+                  )}
                   <IconButton
                     label={`Excluir template ${template.name}`}
                     onClick={() => {

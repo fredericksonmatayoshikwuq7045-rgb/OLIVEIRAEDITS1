@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "checks": [
+    "Headline estende a saída de 1s para 8s; abertura move o início do meme sem consumir seus quadros",
+    "Reprodução atravessa a abertura; camadas têm miniaturas, zoom, ordem real e largura/altura independentes",
+    "Headline em foto também dura além do vídeo; adicionar outra camada conserva a headline anterior",
+    "Dividir camada conserva a fase; aplicação em massa mantém arquivos e durações originais dos destinos",
+    "Backup e restauração reais preservam sequência, entrada da mídia e opção de áudio por camada",
+    "Fotos mantêm sequência e quadro selecionado no PNG real; reload preserva tempos de entrada e camadas"
+  ],
+  "pageErrors": []
+}

@@ -38,6 +38,21 @@ fn args_use_input_seek_output_duration_verified_encodes_and_metadata(){
 }
 
 #[test]
+fn sequence_delays_main_video_and_audio_without_repeating_after_its_window(){
+    let dir=scratch();let mut item=fixture(&dir);
+    item.output_duration=Some(13.0);
+    item.render.as_mut().unwrap().media.enable=Some(Enable{start:8.0,end:11.0});
+    assert_eq!(arguments::duration(&item,&info(&item)).unwrap(),13.0);
+    let args=arguments::build(&item,&info(&item),&dir.join("out.part"),false).unwrap();
+    let filter=&args[args.iter().position(|value|value=="-filter_complex").unwrap()+1];
+    assert!(filter.contains("trim=duration=3,setpts=(PTS-STARTPTS)/1+8/TB"));
+    assert!(filter.contains("gte(t,8)*lt(t,11)"));
+    assert!(args.iter().any(|value|value.contains("atrim=duration=3,asetpts=PTS-STARTPTS,atempo=1,atrim=duration=3,adelay=8000:all=1,apad")));
+    item.output_duration=Some(f64::INFINITY);assert!(arguments::validate(&item).is_err());
+    fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn conflict_policy_preserves_sources_and_existing_outputs(){
     let dir=scratch();let mut item=fixture(&dir);fs::write(&item.output_path,b"old").unwrap();
     item.conflict="skip".into();assert!(arguments::reserve_output(&item,"job").unwrap().is_none());

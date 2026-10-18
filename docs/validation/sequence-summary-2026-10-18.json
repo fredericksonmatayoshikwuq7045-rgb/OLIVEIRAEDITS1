@@ -1,0 +1,66 @@
+{
+  "version": "0.5.0",
+  "date": "2026-10-18",
+  "branch": "refactor/v2",
+  "status": "passed",
+  "unit": {
+    "frontend": 129,
+    "frontendFiles": 22,
+    "rust": 42
+  },
+  "builds": {
+    "typescriptVite": "passed",
+    "tauriCliProductionDebugNoBundle": "passed",
+    "windowsCoreAndTestsCrossCheck": "passed",
+    "windowsNsisAndWebView2Execution": "not run"
+  },
+  "quality": [
+    "ESLint",
+    "Prettier",
+    "code files <=300 lines",
+    "git diff --check"
+  ],
+  "ui": {
+    "sequenceAndBackupChecks": 6,
+    "layerRegressionChecks": 4,
+    "editorUpgradeRegressionChecks": 7
+  },
+  "encodedSequence": {
+    "mp4s": 4,
+    "secondsPerOutput": 12,
+    "frames": 36,
+    "cases": [
+      "intro-main-outro",
+      "intro-main-blur",
+      "spoken-intro",
+      "muted-main"
+    ],
+    "audioRmsBeforeDuringAfter": "passed"
+  },
+  "encodedTimingRegression": {
+    "mp4s": 6,
+    "frames": 28,
+    "backgroundAudioWindow": "passed"
+  },
+  "mediaRegression": {
+    "editedExports": 20,
+    "metadataErrorsCancelAndPartialCleanup": "passed"
+  },
+  "native": {
+    "checks": 5,
+    "protocol": "tauri://localhost",
+    "mp4AndPngViaUi": "passed",
+    "introBeforeMeme": {
+      "introSeconds": 3,
+      "memeSeconds": 1,
+      "outputSeconds": 4
+    },
+    "profileAndProjectSessionUrlsPersisted": false
+  },
+  "limits": [
+    "NSIS/WebView2 require Windows execution",
+    "Linux native test uses software rendering and virtual audio",
+    "Images still export a chosen static PNG/JPG/WebP frame",
+    "No fresh-task cloud snapshot restoration verified"
+  ]
+}

@@ -183,3 +183,24 @@ setup. O processo de teste fica sem proxies HTTP e com
 `WEBKIT_GST_DISABLE_GL_SINK=1`, `LIBGL_ALWAYS_SOFTWARE=1` e
 `ALSOFT_DRIVERS=null`. Essas opções isolam a renderização em software e o áudio
 virtual do teste; não validam hardware/GPU nem áudio em dispositivo real.
+
+## Sequências e abertura — 0.5.0
+
+Com o mesmo Vite/Chromium/FFmpeg e harness das suítes acima:
+
+```sh
+npm run test:sequence
+npm run test:sequence-export
+```
+
+O primeiro percorre headlines em vídeo e foto maiores que o principal, entrada
+adiada, reprodução atravessando o corte, reordenação por botão e drag-and-drop,
+largura/altura, divisão com fase, aplicação em massa, PNG real e backup/restore.
+`OE_SEQUENCE_DIR` seleciona os artefatos. O segundo compara 36 frames Canvas/MP4
+em quatro sequências de 12s, com abertura 8s, principal com trim/velocidade,
+encerramento, blur, áudio da abertura e principal mudo. Mede PCM antes/durante/
+depois de cada intervalo; `OE_SEQUENCE_EXPORT_DIR` altera o diretório.
+
+O teste `native-layer-timeline.py` também monta a abertura pela UI do binário de
+produção e valida o MP4 de 4s com chamada de 3s e meme de 1s. Requer diretórios de
+dados/cache descartáveis e driver novo, como descrito acima.

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 — 2026-10-18
+
+- Duração independente das camadas, incluindo headlines maiores que vídeo/foto.
+- Principal na timeline e ação de abertura antes do meme, sem consumir sua origem.
+- Clipes com miniaturas, régua, zoom, rolagem e arraste de ordem visual.
+- Largura/altura por camada, duplicação, divisão e adição sem substituição.
+- Sequência em massa com tempos e posições, mantendo o conteúdo dos destinos.
+- Áudio de templates em vídeo e principal com controle individual e janelas reais.
+- Exportação inclui abertura/encerramento; blur, áudio atrasado e AAC sincronizados.
+- Preview com relógio da composição, mesmo antes/depois do vídeo principal.
+- 129 testes frontend, 42 Rust, testes reais de interface/backup, MP4/PNG e áudio.
+  Guia: [release 0.5.0](docs/release-0.5.0.md).
+
 ## 0.4.0 — 2026-10-18
 
 - Faixas de início/fim para todas as camadas: borda, marca, headline visual/texto,

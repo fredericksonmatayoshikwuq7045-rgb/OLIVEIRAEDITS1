@@ -69,9 +69,8 @@ pub async fn render_preview(app:AppHandle,engine:State<'_,Engine>,mut item:Expor
         let info=probe::probe(&item.source_path)?;
         let requested=seconds.unwrap_or(3.0);
         if !requested.is_finite()||!(0.01..=5.0).contains(&requested){return Err("A prévia deve ter entre 0,01 e 5 segundos.".into());}
-        let start=item.trim.as_ref().map(|t|t.start).unwrap_or(0.0);
-        let available=item.trim.as_ref().map(|t|t.duration).unwrap_or((info.duration-start).max(0.1));
-        item.trim=Some(Trim{start,duration:(requested*item.speed).min(available)});item.preset="fast".into();item.move_original=false;item.conflict="overwrite".into();
+        item.output_duration=Some(super::arguments::duration(&item,&info)?.min(requested));
+        item.preset="fast".into();item.move_original=false;item.conflict="overwrite".into();
         let directory=engine.0.cache.join("previews");fs::create_dir_all(&directory).map_err(|e|e.to_string())?;
         let path=directory.join(format!("{}.{}",super::unique_id(),if frame.unwrap_or(false){"png"}else{"mp4"}));item.output_path=path.to_string_lossy().into_owned();
         let job_id=engine.start(ExportJob{items:vec![item],concurrency:1,finish_action:"none".into()})?;

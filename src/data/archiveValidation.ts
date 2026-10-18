@@ -145,6 +145,7 @@ const item: Check = fields({
   speed: positive,
   imageTime: optional(number),
   imageDuration: optional(positive),
+  mediaStart: optional(number),
   headlineText: optional(text),
   templates: fields(Object.fromEntries(['border', 'watermark', 'headline', 'background'].map((key) => [key, nullable(identifier)]))),
 });

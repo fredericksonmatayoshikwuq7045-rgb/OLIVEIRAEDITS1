@@ -1,6 +1,6 @@
 # Ambiente de nuvem preparado
 
-Checkout: `/workspace/OLIVEIRAEDITS1`, branch `refactor/v2`, versão 0.4.0. O host é Linux;
+Checkout: `/workspace/OLIVEIRAEDITS1`, branch `refactor/v2`, versão 0.5.0. O host é Linux;
 o produto de destino continua sendo Windows. Não são necessários segredos nem
 serviços externos para editar e validar mídia sintética.
 
@@ -26,7 +26,7 @@ Antes de usar Cargo/Tauri nesta nuvem:
 
 O helper configura a toolchain e os caminhos das bibliotecas privadas.
 `npm ci` também prepara os assets locais de OCR; não exclua `public/vision`
-antes de compilar. Consulte [release 0.4.0](release-0.4.0.md) para a validação.
+antes de compilar. Consulte [release 0.5.0](release-0.5.0.md) para a validação.
 `bash /workspace/.cloud-onboarding/oliveira-edits/install.sh` reexecuta instalação
 das dependências pelo lockfile e os checks principais. A instalação de base e os novos passos de codec/launcher foram verificados
 neste workspace.

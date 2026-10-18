@@ -1,0 +1,245 @@
+{
+  "status": "passed",
+  "cases": [
+    {
+      "name": "intro-main-outro",
+      "status": "passed",
+      "duration": 12,
+      "frames": [
+        {
+          "time": 0.2,
+          "mae": 1.0,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.2,
+          "mae": 0.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 4.2,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 7.9,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 8.1,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 9.8,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10.5,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 11.9,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        }
+      ],
+      "audioRms": {
+        "0.2": 0.0,
+        "7.5": 0.0,
+        "8.3": 2847.096788012747,
+        "9.5": 2894.009412184504,
+        "10.5": 0.0,
+        "11.5": 0.0
+      }
+    },
+    {
+      "name": "intro-main-blur",
+      "status": "passed",
+      "duration": 12,
+      "frames": [
+        {
+          "time": 0.2,
+          "mae": 1.0,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.2,
+          "mae": 0.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 4.2,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 7.9,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 8.1,
+          "mae": 0.9833333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 9.8,
+          "mae": 0.9833333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10.5,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 11.9,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        }
+      ],
+      "audioRms": {
+        "0.2": 0.0,
+        "7.5": 0.0,
+        "8.3": 2847.096788012747,
+        "9.5": 2894.009412184504,
+        "10.5": 0.0,
+        "11.5": 0.0
+      }
+    },
+    {
+      "name": "spoken-intro",
+      "status": "passed",
+      "duration": 12,
+      "frames": [
+        {
+          "time": 0.2,
+          "mae": 1.0,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.2,
+          "mae": 0.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 4.2,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 7.9,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 8.1,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 9.8,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10.5,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 11.9,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        }
+      ],
+      "audioRms": {
+        "0.2": 2861.6256119409936,
+        "7.5": 2890.834533000376,
+        "8.3": 2847.0944490245956,
+        "9.5": 2894.0162856602356,
+        "10.5": 0.0,
+        "11.5": 0.0
+      }
+    },
+    {
+      "name": "muted-main",
+      "status": "passed",
+      "duration": 12,
+      "frames": [
+        {
+          "time": 0.2,
+          "mae": 1.0,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 2.2,
+          "mae": 0.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 4.2,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 7.9,
+          "mae": 1.3333333333333333,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 8.1,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 9.8,
+          "mae": 0.4375,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 10.5,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        },
+        {
+          "time": 11.9,
+          "mae": 1.663888888888889,
+          "fractionPixelsAbove35": 0.0
+        }
+      ],
+      "audioRms": {
+        "0.2": 2861.6256119409936,
+        "7.5": 2890.834533000376,
+        "8.3": 0.0,
+        "9.5": 0.0,
+        "10.5": 0.0,
+        "11.5": 0.0
+      }
+    }
+  ]
+}

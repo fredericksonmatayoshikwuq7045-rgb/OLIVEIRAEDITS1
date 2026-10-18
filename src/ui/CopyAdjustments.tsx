@@ -7,13 +7,15 @@ export function CopyAdjustments({
   targets,
   onApply,
   onClose,
+  sequence = false,
 }: {
   source: MediaItem;
   targets: MediaItem[];
   onApply: (items: MediaItem[]) => void;
   onClose: () => void;
+  sequence?: boolean;
 }) {
-  const [groups, setGroups] = useState<Adjustment[]>(['framing']);
+  const [groups, setGroups] = useState<Adjustment[]>(sequence ? ['framing', 'layers', 'background'] : ['framing']);
   return (
     <Modal title="Aplicar ajustes" onClose={onClose}>
       <div className="stack">
@@ -23,7 +25,7 @@ export function CopyAdjustments({
         {(
           [
             ['framing', 'Enquadramento e recorte'],
-            ['layers', 'Textos, logos e templates'],
+            ['layers', 'Camadas e sequência (textos, templates, tempos e ordem)'],
             ['background', 'Fundo'],
             ['speed', 'Velocidade'],
             ['trim', 'Corte temporal (limitado à duração de cada vídeo)'],

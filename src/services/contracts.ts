@@ -19,6 +19,7 @@ export interface ExportItem {
   sourcePath: string;
   outputPath: string;
   trim?: { start: number; duration: number };
+  outputDuration?: number;
   render?: EngineRenderSpec;
   overlays: { path: string; zIndex: number; enable?: { start: number; end: number } }[];
   preset: Profile['exportSettings']['preset'];

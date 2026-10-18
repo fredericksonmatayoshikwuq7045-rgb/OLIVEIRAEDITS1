@@ -140,6 +140,7 @@ export interface MediaItem {
   render: RenderSpec;
   trim: { in: number; out: number };
   speed: number;
+  mediaStart?: number;
   imageTime?: number;
   imageDuration?: number;
   headlineText?: string;

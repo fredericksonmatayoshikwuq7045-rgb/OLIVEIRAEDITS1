@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { MediaItem } from '../domain/models';
-import { compositionDuration, imageFrameTime } from '../domain/timeline';
+import { compositionDuration, imageFrameTime, playerTime } from '../domain/timeline';
 export function usePlayback(active: MediaItem | null, onChange: (item: MediaItem) => void) {
   const [playing, setPlaying] = useState(false),
     [time, setTime] = useState(0);
-  const initialTime = active ? (active.kind === 'image' ? imageFrameTime(active) : active.trim.in) : 0;
+  const initialTime = active ? (active.kind === 'image' ? imageFrameTime(active) : playerTime(active, 0)) : 0;
   useEffect(() => {
     setPlaying(false);
     setTime(initialTime);
@@ -16,13 +16,13 @@ export function usePlayback(active: MediaItem | null, onChange: (item: MediaItem
   };
   const playTime = (seconds: number) => {
     if (!active) return;
-    const end = active.kind === 'video' ? active.trim.out : compositionDuration(active);
+    const end = playerTime(active, compositionDuration(active));
     if (seconds >= end) {
       setPlaying(false);
       if (active.kind === 'image') {
         setTime(end - 0.001);
         freezeImage(end - 0.001);
-      } else setTime(active.trim.in);
+      } else setTime(playerTime(active, 0));
     } else setTime(seconds);
   };
   const togglePlayback = () => {
@@ -30,8 +30,7 @@ export function usePlayback(active: MediaItem | null, onChange: (item: MediaItem
       setPlaying(false);
       freezeImage();
     } else {
-      if (active && time >= (active.kind === 'video' ? active.trim.out : compositionDuration(active)) - 0.02)
-        setTime(active.kind === 'video' ? active.trim.in : 0);
+      if (active && time >= playerTime(active, compositionDuration(active)) - 0.02) setTime(playerTime(active, 0));
       setPlaying(true);
     }
   };

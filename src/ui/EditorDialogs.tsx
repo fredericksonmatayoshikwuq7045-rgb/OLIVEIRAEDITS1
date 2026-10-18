@@ -41,6 +41,7 @@ export function EditorDialogs({ model }: { model: EditorContext }) {
       {model.copy && (
         <CopyAdjustments
           source={model.copy.source}
+          sequence={model.copy.sequence}
           targets={items.filter((item) => model.copy!.ids.includes(item.id))}
           onApply={applyUpdated}
           onClose={() => model.setCopy(null)}

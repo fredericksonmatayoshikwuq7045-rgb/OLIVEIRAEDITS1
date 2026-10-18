@@ -31,6 +31,9 @@ export const media: Check = fields({
   mask: choices('none', 'circle'),
   opacity,
   zIndex: number,
+  audio: optional(choices('mute', 'mix')),
+  visible: optional(boolean),
+  enable: optional(fields({ start: number, end: number })),
 });
 const background: Check = (value, path) => {
   fields({ enable: optional(fields({ start: number, end: number })), visible: optional(boolean) })(value, path);
@@ -93,6 +96,7 @@ const layer: Check = (value, path) => {
       sourceOffset: optional(number),
       sourceDuration: optional(number),
       loop: optional(boolean),
+      audio: optional(choices('mute', 'mix')),
     })(value, path);
   }
 };

@@ -3,7 +3,7 @@ import type { MediaItem } from '../domain/models';
 import { cropSelectionGeometry, cropSourceDelta } from '../render/crop';
 import { snapMediaPan, snapRect } from '../render/snap';
 import { RenderCanvas } from '../render/RenderCanvas';
-import { BACKGROUND_TRACK } from '../domain/timeline';
+import { BACKGROUND_TRACK, compositionDuration, compositionSpec, mainRange, outputTime } from '../domain/timeline';
 import type { Rect } from '../render/types';
 import { mediaUrl } from '../services/native';
 import { TransformBox } from './TransformBox';
@@ -86,7 +86,7 @@ export function Stage({
           x: ((event.clientX - bounds.left) / bounds.width) * draft.render.canvas.width,
           y: ((event.clientY - bounds.top) / bounds.height) * draft.render.canvas.height,
         },
-        Math.max(0, (time - draft.trim.in) / draft.speed),
+        Math.max(0, outputTime(draft, time)),
       );
       onSelectLayer(selectedLayer);
     }
@@ -177,7 +177,9 @@ export function Stage({
   if (original && draft) {
     original.media.width = draft.render.media.width;
     original.media.height = draft.render.media.height;
+    original.media.enable = mainRange(draft);
   }
+  const timed = draft ? compositionSpec(draft) : null;
   const cropSelection = valid ? cropSelectionGeometry(draft.render) : null;
   const rect = cropSelection?.rect;
   return (
@@ -247,15 +249,17 @@ export function Stage({
               compare && original
                 ? original
                 : {
-                    ...(cropMode && cropSelection ? cropSelection.previewSpec : draft.render),
+                    ...(cropMode && cropSelection ? cropSelection.previewSpec : timed!),
                     media: {
                       ...(cropMode && cropSelection ? cropSelection.previewSpec.media : draft.render.media),
                       source: draft.runtimeUrl || draft.render.media.source,
+                      enable: mainRange(draft),
                     },
                   }
             }
             playbackRate={draft.kind === 'video' ? draft.speed : 1}
-            timeOrigin={draft.kind === 'video' ? draft.trim.in : 0}
+            timeOrigin={draft.kind === 'video' ? draft.trim.in - mainRange(draft).start * draft.speed : 0}
+            duration={compositionDuration(draft)}
             playing={playing}
             time={time}
             onTimeUpdate={onTime}

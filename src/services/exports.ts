@@ -1,5 +1,5 @@
 import { outputFilename } from '../domain/batch';
-import { imageFrameTime } from '../domain/timeline';
+import { compositionDuration, compositionSpec, imageFrameTime } from '../domain/timeline';
 import type { MediaItem, Profile } from '../domain/models';
 import { canvasBlob, compileStaticPlanes, composeCanvas } from '../render/compositor';
 import { computeGeometry } from '../render/geometry';
@@ -50,7 +50,7 @@ function itemSource(item: MediaItem, profile: Profile): string {
 export async function prepareExportItem(item: MediaItem, profile: Profile, index = 0, options: ExportOptions = {}): Promise<ExportItem> {
   if (item.status !== 'ready') throw new Error(`${item.title}: a mídia não está pronta. Re-vincule arquivos ausentes.`);
   if (!profile.exportSettings.outputDir) throw new Error('Escolha a pasta de saída nas configurações da conta.');
-  const spec = structuredClone(item.render);
+  const spec = structuredClone(compositionSpec(item));
   const planes = await compileStaticPlanes(spec, { resolveSource: sourceResolver(profile) });
   const overlays = [];
   for (const plane of planes) {
@@ -71,6 +71,7 @@ export async function prepareExportItem(item: MediaItem, profile: Profile, index
     sourcePath: itemSource(item, profile),
     outputPath: joinPath(profile.exportSettings.outputDir, filename(item, profile, index, 'mp4')),
     trim: { start: item.trim.in, duration: item.trim.out - item.trim.in },
+    outputDuration: compositionDuration(item),
     render: { ...spec, geometry: computeGeometry(spec), layers },
     overlays,
     preset: profile.exportSettings.preset,
@@ -98,7 +99,7 @@ export async function exportImage(item: MediaItem, profile?: Profile, index = 0)
   if (item.status !== 'ready') throw new Error('Re-vincule a imagem ausente antes de exportar.');
   const format = profile?.exportSettings.imageFormat ?? 'png';
   const canvas = await composeCanvas(
-    { ...item.render, media: { ...item.render.media, source: item.runtimeUrl || item.render.media.source } },
+    { ...compositionSpec(item), media: { ...compositionSpec(item).media, source: item.runtimeUrl || item.render.media.source } },
     { resolveSource: sourceResolver(profile), time: imageFrameTime(item) },
   );
   const blob = await canvasBlob(canvas, `image/${format}`, profile?.exportSettings.imageQuality ?? 0.92);

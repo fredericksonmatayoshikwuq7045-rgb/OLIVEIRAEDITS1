@@ -15,12 +15,20 @@ export interface VideoBinding extends Timing {
 export function videoBindings(spec: RenderSpec): VideoBinding[] {
   const entries: VideoBinding[] = [];
   if (spec.media.type === 'video' && spec.media.source)
-    entries.push({ key: spec.media.source, source: spec.media.source, main: true, loop: false });
+    entries.push({
+      ...spec.media,
+      key: spec.media.source,
+      source: spec.media.source,
+      main: true,
+      loop: false,
+      audio: spec.media.audio !== 'mute',
+    });
   const background = spec.background;
   if (background.type === 'video')
     entries.push({ ...background, key: backgroundVideoKey, loop: background.loop, audio: background.audio === 'mix' });
   for (const layer of spec.layers)
-    if (layer.type === 'video') entries.push({ ...layer, key: layerVideoKey(layer.id), loop: layer.loop !== false });
+    if (layer.type === 'video')
+      entries.push({ ...layer, key: layerVideoKey(layer.id), loop: layer.loop !== false, audio: layer.audio === 'mix' });
   return entries;
 }
 export function bindingTime(binding: VideoBinding, outputTime: number, duration: number): number {

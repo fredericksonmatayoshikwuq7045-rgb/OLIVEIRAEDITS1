@@ -1,7 +1,8 @@
 use super::model::{Enable, ExportItem, MediaInfo, RenderSpec};
 use super::probe::input_path;
 
-pub struct Graph { pub filter: String, pub inputs: Vec<String>, pub background_audio: Option<usize> }
+pub struct Graph { pub filter: String, pub inputs: Vec<String>, pub audio_inputs: Vec<AudioInput> }
+pub struct AudioInput { pub index: usize, pub path: String, pub enable: Option<Enable>, pub offset: f64 }
 
 pub fn color(value: &str) -> Result<String, String> {
     let hex = value.strip_prefix('#').unwrap_or(value);
@@ -16,6 +17,7 @@ pub fn validate_render(spec: &RenderSpec) -> Result<(), String> {
         if ![rect.x, rect.y, rect.width, rect.height].iter().all(|v| v.is_finite() && v.abs() <= 65536.0) || rect.width <= 0.0 || rect.height <= 0.0 { return Err("Geometria inválida ou maior que o limite seguro.".into()); }
     }
     if !spec.geometry.matrix.iter().all(|v| v.is_finite()) || !spec.media.rotation.is_finite() || spec.media.rotation.abs() > 3600.0 || !(0.0..=1.0).contains(&spec.media.opacity) { return Err("Transformação inválida.".into()); }
+    enable_filter(&spec.media.enable)?;
     for layer in &spec.layers {
         if ![layer.rect.x,layer.rect.y,layer.rect.width,layer.rect.height,layer.rotation,layer.opacity].iter().all(|v| v.is_finite()) || layer.rect.width <= 0.0 || layer.rect.height <= 0.0 || layer.rect.width > 8.0 || layer.rect.height > 8.0 || !(0.0..=1.0).contains(&layer.opacity) { return Err("Camada fora dos limites seguros.".into()); }
     }
@@ -48,7 +50,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     let mut graph = Vec::new();
     let mut inputs = Vec::new();
     let mut next_input = 1;
-    let mut background_audio = None;
+    let mut audio_inputs = Vec::new();
     let mut add_input = |path: &str, video: bool, repeat: bool| -> Result<usize,String> {
         let real = input_path(path)?;
         let index = next_input; next_input += 1;
@@ -57,13 +59,16 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
         inputs.extend(["-i".into(),real.to_string_lossy().into_owned()]);
         Ok(index)
     };
-    let blur = spec.background.visible && spec.background.kind == "blur";
+    let blur = spec.background.visible && spec.background.kind == "blur" && spec.media.visible;
+    let main_start=spec.media.enable.as_ref().map_or(0.0,|value|value.start);
+    let main_duration=item.trim.as_ref().map_or(info.duration,|trim|trim.duration);
+    let main_timing=format!("trim=duration={main_duration},setpts=(PTS-STARTPTS)/{}+{main_start}/TB",item.speed);
     if blur { graph.push("[0:v]split=2[maininput][blurinput]".into()); }
-    match if spec.background.visible {spec.background.kind.as_str()} else {"solid"} {
+    match if spec.background.visible && (spec.background.kind!="blur" || blur) {spec.background.kind.as_str()} else {"solid"} {
         "image" | "video" => {
             let is_video = spec.background.kind == "video";
             let index = add_input(spec.background.source.as_deref().ok_or("Fundo sem arquivo.")?, is_video, spec.background.loop_video)?;
-            if is_video && spec.background.audio.as_deref() == Some("mix") { background_audio = Some(index); }
+            if is_video && spec.background.audio.as_deref() == Some("mix") { audio_inputs.push(AudioInput{index,path:spec.background.source.clone().unwrap(),enable:spec.background.enable.clone(),offset:spec.background.source_offset.unwrap_or(0.0)}); }
             let opacity=spec.background.opacity.unwrap_or(1.0);
             let timing=media_time(&spec.background.enable,spec.background.source_offset)?;
             if !opacity.is_finite() || !(0.0..=1.0).contains(&opacity){return Err("Opacidade do fundo inválida.".into());}
@@ -77,7 +82,9 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
             let sigma=(radius*w.min(h) as f64).max(0.01);
             let margin=(sigma*2.0).round() as u32;
             let (bw,bh)=(w+margin*2,h+margin*2);
-            graph.push(format!("[blurinput]setpts=(PTS-STARTPTS)/{},scale={bw}:{bh}:force_original_aspect_ratio=increase,crop={bw}:{bh},gblur=sigma={sigma},crop={w}:{h}:{margin}:{margin},setsar=1,format=rgba[bg]",item.speed));
+            graph.push(format!("color=c=0x111111:s={w}x{h}:r={fps}:d={duration},format=rgba[blurbase]"));
+            graph.push(format!("[blurinput]{main_timing},scale={bw}:{bh}:force_original_aspect_ratio=increase,crop={bw}:{bh},gblur=sigma={sigma},crop={w}:{h}:{margin}:{margin},setsar=1,format=rgba[blurred]"));
+            graph.push(format!("[blurbase][blurred]overlay=eof_action=repeat:shortest=0:format=auto{}[bg]",enable_filter(&spec.media.enable)?));
         }
         "gradient" => {
             let start = color(spec.background.from.as_deref().unwrap_or("#111111"))?;
@@ -103,7 +110,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     let crop = spec.geometry.source_crop;
     if crop.x < 0.0 || crop.y < 0.0 || crop.x+crop.width > info.width as f64 || crop.y+crop.height > info.height as f64 { return Err("Crop excede os limites da mídia original.".into()); }
     let draw = spec.geometry.draw_rect;
-    let mut chain = vec![format!("setpts=(PTS-STARTPTS)/{}",item.speed),"format=rgba".into(),format!("crop={:.0}:{:.0}:{:.0}:{:.0}",crop.width.floor(),crop.height.floor(),crop.x.floor(),crop.y.floor()),format!("scale={:.0}:{:.0}:flags=lanczos",draw.width.round(),draw.height.round()),"setsar=1".into()];
+    let mut chain = vec![main_timing,"format=rgba".into(),format!("crop={:.0}:{:.0}:{:.0}:{:.0}",crop.width.floor(),crop.height.floor(),crop.x.floor(),crop.y.floor()),format!("scale={:.0}:{:.0}:flags=lanczos",draw.width.round(),draw.height.round()),"setsar=1".into()];
     if spec.media.flip_h { chain.push("hflip".into()); }
     if spec.media.flip_v { chain.push("vflip".into()); }
     let mut main_source=if blur { "[maininput]".to_owned() } else { "[0:v]".to_owned() };
@@ -121,7 +128,8 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     if spec.media.rotation.rem_euclid(360.0) != 0.0 { chain.push(rotation_filter(spec.media.rotation)); }
     graph.push(format!("{main_source}{}[main]",chain.join(",")));
     let bounds = spec.geometry.bounds;
-    let mut planes = vec![(spec.media.z_index,"main".to_owned(),bounds.x,bounds.y,None)];
+    let main_enable=if spec.media.visible { spec.media.enable.clone() } else {Some(Enable{start:0.0,end:0.0})};
+    let mut planes = vec![(spec.media.z_index,"main".to_owned(),bounds.x,bounds.y,main_enable)];
     for (n,overlay) in item.overlays.iter().enumerate() {
         let index = add_input(&overlay.path,false,true)?;
         let label = format!("overlay{n}");
@@ -140,6 +148,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
         let bh = (lw*angle.sin().abs()+lh*angle.cos().abs()).ceil();
         let fit=match layer.fit.as_deref(){Some("cover")=>format!("scale={lw}:{lh}:force_original_aspect_ratio=increase,crop={lw}:{lh}"),Some("contain")=>format!("scale={lw}:{lh}:force_original_aspect_ratio=decrease,pad={lw}:{lh}:(ow-iw)/2:(oh-ih)/2:color=black@0"),_=>format!("scale={lw}:{lh}")};
         let timing=media_time(&layer.enable,layer.source_offset)?;
+        if layer.kind=="video" && layer.audio.as_deref()==Some("mix") { audio_inputs.push(AudioInput{index,path:layer.source.clone().unwrap(),enable:layer.enable.clone(),offset:layer.source_offset.unwrap_or(0.0)}); }
         graph.push(format!("[{index}:v]{timing},format=rgba,{fit},colorchannelmixer=aa={},{}[{label}]",layer.opacity,rotation_filter(layer.rotation)));
         planes.push((layer.z_index,label,layer.rect.x*w as f64+(lw-bw)/2.0,layer.rect.y*h as f64+(lh-bh)/2.0,layer.enable.clone()));
     }
@@ -152,5 +161,5 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
         previous = output;
     }
     graph.push(format!("[{previous}]format=yuv420p[outv]"));
-    Ok(Graph { filter:graph.join(";"), inputs, background_audio })
+    Ok(Graph { filter:graph.join(";"), inputs, audio_inputs })
 }

@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, Plus, Trash2 } from 'lucide-reac
 import type { MediaItem, Profile } from '../domain/models';
 import { createTextLayer, type RenderLayer, type RenderTextLayer } from '../render/types';
 import { Button, Field, IconButton, Section, Slider, Toggle } from './Primitives';
-import { BACKGROUND_TRACK, trackName } from '../domain/timeline';
+import { BACKGROUND_TRACK, reorderTrack, timelineTracks, trackName } from '../domain/timeline';
 import { BackgroundProperties } from './BackgroundProperties';
 export function TextProperties({
   item,
@@ -24,6 +24,8 @@ export function TextProperties({
   const layers = item.render.layers;
   const selected = layers.find((layer) => layer.id === selectedId);
   const text = selected?.type === 'text' ? selected : null;
+  const order = timelineTracks(item, profile).filter((track) => track.id !== BACKGROUND_TRACK),
+    index = order.findIndex((track) => track.id === selectedId);
   const replace = (updated: RenderLayer[]) => onChange({ ...item, render: { ...item.render, layers: updated } });
   const patch = (change: Partial<RenderTextLayer>) => {
     if (text) replace(layers.map((layer) => (layer.id === text.id ? { ...text, ...change } : layer)));
@@ -249,18 +251,32 @@ export function TextProperties({
             onChange={(width) => patchBase({ rect: { ...selected.rect, width } })}
           />
           <Slider label="Rotação" value={selected.rotation} min={-180} max={180} onChange={(rotation) => patchBase({ rotation })} />
+          {selected.type !== 'text' && (
+            <Slider
+              label="Altura"
+              value={selected.rect.height}
+              min={0.005}
+              max={2}
+              step={0.005}
+              onChange={(height) => patchBase({ rect: { ...selected.rect, height } })}
+            />
+          )}
           <Slider label="Opacidade" value={selected.opacity} min={0} max={1} step={0.01} onChange={(opacity) => patchBase({ opacity })} />
           <div className="property-buttons">
-            <Button onClick={() => patchBase({ zIndex: selected.zIndex + 1 })}>
+            <Button disabled={index <= 0} onClick={() => onChange(reorderTrack(item, selected.id, order[index - 1].id))}>
               <ArrowUp /> Frente
             </Button>
-            <Button onClick={() => patchBase({ zIndex: selected.zIndex - 1 })}>
+            <Button disabled={index === order.length - 1} onClick={() => onChange(reorderTrack(item, selected.id, order[index + 1].id))}>
               <ArrowDown /> Trás
             </Button>
             <Button
               title="Duplicar camada"
               onClick={() => {
-                const layer = { ...selected, id: crypto.randomUUID(), rect: { ...selected.rect, y: selected.rect.y + 0.02 } };
+                const layer = {
+                  ...selected,
+                  id: `${selected.id.split(':copy:')[0].split(':part:')[0]}:copy:${crypto.randomUUID()}`,
+                  rect: { ...selected.rect, y: selected.rect.y + 0.02 },
+                };
                 replace([...layers, layer]);
                 onSelect(layer.id);
               }}

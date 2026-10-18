@@ -81,3 +81,29 @@ responde Range/HEAD e copia em blocos limitados. Não expõe paths na URL nem ab
 arquivos arbitrários recebidos por HTTP. URLs de sessão não são persistidas;
 assets e caminhos originais as recriam na hidratação. Windows/macOS mantêm
 `convertFileSrc`. O teste nativo verifica a autorização e ranges reais.
+
+## Sequência e relógio de composição — 0.5.0
+
+`mediaStart` é a entrada do principal; seu conteúdo continua definido por trim e
+velocidade. `domain/timeline` calcula a duração pela maior saída visível e gera
+um RenderSpec com janela do principal. O player mantém compatibilidade com seus
+tempos de origem, convertendo cursor/relógio por `outputTime`/`playerTime`. O clock
+virtual continua durante a abertura e após o fim do arquivo principal; ele não
+depende mais do evento ended desse decoder. Camadas têm fase e clock próprios.
+
+A faixa virtual `@media` participa da ordenação com as demais; `@background`
+permanece como base. Reordenação atribui ordens distintas, incluindo empates.
+Arraste de clipes tem preview local e um commit de histórico. Miniaturas são
+amostradas somente quando a fonte muda, não a cada frame do player.
+`sequence.splitLayer` preserva a fase e IDs derivados mantêm vínculo com templates.
+
+O contrato de export inclui `outputDuration`, separado do trim da fonte. Rust
+limita o principal à sua janela, desloca seus PTS e produz uma base com a duração
+completa. `engine/audio` apara, atrasa, preenche e renumera timestamps em amostras,
+para AAC sem lacunas durante longos silêncios. Reúne os inputs autorizados com
+áudio escolhido, respeitando suas janelas; templates silenciosos são ignorados.
+Plano estático de texto/imagem e layers dinâmicas mantêm tamanho e ordem.
+
+Copiar camadas também copia a entrada do principal e sua ordem/áudio, sem trocar
+a fonte ou o corte dos destinos. O esquema permanece 2; campos novos opcionais
+são validados na importação do backup. Imagem continua uma saída estática.
