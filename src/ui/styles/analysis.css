@@ -16,7 +16,7 @@
 }
 .analysis-result strong {
   overflow-wrap: anywhere;
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 .analysis-preview {
   position: relative;
@@ -37,7 +37,7 @@
 }
 .analysis-results .toggle-field {
   margin-top: auto;
-  font-size: 10px;
+  font-size: 0.769231rem;
 }
 .analysis-results .toggle-field > span {
   overflow-wrap: anywhere;

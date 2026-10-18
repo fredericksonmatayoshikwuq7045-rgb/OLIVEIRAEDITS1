@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   margin-bottom: 7px;
   color: var(--muted);
 }
@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   color: var(--dim);
 }
 
@@ -48,7 +48,7 @@
 }
 
 .property-modes button {
-  font-size: 11px;
+  font-size: 0.846154rem;
   padding: 9px;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -70,7 +70,7 @@
 .property-buttons .button {
   flex: 1;
   padding: 7px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   min-height: 32px;
 }
 
@@ -82,8 +82,8 @@
   padding: 0 16px;
   border-top: 1px solid var(--border);
   color: var(--dim);
-  font-size: 10px;
-  background: #101216;
+  font-size: 0.769231rem;
+  background: var(--surface);
   flex-shrink: 0;
 }
 
@@ -111,7 +111,7 @@
 }
 
 .media-strip-heading h3 {
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .media-scroll {
@@ -133,7 +133,7 @@
   height: 126px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: #1a1e25;
+  background: var(--surface-raised);
   overflow: hidden;
   cursor: pointer;
   outline-offset: -3px;
@@ -169,7 +169,8 @@
   right: 0;
   padding: 7px 6px;
   background: linear-gradient(transparent, #080a0ee6 30%);
-  font-size: 9px;
+  color: #eceef3;
+  font-size: 0.692308rem;
   line-height: 1.5;
 }
 
@@ -178,9 +179,10 @@
   top: 5px;
   left: 5px;
   background: #000a;
+  color: #eceef3;
   border-radius: 4px;
   padding: 2px 4px;
-  font-size: 9px;
+  font-size: 0.692308rem;
   font-family: var(--font-mono);
 }
 
@@ -208,7 +210,7 @@
   position: absolute;
   top: 28px;
   right: 5px;
-  color: var(--warning);
+  color: #eac178;
 }
 
 .batch-bar {
@@ -223,12 +225,12 @@
 .batch-bar .button {
   min-height: 29px;
   padding: 5px 8px;
-  font-size: 10px;
+  font-size: 0.769231rem;
 }
 
 .batch-bar strong {
-  color: #ff9ca7;
-  font-size: 11px;
+  color: var(--accent-text, var(--accent));
+  font-size: 0.846154rem;
   white-space: nowrap;
 }
 
@@ -239,7 +241,7 @@
   border: 1px solid var(--border);
   padding: 8px;
   border-radius: 7px;
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .layer-row.active {
@@ -273,7 +275,7 @@
 
 .progress-track {
   height: 5px;
-  background: #2a303b;
+  background: var(--surface-hover);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -288,7 +290,7 @@
 .queue-item-meta {
   display: flex;
   gap: 16px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   color: var(--muted);
   margin: 10px 0;
 }

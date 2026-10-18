@@ -91,7 +91,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 .filmstrip {
   position: relative;
@@ -167,9 +167,23 @@
 }
 @media (max-width: 1200px) {
   .editor-shell:not(.layout-focus) {
-    grid-template-columns: 180px 5px minmax(0, 1fr) 5px 230px;
+    grid-template-columns: clamp(180px, var(--library-width), 24vw) 5px minmax(0, 1fr) 5px clamp(230px, var(--details-width), 27vw);
   }
   .layout-right .editor-center {
     grid-template-columns: minmax(160px, 1fr) minmax(220px, 1fr);
   }
+}
+
+.workflow-bar > .row,
+.workflow-steps {
+  flex-wrap: wrap;
+}
+.media-slot-name small {
+  color: #a0a7b5;
+}
+.stage-area > .empty-state {
+  color: #eceef3;
+}
+.stage-area > .empty-state p {
+  color: #a0a7b5;
 }

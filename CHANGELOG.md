@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0 — 2026-10-17
+
+- Foto de perfil com recorte, posição, zoom, confirmação e backup.
+- Frases diárias em três idiomas, filtro de autor, textos pessoais e fontes;
+  traduções livres identificadas e nenhuma frase inventada para preencher autor.
+- Matrix local na seleção de contas, temas claro/escuro/sistema, cor, fontes,
+  tamanho de texto, modo de desempenho e respeito a movimento reduzido.
+- Layout central, player à direita ou foco; divisórias ajustáveis e restauração.
+- Redimensionar e girar mídia/texto/logo pelo player, selecionar camadas,
+  comparar original e edição e desfazer cada gesto como uma ação.
+- Botão direito: remover do projeto, exportar um item, duplicar, re-vincular e
+  copiar grupos de ajustes para selecionados ou todos.
+- Timeline com quadros reais, cortes pelas pontas, campos precisos e divisão
+  no cursor em dois slots independentes sem copiar o vídeo original.
+- Assistente de recorte que distingue a cena de títulos isolados nas molduras.
+- OCR local e referência visual em worker para localizar marcas por arquivo;
+  revisão antes de sobrepor texto/logo com placa opaca, regras salvas na conta.
+- Amostragem nativa de frames com escopos, cache e subprocessos sem console.
+- Pré-verificação de exportação e novas regressões de dados, geometria e visão.
+- Fluxos reais de navegador, backup, WebKit empacotado, OCR offline e vídeo
+  H.264 exportado pela interface. Detalhes em [release 0.3.0](docs/release-0.3.0.md).
+
 ## Correções — 2026-10-17
 
 - FFmpeg/FFprobe, miniaturas e ferramentas auxiliares deixam de criar consoles

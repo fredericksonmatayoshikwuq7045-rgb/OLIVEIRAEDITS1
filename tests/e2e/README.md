@@ -84,3 +84,41 @@ Esse teste envia `WM_DELETE_WINDOW`, testa continuar trabalhando e depois
 confirma sair com uma fila pausada. Verifica cancelamento persistido, ausência
 de parciais, preservação de dados e encerramento da janela. É exclusivo de
 Linux/X11; repetir manualmente o fluxo no Windows permanece necessário.
+
+## Estúdio 0.3.0
+
+Com Vite ativo, Chromium e FFmpeg no PATH:
+
+```sh
+OE_TEST_URL=http://127.0.0.1:3000 npm run test:upgrade
+OE_TEST_URL=http://127.0.0.1:3000 npm run test:appearance
+OE_TEST_URL=http://127.0.0.1:3000 npm run test:reference
+```
+
+O primeiro percorre foto/conta, temas/frases, mouse/histórico, menu/layouts,
+filmstrip real, divisão e trim, recorte com título nas barras, OCR local com
+marcas em posições distintas e exportação PNG real. O segundo verifica contraste,
+cores extremas, fontes, divisórias e layout em 1100px, tema do sistema e movimento
+reduzido. O terceiro usa o comparador visual real em worker e faz backup/restore
+com foto, referência antiga, logo nova e IDs independentes.
+
+`test:upgrade` e `test:appearance` também funcionam contra `vite preview`, usando
+`OE_TEST_URL=http://127.0.0.1:4173`. `OE_UPGRADE_DIR` troca o destino dos artefatos
+do primeiro teste. Não execute duas instâncias de um mesmo teste escrevendo no
+mesmo diretório. Todos usam dados sintéticos em contextos de browser novos.
+
+Para o teste nativo novo, compile o **bundle de produção**, abra uma sessão nova
+do driver com diretório de dados isolado e execute:
+
+```sh
+npm run tauri build -- --debug --no-bundle
+TAURI_DRIVER_URL=http://127.0.0.1:4458 TAURI_APP_BINARY=/caminho/do/binario \
+  OE_NATIVE_TEST_DIR=.artifacts/native-upgrade npm run test:native-upgrade
+```
+
+Ele exige o protocolo de produção (recusa Vite), semeia um vídeo de teste pelo
+IPC e verifica amostragem/cache/autorização, OCR com os assets locais dentro do
+WebKit e exportação H.264 real pela interface com a placa e a marca no frame
+codificado. FFmpeg/FFprobe precisam estar no PATH do teste. A sessão é encerrada
+no final. O teste altera o perfil padrão da instalação de teste: use um diretório
+de dados descartável, nunca o seu perfil de trabalho. Não executa ações de energia.

@@ -1,0 +1,59 @@
+{
+  "version": "0.3.0",
+  "dateLocal": "2026-10-17",
+  "timezone": "America/Sao_Paulo",
+  "platform": "Linux x86_64",
+  "branch": "refactor/v2",
+  "automated": {
+    "frontend": {
+      "tests": 105,
+      "files": 18,
+      "status": "passed"
+    },
+    "rust": {
+      "tests": 36,
+      "status": "passed"
+    },
+    "windowsCoreCheck": "passed; cross-compilation only, no Windows execution",
+    "tauriCliDebugProduction": "passed",
+    "setupScriptReexecuted": "passed; not a new-task restoration",
+    "mediaExports": 20,
+    "browserEditorChecks": 7,
+    "browserProductionChecks": 7,
+    "appearanceChecks": 2,
+    "referenceBackupChecks": 2,
+    "nativeProductionChecks": 3,
+    "folderImportChecks": 10,
+    "migrationChecks": 3,
+    "exportRegressionChecks": 3,
+    "npmAuditVulnerabilities": 0,
+    "appearanceProduction": "passed",
+    "checks": [
+      "ESLint",
+      "Prettier",
+      "code file length <=300 lines",
+      "git diff --check",
+      "TypeScript",
+      "Vite"
+    ]
+  },
+  "knownLimits": [
+    "No NSIS installer or WebView2 Windows execution in this Linux environment",
+    "Five sampled frames, not continuous watermark tracking",
+    "Small local quote catalog, personal quotes allow extension",
+    "No validation of fresh-task cloud restoration",
+    "Windows access-denied policies remain machine-specific"
+  ],
+  "evidence": [
+    "studio-editor-2026-10-17.json",
+    "studio-production-web-2026-10-17.json",
+    "studio-appearance-2026-10-17.json",
+    "studio-reference-backup-2026-10-17.json",
+    "studio-native-2026-10-17.json",
+    "studio-import-2026-10-17.json",
+    "studio-export-regressions-2026-10-17.json",
+    "studio-media-2026-10-17.json",
+    "studio-npm-audit-2026-10-17.json",
+    "studio-migration-2026-10-17.json"
+  ]
+}

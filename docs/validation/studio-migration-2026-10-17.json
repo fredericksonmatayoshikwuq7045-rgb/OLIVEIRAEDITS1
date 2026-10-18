@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checks": [
+    "Migração real recupera arquivo IndexedDB, texto, grupo e template",
+    "JSON legado e arquivo originais intactos",
+    "Campos desconhecidos e arquivo ausente preservados"
+  ],
+  "pageErrors": []
+}

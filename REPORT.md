@@ -1,6 +1,12 @@
 # Relatório de implementação — Oliveira Edits 2
 
-Data: 16/10/2026. Branch: `refactor/v2`. Plataforma de execução: Linux x86_64.
+Versão atual: **0.3.0**, atualização de estúdio em 17/10/2026. Frases, foto,
+personalização, layouts, edição pelo mouse, timeline e assistentes de análise
+estão implementados. Os resultados desta rodada e as instruções estão em
+[release 0.3.0](docs/release-0.3.0.md). As seções abaixo mantêm o relatório
+histórico da reconstrução 0.2.0 e das correções intermediárias.
+
+Data da base: 16/10/2026. Branch: `refactor/v2`. Plataforma de execução: Linux x86_64.
 
 Revisão de bugs em 17/10/2026: importação por pasta e janelas de subprocessos
 Windows corrigidas, junto de slots, revinculação, cache e relatório de exportação.
@@ -43,10 +49,10 @@ comparação visual com tolerância explícita, sem prometer esses resultados ex
 | 11 — validação | Suítes, 20 mídias reais, 9 comparações visuais, migração, 501 imagens, ponte Tauri e fechamento nativo; detalhes abaixo. |
 
 Opcionais não incluídos: intro/outro, biblioteca global de templates e ponto
-focal. Idiomas/temas adicionais e validações de hardware estão em
+focal. Validações de hardware estão em
 [PENDING.md](PENDING.md). Não há controles que anunciem essas funções como prontas.
 
-## Verificação executada
+## Verificação executada na base 0.2.0
 
 | Verificação | Resultado observado |
 | --- | --- |

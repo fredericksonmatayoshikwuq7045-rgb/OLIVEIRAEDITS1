@@ -19,6 +19,7 @@
   --accent-soft: #ed435518;
   --success: #67d5aa;
   --warning: #eac178;
+  --error: #ff8b99;
   --radius: 12px;
   font-family: var(--font-sans);
   font-synthesis: none;
@@ -53,7 +54,7 @@ button:disabled {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-text, var(--accent));
 }
 
 h1,
@@ -64,17 +65,17 @@ p {
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 2.307692rem;
   letter-spacing: -0.8px;
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 1.384615rem;
   letter-spacing: -0.3px;
 }
 
 h3 {
-  font-size: 14px;
+  font-size: 1.076923rem;
 }
 
 input:not([type='checkbox']):not([type='range']):not([type='color']),
@@ -166,7 +167,7 @@ input[type='checkbox'] {
 .button-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: white;
+  color: var(--on-accent, white);
 }
 
 .button-primary:hover {
@@ -186,7 +187,7 @@ input[type='checkbox'] {
 
 .button-danger {
   background: #ed435518;
-  color: #ff7a89;
+  color: var(--error);
   border-color: #ed435540;
 }
 
@@ -244,12 +245,12 @@ small {
 }
 
 small {
-  font-size: 11px;
+  font-size: 0.846154rem;
   line-height: 1.5;
 }
 
 .tiny {
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .mono {

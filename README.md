@@ -1,7 +1,19 @@
-# Oliveira Edits 2
+# Oliveira Edits — 0.3.0
 
 Editor local em pt-BR para vídeos e imagens em lote. Cada conta mantém templates,
 fontes, presets, projetos e configurações de exportação próprios.
+
+## Novidades desta versão
+
+Foto recortável por conta; frases do dia em pt-BR, inglês ou espanhol; animação
+Matrix só na seleção de perfis; temas claro/escuro/sistema, cores, fontes e três
+layouts. O player tem alças de tamanho e rotação, menu com botão direito e
+comparação com o original. A timeline mostra quadros reais, corta pelas pontas
+e divide o vídeo em slots independentes. O assistente em lote sugere o recorte
+da cena e encontra marcas por texto ou referência visual para sobrepor sua marca.
+
+Guia das funções, limites e testes: [release 0.3.0](docs/release-0.3.0.md).
+As novidades estão em `refactor/v2`; baixe essa branch para obter esta versão.
 
 ## Requisitos e início
 
@@ -14,6 +26,11 @@ fontes, presets, projetos e configurações de exportação próprios.
 npm ci
 npm run dev
 ```
+
+`npm ci` também prepara os arquivos locais de OCR e três idiomas (cerca de
+36 MB). O aplicativo não baixa modelos durante o uso. Se esses arquivos faltarem
+em uma cópia de desenvolvimento, execute `npm run setup:vision`. Não exclua
+`public/vision` entre a instalação e o build.
 
 O navegador serve para desenvolver o editor e exportar PNG/JPG/WebP. Renderização
 de vídeo e limpeza de metadados usam exclusivamente o aplicativo desktop, sem

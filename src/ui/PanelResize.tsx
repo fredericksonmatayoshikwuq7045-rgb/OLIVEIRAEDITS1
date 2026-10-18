@@ -11,6 +11,8 @@ export function PanelResize({
   reverse?: boolean;
 }) {
   const start = useRef<{ x: number; value: number } | null>(null);
+  const displayedWidth = (element: HTMLElement) =>
+    (reverse ? element.nextElementSibling : element.previousElementSibling)?.getBoundingClientRect().width ?? value;
   return (
     <div
       className="panel-resize"
@@ -20,7 +22,7 @@ export function PanelResize({
       aria-orientation="vertical"
       aria-valuenow={value}
       onPointerDown={(event) => {
-        start.current = { x: event.clientX, value };
+        start.current = { x: event.clientX, value: displayedWidth(event.currentTarget) };
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
       onPointerMove={(event) => {
@@ -35,7 +37,7 @@ export function PanelResize({
       onKeyDown={(event) => {
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
           event.preventDefault();
-          onChange(value + (event.key === 'ArrowRight' ? 10 : -10) * (reverse ? -1 : 1));
+          onChange(displayedWidth(event.currentTarget) + (event.key === 'ArrowRight' ? 10 : -10) * (reverse ? -1 : 1));
         }
       }}
     />

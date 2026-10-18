@@ -1,6 +1,6 @@
 .log {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 0.769231rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   padding: 10px;
@@ -22,14 +22,14 @@
   background: var(--surface-raised);
   border-radius: 8px;
   padding: 12px;
-  font-size: 12px;
+  font-size: 0.923077rem;
 }
 
 .metadata-tags {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  font-size: 10px;
+  font-size: 0.769231rem;
 }
 
 .metadata-tags pre {
@@ -96,7 +96,7 @@
   left: 3px;
   top: 24px;
   max-width: 100%;
-  font-size: 8px;
+  font-size: 0.615385rem;
   background: #111c;
   color: #fff;
   padding: 2px 4px;

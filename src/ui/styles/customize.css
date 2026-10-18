@@ -10,6 +10,7 @@
   --dim: #647388;
   --success: #186c4e;
   --warning: #8b5b12;
+  --error: #b52540;
 }
 .dashboard {
   position: relative;
@@ -54,7 +55,7 @@
 }
 .daily-quote details {
   margin-top: 8px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   color: var(--muted);
   overflow-wrap: anywhere;
 }
@@ -67,10 +68,10 @@
   overflow: auto;
 }
 .quote-compact .eyebrow {
-  font-size: 8px;
+  font-size: 0.615385rem;
 }
 .quote-compact blockquote {
-  font-size: 12px;
+  font-size: 0.923077rem;
   margin: 4px 0;
 }
 .quote-compact details {
@@ -116,7 +117,7 @@
   outline: 1px solid var(--accent);
 }
 .media-context-menu button.danger-text {
-  color: #df4960;
+  color: var(--error);
 }
 .transform-box {
   position: absolute;

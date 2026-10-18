@@ -22,8 +22,8 @@
 }
 
 .eyebrow {
-  color: var(--accent);
-  font-size: 10px;
+  color: var(--accent-text, var(--accent));
+  font-size: 0.769231rem;
   font-weight: 700;
   letter-spacing: 2px;
 }
@@ -94,7 +94,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 1.307692rem;
   font-weight: 700;
   overflow: hidden;
 }
@@ -108,14 +108,14 @@
 .account-handle {
   color: var(--muted);
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 0.923077rem;
 }
 
 .niche-tag {
   display: inline-block;
   color: var(--muted);
   border: 1px solid var(--border);
-  font-size: 10px;
+  font-size: 0.769231rem;
   padding: 4px 8px;
   border-radius: 5px;
   margin-top: 14px;
@@ -125,7 +125,7 @@
   display: flex;
   gap: 17px;
   margin: 24px 0 19px;
-  font-size: 11px;
+  font-size: 0.846154rem;
   color: var(--muted);
 }
 
@@ -144,7 +144,7 @@
 }
 
 .account-card footer small {
-  font-size: 10px;
+  font-size: 0.769231rem;
 }
 
 .account-open {
@@ -173,8 +173,8 @@
   right: 0;
   top: 35px;
   min-width: 180px;
-  background: #20242c;
-  border: 1px solid #414857;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 6px;
   z-index: 10;
@@ -192,7 +192,7 @@
   padding: 9px;
   border-radius: 6px;
   text-align: left;
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .dropdown-menu > button:hover {
@@ -200,7 +200,7 @@
 }
 
 .danger-text {
-  color: #ff7a89 !important;
+  color: var(--error) !important;
 }
 
 .account-add {
@@ -223,18 +223,18 @@
 }
 
 .account-add strong {
-  font-size: 13px;
+  font-size: 1rem;
 }
 
 .account-add span {
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .dashboard-footnote {
   display: flex;
   gap: 10px;
   color: var(--dim);
-  font-size: 11px;
+  font-size: 0.846154rem;
   line-height: 1.7;
   margin-top: 33px;
   max-width: 650px;
@@ -255,21 +255,23 @@
 }
 
 .active-account strong {
-  font-size: 12px;
+  font-size: 0.923077rem;
   display: block;
 }
 
 .active-account small {
-  font-size: 10px;
+  font-size: 0.769231rem;
 }
 
 .workflow-bar {
-  height: 58px;
-  background: #101216;
+  min-height: 58px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 8px 20px;
   border-bottom: 1px solid var(--border);
   gap: 12px;
 }
@@ -289,5 +291,5 @@
   border: 0;
   border-radius: 8px;
   padding: 8px 11px;
-  font-size: 11px;
+  font-size: 0.846154rem;
 }

@@ -1,0 +1,153 @@
+{
+  "status": "passed",
+  "checks": [
+    "Production native sampling returns real cached frames and preserves path authorization",
+    "Bundled WebKit runs local OCR from the production protocol and persists the detected coverage",
+    "Real H.264 export through the UI contains the opaque coverage and new branding"
+  ],
+  "url": "tauri://localhost",
+  "job": {
+    "warnings": [
+      "ExifTool opcional ausente: a limpeza usa FFmpeg e verifica as tags vis\u00edveis pelo FFprobe."
+    ],
+    "concurrency": 1,
+    "request": {
+      "concurrency": 1,
+      "items": [
+        {
+          "overlays": [
+            {
+              "path": "/workspace/.cloud-onboarding/oliveira-edits/native-test/cache-v3-confirmed/com.oliveira.masseditor/export-engine/queue-assets/113215-1792285790132-16/0-0.png",
+              "enable": null,
+              "zIndex": 100
+            }
+          ],
+          "outputPath": "/workspace/.cloud-onboarding/oliveira-edits/native-test/data-v3-confirmed/com.oliveira.masseditor/native-upgrade/output/Padr\u00e3o_2026-10-18_01.mp4",
+          "deepClean": false,
+          "speed": 1,
+          "silentAudio": false,
+          "cleanMetadata": true,
+          "conflict": "suffix",
+          "id": "2ae845fa-2eea-49f7-a005-d583e0abe558",
+          "encoder": "libx264",
+          "sourcePath": "/workspace/.cloud-onboarding/oliveira-edits/native-test/data-v3-confirmed/com.oliveira.masseditor/profiles/b4f608b8-0c39-4e06-aecc-c090fe28056e/assets/native-marked.mp4",
+          "mode": "render",
+          "fps": null,
+          "preset": "standard",
+          "trim": {
+            "start": 0,
+            "duration": 3
+          },
+          "render": {
+            "canvas": {
+              "width": 1080,
+              "height": 1920
+            },
+            "geometry": {
+              "sourceCrop": {
+                "width": 1000,
+                "x": 0,
+                "height": 200,
+                "y": 0
+              },
+              "drawRect": {
+                "width": 1080,
+                "x": 0,
+                "height": 216,
+                "y": 852
+              },
+              "bounds": {
+                "width": 1080,
+                "x": 0,
+                "height": 216,
+                "y": 852
+              },
+              "matrix": [
+                1.08,
+                0,
+                0,
+                1.08,
+                0,
+                852
+              ]
+            },
+            "layers": [],
+            "background": {
+              "opacity": null,
+              "from": null,
+              "source": null,
+              "to": null,
+              "radius": null,
+              "audio": null,
+              "type": "solid",
+              "angle": null,
+              "color": "#111111"
+            },
+            "media": {
+              "flipV": false,
+              "opacity": 1,
+              "height": 200,
+              "zIndex": 10,
+              "mask": "none",
+              "flipH": false,
+              "width": 1000,
+              "rotation": 0
+            }
+          },
+          "moveOriginal": false
+        }
+      ],
+      "finishAction": "none"
+    },
+    "status": "completed",
+    "items": [
+      {
+        "metadata": {
+          "sensitiveRemaining": [],
+          "removed": [
+            "format.encoder",
+            "stream0.encoder"
+          ],
+          "after": {
+            "format.compatible_brands": "isomiso2avc1mp41",
+            "format.minor_version": "512",
+            "stream0.vendor_id": "[0][0][0][0]",
+            "format.major_brand": "isom",
+            "stream0.handler_name": "VideoHandler",
+            "stream0.encoder": "Lavc libx264",
+            "stream0.language": "und"
+          },
+          "exiftoolUsed": false,
+          "before": {
+            "format.compatible_brands": "isomiso2avc1mp41",
+            "format.minor_version": "512",
+            "stream0.vendor_id": "[0][0][0][0]",
+            "format.encoder": "Lavf61.7.103",
+            "format.major_brand": "isom",
+            "stream0.handler_name": "VideoHandler",
+            "stream0.encoder": "Lavc61.19.101 libx264",
+            "stream0.language": "und"
+          }
+        },
+        "error": null,
+        "progress": {
+          "itemId": "2ae845fa-2eea-49f7-a005-d583e0abe558",
+          "fps": 33.67,
+          "speed": 1.31,
+          "percent": 100,
+          "outSizeBytes": 11234,
+          "jobId": "113215-1792285790132-16",
+          "etaSeconds": 0.06106870229007639
+        },
+        "outputPath": "/workspace/.cloud-onboarding/oliveira-edits/native-test/data-v3-confirmed/com.oliveira.masseditor/native-upgrade/output/Padr\u00e3o_2026-10-18_01.mp4",
+        "status": "ok",
+        "logPath": "/workspace/.cloud-onboarding/oliveira-edits/native-test/cache-v3-confirmed/com.oliveira.masseditor/export-engine/logs/113215-1792285790132-16/113215-1792285791042-18.log",
+        "durationMs": 3155,
+        "id": "2ae845fa-2eea-49f7-a005-d583e0abe558",
+        "sourcePath": "/workspace/.cloud-onboarding/oliveira-edits/native-test/data-v3-confirmed/com.oliveira.masseditor/profiles/b4f608b8-0c39-4e06-aecc-c090fe28056e/assets/native-marked.mp4",
+        "outputSize": 11234
+      }
+    ],
+    "id": "113215-1792285790132-16"
+  }
+}

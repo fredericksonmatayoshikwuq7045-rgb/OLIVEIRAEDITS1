@@ -37,7 +37,14 @@
 
 - Intro/outro por perfil, biblioteca global compartilhada e ponto focal manual
   são opcionais no plano; exigem novos contratos/UX e matriz de render própria.
-- Idiomas e temas adicionais. Nesta entrega, pt-BR e tema escuro/vermelho.
+- Tradução completa da interface: continua em pt-BR. As frases já têm pt-BR,
+  inglês e espanhol; temas claro/escuro/sistema e cores estão implementados.
+- Rastreamento contínuo de marca em movimento, remoção por reconstrução e OCR de
+  todos os frames não fazem parte da 0.3.0. A análise usa até cinco amostras e
+  exige revisão; resultados ambíguos não ficam selecionados automaticamente.
+- O catálogo de frases é local e pequeno; um autor com uma única frase repete
+  esse texto. Frases pessoais ampliam o catálogo. Ilia Topuria está disponível
+  como filtro para frases adicionadas pelo usuário, sem atribuição inventada.
 - ExifTool não é distribuído como sidecar; há detecção opcional se instalado.
 - `cargo audit` não estava instalado; o relatório de segurança de dependências
   desta execução cobre `npm audit`, compilação e revisão dos escopos.

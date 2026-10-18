@@ -33,3 +33,23 @@ copiados para diretórios próprios do app.
 
 O recurso Cargo `desktop` integra Tauri; o núcleo tem testes sem janela. Isso
 permite validar mídia em Linux sem afirmar que o instalador Windows foi testado.
+
+## Estúdio 0.3.0
+
+`domain/preferences` valida preferências globais em `oe_ui_v2`; o tema e as
+fontes não alteram o RenderSpec nem as fontes de exportação. O catálogo de
+frases é local, com seleção estável por dia local/perfil e textos pessoais.
+Foto e regra de cobertura pertencem ao perfil; assets e IDs são preservados
+ou remapeados ao duplicar/importar `.oeprofile`. O formato de dados continua v2.
+
+Timeline e análise compartilham `services/filmstrip`. Desktop amostra frames
+com um comando tipado que autoriza o caminho, valida tempos/tamanho e usa
+FFmpeg/cache. Browser usa seek e Canvas somente na mídia ativa. `vision/content`
+separa a cena dominante das molduras; `vision/ocr` carrega modelos locais; o
+comparador visual usa um worker. Cinco amostras estimam estabilidade e confiança.
+O usuário revisa antes de uma única alteração com histórico. A cobertura gera
+camadas comuns com placa opaca e texto/logo, renderizadas pelo motor existente.
+
+A divisão mantém uma referência ao mesmo original com trims independentes e
+ajusta a janela das camadas. Alças usam geometria normalizada e um commit por
+gesto. O menu contextual copia somente os grupos escolhidos pelo usuário.

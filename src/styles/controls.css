@@ -11,7 +11,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 3px 7px;
-  font-size: 10px;
+  font-size: 0.769231rem;
   color: var(--muted);
 }
 
@@ -21,22 +21,22 @@
 }
 
 .badge-error {
-  color: #ff7a89;
+  color: var(--error);
   border-color: #ed435540;
 }
 
 .notice {
   background: #eac1780b;
   border: 1px solid #eac17833;
-  color: #e7ce9d;
+  color: var(--warning);
   border-radius: 9px;
   padding: 12px;
   line-height: 1.6;
-  font-size: 12px;
+  font-size: 0.923077rem;
 }
 
 .error-message {
-  color: #ff8b99;
+  color: var(--error);
   background: #ed435510;
   border: 1px solid #ed435535;
   border-radius: 8px;
@@ -53,7 +53,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 11px;
+  font-size: 0.846154rem;
   color: var(--muted);
 }
 
@@ -79,7 +79,7 @@
   flex-direction: column;
   gap: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 0.846154rem;
 }
 
 .slider-field > span {
@@ -97,7 +97,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
+  font-size: 0.923077rem;
   cursor: pointer;
 }
 
@@ -118,7 +118,7 @@
 .property-section summary {
   padding: 15px 0;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.923077rem;
   font-weight: 600;
 }
 
@@ -146,7 +146,7 @@
   max-width: 100%;
   max-height: 90vh;
   background: var(--surface);
-  border: 1px solid #363c48;
+  border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 30px 100px #0008;
   display: flex;
@@ -198,7 +198,7 @@
   justify-content: center;
   border: 1px solid #ed43553b;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text, var(--accent));
   border-radius: 18px;
   margin-bottom: 8px;
 }
@@ -208,7 +208,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  color: #ff8b99;
+  color: var(--error);
   max-width: 100%;
   overflow: auto;
 }
@@ -228,7 +228,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
+  font-size: 1.153846rem;
   font-weight: 750;
   letter-spacing: -0.4px;
 }
@@ -240,9 +240,9 @@
   width: 33px;
   height: 33px;
   background: var(--accent);
-  color: white;
+  color: var(--on-accent, white);
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 1.230769rem;
   letter-spacing: -2px;
   padding-right: 2px;
 }

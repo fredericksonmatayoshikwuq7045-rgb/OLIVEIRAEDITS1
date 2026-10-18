@@ -21,7 +21,11 @@
     "test:native": "python3 tests/e2e/native-smoke.py",
     "test:close": "python3 tests/e2e/native-close.py",
     "postinstall": "node scripts/setup-vision.mjs",
-    "setup:vision": "node scripts/setup-vision.mjs"
+    "setup:vision": "node scripts/setup-vision.mjs",
+    "test:upgrade": "node tests/e2e/editor-upgrade.mjs",
+    "test:appearance": "node tests/e2e/appearance-layout.mjs",
+    "test:reference": "node tests/e2e/automation-reference.mjs",
+    "test:native-upgrade": "python3 tests/e2e/native-upgrade.py"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

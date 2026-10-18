@@ -14,7 +14,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { useWorkspace } from '../data/useWorkspace';
 import type { Profile } from '../domain/models';
 import { appearance, type UiSettings } from '../domain/preferences';
@@ -50,6 +50,28 @@ export function Dashboard({
   const [menu, setMenu] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Profile | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  const menuRoot = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const root = menuRoot.current,
+      trigger = root?.querySelector('button');
+    root?.querySelector<HTMLButtonElement>('.dropdown-menu button')?.focus();
+    const outside = (event: PointerEvent) => {
+      if (!root?.contains(event.target as Node)) setMenu(null);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenu(null);
+        trigger?.focus();
+      }
+    };
+    window.addEventListener('pointerdown', outside);
+    window.addEventListener('keydown', key);
+    return () => {
+      window.removeEventListener('pointerdown', outside);
+      window.removeEventListener('keydown', key);
+    };
+  }, [menu]);
   const workspace = store.workspace;
   if (!workspace) return null;
   const profiles = [...workspace.profiles].sort((a, b) => a.order - b.order);
@@ -145,8 +167,12 @@ export function Dashboard({
                   <div className="account-avatar" style={{ background: `${profile.color}22`, color: profile.color }}>
                     {avatar?.runtimeUrl ? <img src={avatar.runtimeUrl} alt="" /> : profile.name.slice(0, 2).toLocaleUpperCase('pt-BR')}
                   </div>
-                  <div className="account-menu">
-                    <IconButton label={`Opções de ${profile.name}`} onClick={() => setMenu(menu === profile.id ? null : profile.id)}>
+                  <div className="account-menu" ref={menu === profile.id ? menuRoot : undefined}>
+                    <IconButton
+                      label={`Opções de ${profile.name}`}
+                      aria-expanded={menu === profile.id}
+                      onClick={() => setMenu(menu === profile.id ? null : profile.id)}
+                    >
                       <MoreHorizontal size={19} />
                     </IconButton>
                     {menu === profile.id && (
