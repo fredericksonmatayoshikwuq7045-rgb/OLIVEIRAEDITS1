@@ -2,7 +2,8 @@ import { convertFileSrc, invoke, isTauri } from '@tauri-apps/api/core';
 import type { MediaProbe } from '../domain/models';
 
 export const isNative = (): boolean => isTauri();
-export const mediaUrl = (path: string): string => (isNative() && !/^(blob:|data:|https?:)/.test(path) ? convertFileSrc(path) : path);
+export const mediaUrl = (path: string): string =>
+  isNative() && !/^(blob:|data:|https?:|asset:)/i.test(path) ? convertFileSrc(path) : path;
 export const nativeAssetUrl = mediaUrl;
 
 export async function nativeCall<T>(command: string, args?: Record<string, unknown>): Promise<T> {

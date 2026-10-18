@@ -1,4 +1,4 @@
-use super::model::{ExportItem, MediaInfo, RenderSpec};
+use super::model::{Enable, ExportItem, MediaInfo, RenderSpec};
 use super::probe::input_path;
 
 pub struct Graph { pub filter: String, pub inputs: Vec<String>, pub background_audio: Option<usize> }
@@ -22,6 +22,20 @@ pub fn validate_render(spec: &RenderSpec) -> Result<(), String> {
     Ok(())
 }
 
+fn enable_filter(enable: &Option<Enable>) -> Result<String,String> {
+    if let Some(value)=enable {
+        if !value.start.is_finite() || !value.end.is_finite() || value.start<0.0 || value.end<value.start { return Err("Intervalo de camada inválido.".into()); }
+        Ok(format!(":enable='gte(t,{})*lt(t,{})'",value.start,value.end))
+    } else { Ok(String::new()) }
+}
+fn media_time(enable:&Option<Enable>,offset:Option<f64>)->Result<String,String>{
+    enable_filter(enable)?;
+    let offset=offset.unwrap_or(0.0);
+    if !offset.is_finite() || !(0.0..=86400.0).contains(&offset){return Err("Início do template inválido.".into());}
+    let start=enable.as_ref().map_or(0.0,|value|value.start);
+    Ok(format!("trim=start={offset},setpts=PTS-STARTPTS+{start}/TB"))
+}
+
 fn rotation_filter(angle: f64) -> String {
     format!("rotate={angle:.9}*PI/180:c=none:ow=ceil(rotw({angle:.9}*PI/180)):oh=ceil(roth({angle:.9}*PI/180))")
 }
@@ -35,25 +49,26 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     let mut inputs = Vec::new();
     let mut next_input = 1;
     let mut background_audio = None;
-    let mut add_input = |path: &str, video: bool| -> Result<usize,String> {
+    let mut add_input = |path: &str, video: bool, repeat: bool| -> Result<usize,String> {
         let real = input_path(path)?;
         let index = next_input; next_input += 1;
-        if video { inputs.extend(["-stream_loop".into(),"-1".into()]); }
-        else { inputs.extend(super::probe::image_loop_args(&real).map(str::to_owned)); }
+        if video && repeat { inputs.extend(["-stream_loop".into(),"-1".into()]); }
+        else if !video { inputs.extend(super::probe::image_loop_args(&real).map(str::to_owned)); }
         inputs.extend(["-i".into(),real.to_string_lossy().into_owned()]);
         Ok(index)
     };
-    let blur = spec.background.kind == "blur";
+    let blur = spec.background.visible && spec.background.kind == "blur";
     if blur { graph.push("[0:v]split=2[maininput][blurinput]".into()); }
-    match spec.background.kind.as_str() {
+    match if spec.background.visible {spec.background.kind.as_str()} else {"solid"} {
         "image" | "video" => {
             let is_video = spec.background.kind == "video";
-            let index = add_input(spec.background.source.as_deref().ok_or("Fundo sem arquivo.")?, is_video)?;
+            let index = add_input(spec.background.source.as_deref().ok_or("Fundo sem arquivo.")?, is_video, spec.background.loop_video)?;
             if is_video && spec.background.audio.as_deref() == Some("mix") { background_audio = Some(index); }
             let opacity=spec.background.opacity.unwrap_or(1.0);
+            let timing=media_time(&spec.background.enable,spec.background.source_offset)?;
             if !opacity.is_finite() || !(0.0..=1.0).contains(&opacity){return Err("Opacidade do fundo inválida.".into());}
             graph.push(format!("color=c=0x111111:s={w}x{h}:r={fps}:d={duration},format=rgba[basebg]"));
-            graph.push(format!("[{index}:v]setpts=PTS-STARTPTS,scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,format=rgba,colorchannelmixer=aa={opacity}[backgroundfile]"));
+            graph.push(format!("[{index}:v]{timing},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,format=rgba,colorchannelmixer=aa={opacity}[backgroundfile]"));
             graph.push("[basebg][backgroundfile]overlay=eof_action=repeat:format=auto[bg]".into());
         }
         "blur" => {
@@ -76,8 +91,14 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
             let channel = |shift:u32| format!("{}+({}-{})*({blend})",(first>>shift)&255u32,(last>>shift)&255u32,(first>>shift)&255u32);
             graph.push(format!("nullsrc=s={w}x{h}:r={fps}:d={duration},format=rgba,geq=r='{}':g='{}':b='{}':a=255[bg]",channel(16),channel(8),channel(0)));
         }
-        "solid" | "" => { let c = color(spec.background.color.as_deref().unwrap_or("#111111"))?; graph.push(format!("color=c={c}:s={w}x{h}:r={fps}:d={duration},format=rgba[bg]")); }
+        "solid" | "" => { let c = color(if spec.background.visible {spec.background.color.as_deref().unwrap_or("#111111")}else{"#111111"})?; graph.push(format!("color=c={c}:s={w}x{h}:r={fps}:d={duration},format=rgba[bg]")); }
         _ => return Err("Tipo de fundo não reconhecido.".into()),
+    }
+    if spec.background.visible && spec.background.enable.is_some() {
+        let enable=enable_filter(&spec.background.enable)?;
+        for node in &mut graph { *node=node.replace("[bg]","[timedbg]"); }
+        graph.push(format!("color=c=0x111111:s={w}x{h}:r={fps}:d={duration},format=rgba[fallbackbg]"));
+        graph.push(format!("[fallbackbg][timedbg]overlay=shortest=0:eof_action=repeat:format=auto{enable}[bg]"));
     }
     let crop = spec.geometry.source_crop;
     if crop.x < 0.0 || crop.y < 0.0 || crop.x+crop.width > info.width as f64 || crop.y+crop.height > info.height as f64 { return Err("Crop excede os limites da mídia original.".into()); }
@@ -88,7 +109,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     let mut main_source=if blur { "[maininput]".to_owned() } else { "[0:v]".to_owned() };
     if spec.media.mask == "circle" {
         if let Some(path)=&spec.mask_path {
-            let index=add_input(path,false)?;
+            let index=add_input(path,false,true)?;
             graph.push(format!("{main_source}{},split=2[unmasked][withalpha]",chain.join(",")));
             graph.push("[withalpha]alphaextract[originalalpha]".into());
             graph.push(format!("[{index}:v]format=gray[circlemask]"));
@@ -102,7 +123,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     let bounds = spec.geometry.bounds;
     let mut planes = vec![(spec.media.z_index,"main".to_owned(),bounds.x,bounds.y,None)];
     for (n,overlay) in item.overlays.iter().enumerate() {
-        let index = add_input(&overlay.path,false)?;
+        let index = add_input(&overlay.path,false,true)?;
         let label = format!("overlay{n}");
         graph.push(format!("[{index}:v]setpts=PTS-STARTPTS,scale={w}:{h},format=rgba[{label}]"));
         planes.push((overlay.z_index,label,0.0,0.0,overlay.enable.clone()));
@@ -110,7 +131,7 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
     for (n,layer) in spec.layers.iter().enumerate() {
         if layer.kind == "text" || !layer.visible { continue; }
         if layer.kind != "image" && layer.kind != "video" { return Err("Tipo de camada não suportado.".into()); }
-        let index = add_input(layer.source.as_deref().ok_or("Camada sem arquivo.")?,layer.kind == "video")?;
+        let index = add_input(layer.source.as_deref().ok_or("Camada sem arquivo.")?,layer.kind == "video",layer.loop_video)?;
         let label = format!("dynamic{n}");
         let lw = (layer.rect.width*w as f64).round().max(1.0);
         let lh = (layer.rect.height*h as f64).round().max(1.0);
@@ -118,14 +139,15 @@ pub fn build(item: &ExportItem, info: &MediaInfo, duration: f64) -> Result<Graph
         let bw = (lw*angle.cos().abs()+lh*angle.sin().abs()).ceil();
         let bh = (lw*angle.sin().abs()+lh*angle.cos().abs()).ceil();
         let fit=match layer.fit.as_deref(){Some("cover")=>format!("scale={lw}:{lh}:force_original_aspect_ratio=increase,crop={lw}:{lh}"),Some("contain")=>format!("scale={lw}:{lh}:force_original_aspect_ratio=decrease,pad={lw}:{lh}:(ow-iw)/2:(oh-ih)/2:color=black@0"),_=>format!("scale={lw}:{lh}")};
-        graph.push(format!("[{index}:v]setpts=PTS-STARTPTS,format=rgba,{fit},colorchannelmixer=aa={},{}[{label}]",layer.opacity,rotation_filter(layer.rotation)));
+        let timing=media_time(&layer.enable,layer.source_offset)?;
+        graph.push(format!("[{index}:v]{timing},format=rgba,{fit},colorchannelmixer=aa={},{}[{label}]",layer.opacity,rotation_filter(layer.rotation)));
         planes.push((layer.z_index,label,layer.rect.x*w as f64+(lw-bw)/2.0,layer.rect.y*h as f64+(lh-bh)/2.0,layer.enable.clone()));
     }
     planes.sort_by_key(|p|p.0);
     let mut previous = "bg".to_owned();
     for (index,(_,label,x,y,enable)) in planes.iter().enumerate() {
         let output = format!("composite{index}");
-        let enable=if let Some(enable)=enable { if !enable.start.is_finite()||!enable.end.is_finite()||enable.start<0.0||enable.end<enable.start{return Err("Intervalo de camada inválido.".into());} format!(":enable='gte(t,{})*lt(t,{})'",enable.start,enable.end) }else{String::new()};
+        let enable=enable_filter(enable)?;
         graph.push(format!("[{previous}][{label}]overlay=x={x:.6}:y={y:.6}:eof_action=repeat:shortest=0:format=auto{enable}[{output}]"));
         previous = output;
     }

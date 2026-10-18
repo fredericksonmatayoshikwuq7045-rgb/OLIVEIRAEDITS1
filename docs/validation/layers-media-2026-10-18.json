@@ -1,0 +1,410 @@
+{
+  "directory": "/tmp/oliveira-media-8a4vwz",
+  "startedAt": "2026-10-18T05:29:50.527Z",
+  "checks": [
+    {
+      "name": "FFmpeg disponível",
+      "detail": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    {
+      "name": "FFprobe disponível",
+      "detail": "ffprobe version 7.1.5-0+deb13u1 Copyright (c) 2007-2026 the FFmpeg developers"
+    },
+    {
+      "name": "20 exports editados com overlay, codec, áudio, trim, faststart e metadados verificados",
+      "detail": [
+        {
+          "id": "fixture-0",
+          "status": "ok",
+          "width": 320,
+          "height": 180,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 19103
+        },
+        {
+          "id": "fixture-1",
+          "status": "ok",
+          "width": 240,
+          "height": 240,
+          "pixFmt": "yuv420p",
+          "duration": 3,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 84524
+        },
+        {
+          "id": "fixture-2",
+          "status": "ok",
+          "width": 240,
+          "height": 300,
+          "pixFmt": "yuv420p",
+          "duration": 0.75,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 42553
+        },
+        {
+          "id": "fixture-3",
+          "status": "ok",
+          "width": 180,
+          "height": 320,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 24316
+        },
+        {
+          "id": "fixture-4",
+          "status": "ok",
+          "width": 320,
+          "height": 180,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 48918
+        },
+        {
+          "id": "fixture-5",
+          "status": "ok",
+          "width": 240,
+          "height": 240,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 50277
+        },
+        {
+          "id": "fixture-6",
+          "status": "ok",
+          "width": 240,
+          "height": 300,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 33873
+        },
+        {
+          "id": "fixture-7",
+          "status": "ok",
+          "width": 180,
+          "height": 320,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 41530
+        },
+        {
+          "id": "fixture-8",
+          "status": "ok",
+          "width": 320,
+          "height": 180,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 42715
+        },
+        {
+          "id": "fixture-9",
+          "status": "ok",
+          "width": 240,
+          "height": 240,
+          "pixFmt": "yuv420p",
+          "duration": 1.458333,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 28623
+        },
+        {
+          "id": "fixture-10",
+          "status": "ok",
+          "width": 240,
+          "height": 300,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 56760
+        },
+        {
+          "id": "fixture-11",
+          "status": "ok",
+          "width": 180,
+          "height": 320,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 60769
+        },
+        {
+          "id": "fixture-12",
+          "status": "ok",
+          "width": 320,
+          "height": 180,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 28864
+        },
+        {
+          "id": "fixture-13",
+          "status": "ok",
+          "width": 240,
+          "height": 240,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 55283
+        },
+        {
+          "id": "fixture-14",
+          "status": "ok",
+          "width": 240,
+          "height": 300,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 61091
+        },
+        {
+          "id": "fixture-15",
+          "status": "ok",
+          "width": 180,
+          "height": 320,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 24480
+        },
+        {
+          "id": "fixture-16",
+          "status": "ok",
+          "width": 320,
+          "height": 180,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 66111
+        },
+        {
+          "id": "fixture-17",
+          "status": "ok",
+          "width": 240,
+          "height": 240,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 59539
+        },
+        {
+          "id": "fixture-18",
+          "status": "ok",
+          "width": 240,
+          "height": 300,
+          "pixFmt": "yuv420p",
+          "duration": 1.5,
+          "audio": false,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 38472
+        },
+        {
+          "id": "fixture-19",
+          "status": "ok",
+          "width": 180,
+          "height": 320,
+          "pixFmt": "yuv420p",
+          "duration": 8,
+          "audio": true,
+          "faststart": true,
+          "sensitiveTags": [],
+          "overlayVerified": true,
+          "outputSize": 286942
+        }
+      ]
+    },
+    {
+      "name": "Fundo de vídeo curto continua animado após o fim do arquivo de origem",
+      "detail": {
+        "sourceDuration": 0.5,
+        "sampledAt": [
+          0.7,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Pasta de saída sem temporários",
+      "detail": [
+        "edited-0.mp4",
+        "edited-1.mp4",
+        "edited-10.mp4",
+        "edited-11.mp4",
+        "edited-12.mp4",
+        "edited-13.mp4",
+        "edited-14.mp4",
+        "edited-15.mp4",
+        "edited-16.mp4",
+        "edited-17.mp4",
+        "edited-18.mp4",
+        "edited-19.mp4",
+        "edited-2.mp4",
+        "edited-3.mp4",
+        "edited-4.mp4",
+        "edited-5.mp4",
+        "edited-6.mp4",
+        "edited-7.mp4",
+        "edited-8.mp4",
+        "edited-9.mp4"
+      ]
+    },
+    {
+      "name": "Modo só limpar com tags reais antes/depois",
+      "detail": {
+        "after": {
+          "format.compatible_brands": "isomiso2avc1mp41",
+          "format.major_brand": "isom",
+          "format.minor_version": "512",
+          "stream0.handler_name": "VideoHandler",
+          "stream0.language": "und",
+          "stream0.vendor_id": "[0][0][0][0]"
+        },
+        "before": {
+          "format.com.apple.quicktime.location.ISO6709": "+37.7749-122.4194/",
+          "format.com.apple.quicktime.make": "FixtureCamera",
+          "format.compatible_brands": "isomiso2avc1mp41",
+          "format.creation_time": "2020-01-01T00:00:00Z",
+          "format.encoder": "Lavf61.7.103",
+          "format.location": "+37.7749-122.4194/",
+          "format.location-eng": "+37.7749-122.4194/",
+          "format.major_brand": "isom",
+          "format.minor_version": "512",
+          "stream0.creation_time": "2020-01-01T00:00:00.000000Z",
+          "stream0.encoder": "Lavc61.19.101 libx264",
+          "stream0.handler_name": "VideoHandler",
+          "stream0.language": "und",
+          "stream0.vendor_id": "[0][0][0][0]"
+        },
+        "exiftoolUsed": false,
+        "removed": [
+          "format.com.apple.quicktime.location.ISO6709",
+          "format.com.apple.quicktime.make",
+          "format.creation_time",
+          "format.encoder",
+          "format.location",
+          "format.location-eng",
+          "stream0.creation_time",
+          "stream0.encoder"
+        ],
+        "sensitiveRemaining": []
+      }
+    },
+    {
+      "name": "Limpeza de EXIF JPEG real preserva original",
+      "detail": {
+        "originalExif": true,
+        "outputExif": false
+      }
+    },
+    {
+      "name": "Arquivo corrompido",
+      "detail": "Não foi possível ler a mídia: [mov,mp4,m4a,3gp,3g2,mj2 @ 0x559cae078040] moov atom not found\n/tmp/oliveira-media-8a4vwz/input/corrupt.mp4: Invalid data found when processing input"
+    },
+    {
+      "name": "Arquivo ausente",
+      "detail": "Arquivo ausente ou inacessível: /tmp/oliveira-media-8a4vwz/input/missing.mp4: No such file or directory (os error 2)"
+    },
+    {
+      "name": "Saída sem diretório gravável",
+      "detail": "Pasta de saída não existe. Selecione outra pasta."
+    },
+    {
+      "name": "Pasta realmente sem permissão de escrita",
+      "detail": "Não foi possível gravar na pasta de saída: Permission denied (os error 13)"
+    },
+    {
+      "name": "Dimensões ímpares rejeitadas",
+      "detail": "Canvas precisa ter dimensões pares entre 2 e 8192 pixels."
+    },
+    {
+      "name": "Cancelamento real remove saída parcial",
+      "detail": {
+        "durationMs": 384,
+        "error": "Exportação cancelada.",
+        "id": "cancel",
+        "logPath": "/tmp/oliveira-media-8a4vwz/engine/logs/145206-1792301408199-0/145206-1792301408535-2.log",
+        "metadata": null,
+        "outputPath": "/tmp/oliveira-media-8a4vwz/output/cancelled.mp4",
+        "outputSize": null,
+        "progress": {
+          "etaSeconds": null,
+          "fps": null,
+          "itemId": "cancel",
+          "jobId": "145206-1792301408199-0",
+          "outSizeBytes": null,
+          "percent": 0,
+          "speed": null
+        },
+        "sourcePath": "/tmp/oliveira-media-8a4vwz/input/source-19.mp4",
+        "status": "cancelled"
+      }
+    }
+  ],
+  "pending": [
+    "Fechamento da janela não é coberto por este harness; execute test:close em Tauri/Linux e valide também no Windows.",
+    "Disco cheio: falta um volume de teste limitado montável sem privilégios."
+  ],
+  "finishedAt": "2026-10-18T05:30:08.848Z"
+}

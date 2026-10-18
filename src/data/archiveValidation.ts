@@ -35,6 +35,8 @@ const template: Check = fields({
   mediaType: optional(kind),
   sourceWidth: optional(positive),
   sourceHeight: optional(positive),
+  sourceDuration: optional(number),
+  shared: optional(boolean),
   assetId: optional(identifier),
   source: text,
   placement: fields({ x: number, y: number, width: positive, rotation: number, opacity, zIndex: number }),
@@ -141,6 +143,8 @@ const item: Check = fields({
   render,
   trim: fields({ in: number, out: number }),
   speed: positive,
+  imageTime: optional(number),
+  imageDuration: optional(positive),
   headlineText: optional(text),
   templates: fields(Object.fromEntries(['border', 'watermark', 'headline', 'background'].map((key) => [key, nullable(identifier)]))),
 });

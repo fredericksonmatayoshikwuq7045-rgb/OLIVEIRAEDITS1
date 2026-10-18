@@ -1,6 +1,7 @@
 import { Check, Layers, Plus, Save, Settings2, Trash2, Type, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
-import type { AccountTemplate, MediaItem, TemplateCategory } from '../domain/models';
+import type { AccountTemplate, MediaItem, MediaKind, TemplateCategory } from '../domain/models';
+import { mediaKind } from '../data/mediaImport';
 import { removeTemplateReferences } from '../domain/templates';
 import type { WorkspaceStore } from './Dashboard';
 import { TemplateEditor } from './TemplateEditor';
@@ -13,6 +14,7 @@ export function Library({
   onApplyPreset,
   onSavePreset,
   notify,
+  kind = 'video',
 }: {
   store: WorkspaceStore;
   item: MediaItem | null;
@@ -20,18 +22,22 @@ export function Library({
   onApplyPreset: (id: string) => void;
   onSavePreset: () => void;
   notify: (message: string) => void;
+  kind?: MediaKind;
 }) {
   const [tab, setTab] = useState<'templates' | 'presets' | 'fonts'>('templates');
   const [category, setCategory] = useState<TemplateCategory>('border');
   const [group, setGroup] = useState('');
   const [editing, setEditing] = useState<AccountTemplate | null>(null);
+  const [sourceType, setSourceType] = useState<'all' | MediaKind>('all');
   const templateInput = useRef<HTMLInputElement>(null),
     fontInput = useRef<HTMLInputElement>(null);
   const profile = store.profile;
   if (!profile) return null;
-  const groups = profile.groups.filter((g) => !item || g.type === item.kind);
+  const targetKind = item?.kind || kind;
+  const groups = profile.groups.filter((g) => g.type === targetKind);
+  const effectiveGroup = groups.some((entry) => entry.id === group) ? group : '';
   const templates = profile.templates.filter(
-    (t) => t.category === category && (!group || t.groupId === group) && (!item || t.type === item.kind),
+    (t) => t.category === category && (!effectiveGroup || t.groupId === effectiveGroup) && (t.shared || t.type === targetKind),
   );
   return (
     <aside className="library">
@@ -55,7 +61,7 @@ export function Library({
             </div>
             <Field label="Grupo">
               <div className="row">
-                <select value={group} onChange={(e) => setGroup(e.target.value)}>
+                <select value={effectiveGroup} onChange={(e) => setGroup(e.target.value)}>
                   <option value="">Todos os grupos</option>
                   {groups.map((g) => (
                     <option key={g.id} value={g.id}>
@@ -69,7 +75,7 @@ export function Library({
                     const name = window.prompt('Nome do grupo:');
                     if (!name?.trim()) return;
                     const id = crypto.randomUUID();
-                    store.updateProfile({ groups: [...profile.groups, { id, name: name.trim(), type: item?.kind || 'video' }] });
+                    store.updateProfile({ groups: [...profile.groups, { id, name: name.trim(), type: targetKind }] });
                     setGroup(id);
                   }}
                 >
@@ -102,14 +108,19 @@ export function Library({
                     disabled={!item}
                     onClick={() => onApplyTemplate(template.id, category)}
                   >
-                    {/\.(mp4|mov|webm)$/i.test(template.source) ? (
+                    {(template.mediaType || mediaKind(template.name)) === 'video' ? (
                       <div className="template-thumb row" style={{ justifyContent: 'center' }}>
                         <Layers size={17} />
                       </div>
                     ) : (
                       <img className="template-thumb" src={template.runtimeUrl || template.source} alt="" />
                     )}
-                    <span className="truncate">{template.name}</span>
+                    <span className="truncate">
+                      {template.name}
+                      {template.mediaType === 'video' && (
+                        <small className="template-video-tag">Vídeo · {template.sourceDuration?.toFixed(1) || '—'}s</small>
+                      )}
+                    </span>
                   </button>
                   <IconButton label={`Editar template ${template.name}`} onClick={() => setEditing(template)}>
                     <Settings2 size={12} />
@@ -127,21 +138,31 @@ export function Library({
                 </div>
               ))}
             </div>
-            {templates.length === 0 && <small>Adicione uma imagem com a identidade da sua página. Fundos também aceitam vídeo.</small>}
+            {templates.length === 0 && <small>Adicione uma imagem ou vídeo com a identidade da sua página.</small>}
+            <Field label="Tipo de template">
+              <select value={sourceType} onChange={(event) => setSourceType(event.target.value as typeof sourceType)}>
+                <option value="all">Imagem ou vídeo</option>
+                <option value="image">Template em imagem</option>
+                <option value="video">Template em vídeo</option>
+              </select>
+            </Field>
             <Button onClick={() => templateInput.current?.click()}>
               <Upload /> Adicionar {labels[category].toLocaleLowerCase('pt-BR')}
+              {sourceType === 'video' ? ' em vídeo' : ''}
             </Button>
             <input
               hidden
               ref={templateInput}
               aria-label="Arquivo do template"
               type="file"
-              accept={category === 'background' ? 'image/*,video/*' : 'image/*'}
+              accept={sourceType === 'all' ? 'image/*,video/*' : `${sourceType}/*`}
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 try {
-                  await store.addTemplate(file, category, undefined, item?.kind || 'video');
+                  if (sourceType !== 'all' && mediaKind(file.name) !== sourceType)
+                    throw new Error(`Escolha um template em ${sourceType === 'video' ? 'vídeo' : 'imagem'} ou altere o tipo de template.`);
+                  await store.addTemplate(file, category, undefined, targetKind);
                   notify('Template adicionado à biblioteca da conta.');
                 } catch (error) {
                   notify(String(error));

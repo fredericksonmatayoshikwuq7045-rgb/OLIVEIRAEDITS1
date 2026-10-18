@@ -3,6 +3,7 @@ import type { MediaItem } from '../domain/models';
 import { cropSelectionGeometry, cropSourceDelta } from '../render/crop';
 import { snapMediaPan, snapRect } from '../render/snap';
 import { RenderCanvas } from '../render/RenderCanvas';
+import { BACKGROUND_TRACK } from '../domain/timeline';
 import type { Rect } from '../render/types';
 import { mediaUrl } from '../services/native';
 import { TransformBox } from './TransformBox';
@@ -253,9 +254,9 @@ export function Stage({
                     },
                   }
             }
-            playbackRate={draft.speed}
-            timeOrigin={draft.trim.in}
-            playing={playing && draft.kind === 'video'}
+            playbackRate={draft.kind === 'video' ? draft.speed : 1}
+            timeOrigin={draft.kind === 'video' ? draft.trim.in : 0}
+            playing={playing}
             time={time}
             onTimeUpdate={onTime}
             onEnded={onEnded}
@@ -273,7 +274,9 @@ export function Stage({
               </div>
             )}
           </div>
-          {!cropMode && !compare && <TransformBox item={draft} layerId={activeLayerId} onDraft={changeDraft} onCommit={onChange} />}
+          {!cropMode && !compare && activeLayerId !== BACKGROUND_TRACK && (
+            <TransformBox item={draft} layerId={activeLayerId} onDraft={changeDraft} onCommit={onChange} />
+          )}
           {cropMode && !compare && rect && <CropOverlay item={draft} rect={rect} onStart={start} />}
         </div>
       ) : (

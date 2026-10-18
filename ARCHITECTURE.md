@@ -53,3 +53,31 @@ camadas comuns com placa opaca e texto/logo, renderizadas pelo motor existente.
 A divisão mantém uma referência ao mesmo original com trims independentes e
 ajusta a janela das camadas. Alças usam geometria normalizada e um commit por
 gesto. O menu contextual copia somente os grupos escolhidos pelo usuário.
+
+## Camadas temporais e alas — 0.4.0
+
+`domain/timeline` expõe todas as camadas e um identificador virtual para o fundo,
+sem transformá-lo em overlay: isso preserva sua política de áudio e composição.
+Janelas usam segundos da saída após trim/velocidade, com início inclusivo e fim
+exclusivo. A divisão remapeia janelas e offsets. Campos opcionais mantêm o formato
+v2; a validação do backup inclui os novos tempos, visibilidade e repetição.
+
+`render/playback` dá uma chave por ocorrência de vídeo, inclusive para o fundo.
+Cada ocorrência tem seu próprio elemento/seek, mesmo quando compartilha o arquivo.
+O compositor e o motor respeitam janela, offset e repetição; o Rust desloca PTS
+e atrasa/limita o áudio do fundo. Planos estáticos mantêm suas janelas individuais.
+O relógio virtual de imagens usa refs e não reinicia a animação a cada atualização
+React. `mediaUrl` preserva endereços `asset://` já convertidos.
+
+`MediaAreas` filtra a visão de um único projeto; `allItems` preserva o conjunto
+completo para limpar a leva. Templates podem ser compartilhados entre tipos,
+continuando restritos ao perfil. `imageTime`/`imageDuration` guardam o momento e
+a duração da composição; a exportação de imagem usa o momento salvo. O filtro
+visual da ala não é uma separação de armazenamento nem desativa as ferramentas.
+
+No Linux, `storage_media_url` autoriza o caminho antes de registrar uma URL em
+loopback. O servidor usa tokens aleatórios por arquivo, valida Host/Origin,
+responde Range/HEAD e copia em blocos limitados. Não expõe paths na URL nem abre
+arquivos arbitrários recebidos por HTTP. URLs de sessão não são persistidas;
+assets e caminhos originais as recriam na hidratação. Windows/macOS mantêm
+`convertFileSrc`. O teste nativo verifica a autorização e ranges reais.

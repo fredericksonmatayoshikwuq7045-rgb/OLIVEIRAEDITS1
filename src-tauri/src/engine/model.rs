@@ -51,6 +51,11 @@ pub struct Geometry {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Background {
+    pub enable: Option<Enable>,
+    #[serde(default = "yes")] pub visible: bool,
+    #[serde(default = "yes", rename = "loop")] pub loop_video: bool,
+    pub source_offset: Option<f64>,
+    pub source_duration: Option<f64>,
     #[serde(rename = "type", default)] pub kind: String,
     pub color: Option<String>,
     pub from: Option<String>,
@@ -89,6 +94,9 @@ pub struct RenderSpec {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DynamicLayer {
+    #[serde(default = "yes", rename = "loop")] pub loop_video: bool,
+    pub source_offset: Option<f64>,
+    pub source_duration: Option<f64>,
     #[serde(rename = "type")] pub kind: String,
     pub source: Option<String>,
     pub rect: Rect,

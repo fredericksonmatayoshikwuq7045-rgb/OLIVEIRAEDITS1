@@ -4,7 +4,8 @@ import { Field, Section, Slider, Toggle } from './Primitives';
 
 export function BackgroundProperties({ item, onChange }: { item: MediaItem; onChange: (item: MediaItem) => void }) {
   const background = item.render.background;
-  const change = (value: RenderBackground) => onChange({ ...item, render: { ...item.render, background: value } });
+  const change = (value: RenderBackground) =>
+    onChange({ ...item, render: { ...item.render, background: { ...value, enable: background.enable, visible: background.visible } } });
   return (
     <Section title="Fundo" defaultOpen={false}>
       <Field label="Tipo de fundo">

@@ -33,6 +33,7 @@ export const media: Check = fields({
   zIndex: number,
 });
 const background: Check = (value, path) => {
+  fields({ enable: optional(fields({ start: number, end: number })), visible: optional(boolean) })(value, path);
   const source = record(value, path);
   switch (source.type) {
     case 'solid':
@@ -43,10 +44,16 @@ const background: Check = (value, path) => {
       return fields({ radius: opacity })(value, path);
     case 'image':
     case 'video':
-      return fields({ source: text, width: positive, height: positive, opacity, loop: boolean, audio: choices('mute', 'mix') })(
-        value,
-        path,
-      );
+      return fields({
+        source: text,
+        width: positive,
+        height: positive,
+        opacity,
+        loop: boolean,
+        audio: choices('mute', 'mix'),
+        sourceOffset: optional(number),
+        sourceDuration: optional(number),
+      })(value, path);
     default:
       invalid(`${path}.type`);
   }
@@ -77,10 +84,16 @@ const layer: Check = (value, path) => {
       shadow: fields({ color: text, blur: number, offsetX: number, offsetY: number }),
     })(value, path);
   } else {
-    fields({ type: kind, source: text, fit: choices('cover', 'contain', 'stretch'), sourceWidth: positive, sourceHeight: positive })(
-      value,
-      path,
-    );
+    fields({
+      type: kind,
+      source: text,
+      fit: choices('cover', 'contain', 'stretch'),
+      sourceWidth: positive,
+      sourceHeight: positive,
+      sourceOffset: optional(number),
+      sourceDuration: optional(number),
+      loop: optional(boolean),
+    })(value, path);
   }
 };
 export const render: Check = fields({

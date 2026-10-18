@@ -1,14 +1,18 @@
 import { sortMedia } from '../domain/batch';
+import { useState } from 'react';
 import { Copy, FolderOpen, Play, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { isNative } from '../services/native';
 import { MediaStrip } from './MediaStrip';
 import { PanelBoundary } from './PanelBoundary';
 import { Button, IconButton } from './Primitives';
 import { VideoTimeline } from './VideoTimeline';
+import { LayerTimeline } from './LayerTimeline';
+import { ImageTimeline } from './ImageTimeline';
 import { Stage } from './Stage';
 import type { EditorContext } from './useEditor';
 
 export function EditorCenter({ model }: { model: EditorContext }) {
+  const [expandedTimeline, setExpandedTimeline] = useState(false);
   const {
     active,
     project,
@@ -110,18 +114,52 @@ export function EditorCenter({ model }: { model: EditorContext }) {
           }}
         />
       </PanelBoundary>
-      {active?.kind === 'video' && active.status === 'ready' && (
-        <VideoTimeline
-          item={active}
-          profile={model.profile}
-          time={time}
-          playing={playing}
-          onTime={setTime}
-          onPlay={() => setPlaying((value) => !value)}
-          onChange={changeItem}
-          onSplit={model.split}
-          performance={model.settings.performance}
-        />
+      {active?.status === 'ready' && (
+        <div className={`composition-timeline ${expandedTimeline ? 'timeline-expanded' : ''}`}>
+          <div className="timeline-dock-heading">
+            <strong>Timeline</strong>
+            <button aria-expanded={expandedTimeline} onClick={() => setExpandedTimeline((value) => !value)}>
+              {expandedTimeline ? 'Reduzir timeline' : 'Expandir timeline'}
+            </button>
+          </div>
+          {active.kind === 'video' ? (
+            <VideoTimeline
+              item={active}
+              profile={model.profile}
+              time={time}
+              playing={playing}
+              onTime={setTime}
+              onPlay={model.togglePlayback}
+              onChange={changeItem}
+              onSplit={model.split}
+              performance={model.settings.performance}
+            />
+          ) : (
+            <ImageTimeline
+              item={active}
+              time={time}
+              playing={playing}
+              onTime={setTime}
+              onPlay={model.togglePlayback}
+              onChange={changeItem}
+            />
+          )}
+          <LayerTimeline
+            item={active}
+            profile={model.profile}
+            time={time}
+            selectedId={layerId}
+            onSelect={(id) => {
+              model.setLayerId(id);
+              model.setStep(3);
+            }}
+            onChange={changeItem}
+            onTime={(value) => {
+              setTime(value);
+              if (active.kind === 'image') changeItem({ ...active, imageTime: value });
+            }}
+          />
+        </div>
       )}
       <MediaStrip
         items={items}
@@ -139,6 +177,8 @@ export function EditorCenter({ model }: { model: EditorContext }) {
         onImportFolder={() => void importMedia(true)}
         onClear={model.requestClear}
         clearingDisabled={previewBusy}
+        clearCount={model.allItems.length}
+        kind={model.workspaceKind}
         importing={importing}
         onSelectAll={() => setSelectedIds(items.map((item) => item.id))}
         onSelectUnedited={() =>

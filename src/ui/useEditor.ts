@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { copyFraming, rangeSelection } from '../domain/batch';
-import type { MediaItem, Profile, Project, TemplateCategory } from '../domain/models';
+import type { MediaItem, MediaKind, Profile, Project, TemplateCategory } from '../domain/models';
+import { usePlayback } from './usePlayback';
 import { applyTemplate } from '../domain/templates';
 import type { RenderTextLayer } from '../render/types';
 import { mediaUrl, renderPreview } from '../services/native';
@@ -32,9 +33,7 @@ export function useEditor({
     [cropLocked, setCropLocked] = useState(true),
     [guides, setGuides] = useState(false),
     [safeZone, setSafeZone] = useState(false);
-  const [playing, setPlaying] = useState(false),
-    [time, setTime] = useState(0),
-    [batch, setBatch] = useState(false),
+  const [batch, setBatch] = useState(false),
     [exporting, setExporting] = useState(false),
     [metadata, setMetadata] = useState(false),
     [preview, setPreview] = useState<string | null>(null),
@@ -50,7 +49,9 @@ export function useEditor({
     relinkInput = useRef<HTMLInputElement>(null);
   const profile = store.profile,
     project = store.project;
-  const items = useMemo(() => project?.items.filter((item) => item.status !== 'empty') || [], [project?.items]);
+  const [workspaceKind, setWorkspaceKind] = useState<MediaKind | 'all'>('all');
+  const allItems = useMemo(() => project?.items.filter((item) => item.status !== 'empty') || [], [project?.items]);
+  const items = useMemo(() => allItems.filter((item) => workspaceKind === 'all' || item.kind === workspaceKind), [allItems, workspaceKind]);
   const active = items.find((item) => item.id === activeId) || items[0] || null;
   const selected = items.filter((item) => selectedIds.includes(item.id));
   useEffect(() => {
@@ -60,14 +61,14 @@ export function useEditor({
     }
   }, [active, activeId]);
   useEffect(() => {
-    setPlaying(false);
-    setTime(active?.trim.in || 0);
     setLayerId(null);
   }, [active?.id, active?.trim.in]);
   const changeItem = useCallback(
     (updated: MediaItem) => store.updateProject((p) => ({ ...p, items: p.items.map((item) => (item.id === updated.id ? updated : item)) })),
     [store],
   );
+  const playback = usePlayback(active, changeItem);
+  const { time, setTime, playing, setPlaying, playTime, freezeImage } = playback;
   const { importing, importProgress, importFiles, importMedia } = useMediaImport(store, notify);
   const select = useCallback(
     (item: MediaItem, ctrl: boolean, shift: boolean) => {
@@ -97,20 +98,25 @@ export function useEditor({
   const onTemplate = (id: string | null, category: TemplateCategory) => {
     if (active && profile) changeItem(applyTemplate(active, profile.templates.find((t) => t.id === id) || null, category));
   };
-  const openExport = (cleanOnly = false, ids: string[] | null = null) => {
-    setExportIds(ids);
-    setMetadata(cleanOnly);
-    setExporting(true);
-    setStep(4);
-  };
-  const clip = useClipActions({ store, active, selected, time, notify, exportOne: (id) => openExport(false, [id]) });
+  const openExport = useCallback(
+    (cleanOnly = false, ids: string[] | null = null) => {
+      freezeImage();
+      setPlaying(false);
+      setExportIds(ids);
+      setMetadata(cleanOnly);
+      setExporting(true);
+      setStep(4);
+    },
+    [freezeImage, setPlaying],
+  );
+  const clip = useClipActions({ store, active, selected, items, time, notify, exportOne: (id) => openExport(false, [id]) });
   const requestClear = () => {
-    if (importing || previewBusy || !project || !items.length) return;
+    if (importing || previewBusy || !project || !allItems.length) return;
     clearRequest.current = project.id;
     setClearProjectId(project.id);
   };
   const clearMedia = () => {
-    if (importing || previewBusy || !project || clearProjectId !== project.id || clearRequest.current !== project.id || !items.length)
+    if (importing || previewBusy || !project || clearProjectId !== project.id || clearRequest.current !== project.id || !allItems.length)
       return;
     clearRequest.current = null;
     store.updateProject((value) => ({ ...value, items: [] }));
@@ -128,7 +134,7 @@ export function useEditor({
     setExportIds(null);
     setStep(1);
     setClearProjectId(null);
-    notify(`${items.length} mídia(s) removida(s) do projeto. Originais e biblioteca preservados; Ctrl + Z desfaz.`);
+    notify(`${allItems.length} mídia(s) removida(s) do projeto. Originais e biblioteca preservados; Ctrl + Z desfaz.`);
   };
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -162,17 +168,11 @@ export function useEditor({
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [items, active?.id, store, select]);
+  }, [items, active?.id, store, select, openExport]);
   const resolveSource = (source: string) => {
     const asset = profile?.assets.find((asset) => asset.source === source || asset.relativePath === source);
     const item = items.find((item) => item.sourcePath === source || item.render.media.source === source);
     return asset?.runtimeUrl || item?.runtimeUrl || mediaUrl(source);
-  };
-  const playTime = (seconds: number) => {
-    if (active && seconds >= active.trim.out) {
-      setPlaying(false);
-      setTime(active.trim.in);
-    } else setTime(seconds);
   };
   const nativePreview = async (frame = false) => {
     if (!active || !profile) return;
@@ -186,6 +186,10 @@ export function useEditor({
     }
   };
   return {
+    allItems,
+    workspaceKind,
+    setWorkspaceKind,
+    togglePlayback: playback.togglePlayback,
     clearProjectId,
     setClearProjectId,
     requestClear,

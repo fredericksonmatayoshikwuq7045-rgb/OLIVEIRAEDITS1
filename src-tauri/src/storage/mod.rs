@@ -1,5 +1,7 @@
 mod atomic;
 mod paths;
+#[cfg(target_os="linux")]
+pub mod media_server;
 pub mod grants;
 pub mod images;
 #[cfg(feature = "desktop")]

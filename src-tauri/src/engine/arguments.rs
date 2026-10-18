@@ -63,8 +63,13 @@ pub fn build(item:&ExportItem, info:&MediaInfo, partial:&Path, fallback:bool) ->
             if let Some(background)=graph.background_audio {
                 let bg_has_audio=item.render.as_ref().and_then(|r|r.background.source.as_ref()).and_then(|p|probe::probe(p).ok()).is_some_and(|p|p.has_audio);
                 if bg_has_audio {
-                    if info.has_audio { filter.push_str(&format!(";[0:a]asetpts=PTS-STARTPTS,atempo={}[mainaudio];[{background}:a]asetpts=PTS-STARTPTS[bgaudio];[mainaudio][bgaudio]amix=inputs=2:duration=longest:normalize=1[aout]",item.speed)); }
-                    else { filter.push_str(&format!(";[{background}:a]asetpts=PTS-STARTPTS[aout]")); }
+                    let bg=&item.render.as_ref().unwrap().background;
+                    let start=bg.enable.as_ref().map_or(0.0,|value|value.start);
+                    let span=(bg.enable.as_ref().map_or(duration,|value|value.end)-start).max(0.0);
+                    let offset=bg.source_offset.unwrap_or(0.0);
+                    filter.push_str(&format!(";[{background}:a]atrim=start={offset},asetpts=PTS-STARTPTS,atrim=duration={span},adelay={}:all=1,apad[bgaudio]",(start*1000.0).round() as u64));
+                    if info.has_audio { filter.push_str(&format!(";[0:a]asetpts=PTS-STARTPTS,atempo={}[mainaudio];[mainaudio][bgaudio]amix=inputs=2:duration=longest:normalize=1[aout]",item.speed)); }
+                    else { filter.push_str(";[bgaudio]anull[aout]"); }
                     args.extend(["-map".into(),"[aout]".into()]);
                 } else if info.has_audio { args.extend(["-map".into(),"0:a:0".into(),"-af".into(),format!("asetpts=PTS-STARTPTS,atempo={}",item.speed)]); }
             } else if info.has_audio { args.extend(["-map".into(),"0:a:0".into(),"-af".into(),format!("asetpts=PTS-STARTPTS,atempo={}",item.speed)]); }

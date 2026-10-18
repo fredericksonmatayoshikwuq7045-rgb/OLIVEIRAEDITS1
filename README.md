@@ -1,4 +1,4 @@
-# Oliveira Edits — 0.3.1
+# Oliveira Edits — 0.4.0
 
 Editor local em pt-BR para vídeos e imagens em lote. Cada conta mantém templates,
 fontes, presets, projetos e configurações de exportação próprios.
@@ -13,14 +13,18 @@ indisponível durante a importação e quando não há mídias.
 
 ## Novidades desta versão
 
-Foto recortável por conta; frases do dia em pt-BR, inglês ou espanhol; animação
-Matrix só na seleção de perfis; temas claro/escuro/sistema, cores, fontes e três
-layouts. O player tem alças de tamanho e rotação, menu com botão direito e
-comparação com o original. A timeline mostra quadros reais, corta pelas pontas
-e divide o vídeo em slots independentes. O assistente em lote sugere o recorte
-da cena e encontra marcas por texto ou referência visual para sobrepor sua marca.
+Todos os templates, textos e o fundo têm faixas próprias na timeline. Arraste as
+pontas ou defina os segundos exatos de entrada/saída. Templates em vídeo funcionam
+em todas as categorias, com ponto de entrada e repetição por camada. A timeline
+pode ser expandida para editar várias faixas.
 
-Guia das funções, limites e testes: [release 0.3.0](docs/release-0.3.0.md).
+As alas **Todas / Vídeos / Imagens** organizam o projeto preservando as ferramentas.
+Uma imagem com template animado exporta o quadro escolhido em PNG/JPG/WebP.
+A edição do template permite compartilhá-lo entre vídeos e imagens.
+
+Guia e limites: [release 0.4.0](docs/release-0.4.0.md). Foto de perfil, frases,
+temas, layouts, alças, assistente e demais funções da
+[0.3.0](docs/release-0.3.0.md) continuam disponíveis.
 As novidades estão em `refactor/v2`; baixe essa branch para obter esta versão.
 
 ## Requisitos e início
@@ -28,7 +32,8 @@ As novidades estão em `refactor/v2`; baixe essa branch para obter esta versão.
 - Node.js 22.12+ e npm; neste ambiente foram usados Node 24.19 e npm 11.9.
 - Para desktop: Rust estável atual, ferramentas C/C++ do sistema e FFmpeg/FFprobe.
 - No Windows: Visual Studio Build Tools com C++, SDK Windows e WebView2.
-- No Linux: GTK3, WebKitGTK 4.1 e demais [pré-requisitos Tauri](https://v2.tauri.app/start/prerequisites/).
+- No Linux: GTK3, WebKitGTK 4.1, GStreamer com decoder H.264 (`gstreamer1.0-libav`)
+  e demais [pré-requisitos Tauri](https://v2.tauri.app/start/prerequisites/).
 
 ```bash
 npm ci

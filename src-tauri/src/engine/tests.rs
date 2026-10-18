@@ -76,3 +76,29 @@ fn gif_and_avif_with_no_duration_render_as_images_and_use_supported_loops() {
     }
     fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn layer_video_starts_at_its_window_with_offset_and_optional_loop() {
+    let dir=scratch();let mut item=fixture(&dir);
+    item.render.as_mut().unwrap().layers=vec![serde_json::from_value(serde_json::json!({"type":"video","source":item.source_path,"rect":{"x":0,"y":0,"width":0.2,"height":0.2},"visible":true,"sourceOffset":0.5,"loop":false,"enable":{"start":1,"end":2}})).unwrap()];
+    let result=graph::build(&item,&info(&item),3.).unwrap();
+    assert!(!result.inputs.iter().any(|value|value=="-stream_loop"));
+    assert!(result.filter.contains("trim=start=0.5,setpts=PTS-STARTPTS+1/TB"));
+    assert!(result.filter.contains("gte(t,1)*lt(t,2)"));
+    item.render.as_mut().unwrap().layers[0].source_offset=Some(f64::NAN);
+    assert!(graph::build(&item,&info(&item),3.).is_err());
+    fs::remove_dir_all(dir).unwrap();
+}
+#[test]
+fn timed_background_has_a_fallback_and_hidden_blur_leaves_no_disconnected_input() {
+    let dir=scratch();let mut item=fixture(&dir);
+    item.render.as_mut().unwrap().background.enable=Some(Enable{start:1.,end:2.});
+    let result=graph::build(&item,&info(&item),3.).unwrap();
+    assert!(result.filter.contains("[fallbackbg][timedbg]"));
+    assert!(result.filter.contains("gte(t,1)*lt(t,2)"));
+    let background=&mut item.render.as_mut().unwrap().background;
+    background.kind="blur".into();background.visible=false;
+    let hidden=graph::build(&item,&info(&item),3.).unwrap();
+    assert!(!hidden.filter.contains("split=2"));assert!(!hidden.filter.contains("gblur"));
+    fs::remove_dir_all(dir).unwrap();
+}

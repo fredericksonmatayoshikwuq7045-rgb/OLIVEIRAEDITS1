@@ -2,6 +2,7 @@ import { disposeAssets, loadAssets, seekAssets, type RenderAsset, type RenderAss
 import { computeGeometry } from './geometry';
 import { drawText, prepareFonts } from './text';
 import type { RenderImageLayer, RenderLayer, RenderSpec } from './types';
+import { activeAt, backgroundVideoKey, layerVideoKey } from './playback';
 
 export interface CompositionOptions {
   assets?: RenderAssets;
@@ -68,7 +69,7 @@ function drawMedia(context: CanvasRenderingContext2D, spec: RenderSpec, assets: 
 }
 
 function drawImageLayer(context: CanvasRenderingContext2D, layer: RenderImageLayer, spec: RenderSpec, assets: RenderAssets): void {
-  const asset = assets.get(layer.source);
+  const asset = assets.get(layer.type === 'video' ? layerVideoKey(layer.id) : layer.source);
   if (!asset) return;
   const width = layer.rect.width * spec.canvas.width;
   const height = layer.rect.height * spec.canvas.height;
@@ -81,11 +82,12 @@ function drawImageLayer(context: CanvasRenderingContext2D, layer: RenderImageLay
   context.restore();
 }
 
-function drawBackground(context: CanvasRenderingContext2D, spec: RenderSpec, assets: RenderAssets): void {
+function drawBackground(context: CanvasRenderingContext2D, spec: RenderSpec, assets: RenderAssets, time: number): void {
   const { width, height } = spec.canvas;
   const background = spec.background;
-  context.fillStyle = background.type === 'solid' ? background.color : '#111111';
+  context.fillStyle = activeAt(background, time) && background.type === 'solid' ? background.color : '#111111';
   context.fillRect(0, 0, width, height);
+  if (!activeAt(background, time)) return;
   if (background.type === 'gradient') {
     const angle = (background.angle * Math.PI) / 180;
     const dx = Math.cos(angle),
@@ -102,7 +104,7 @@ function drawBackground(context: CanvasRenderingContext2D, spec: RenderSpec, ass
     context.fillStyle = gradient;
     context.fillRect(0, 0, width, height);
   } else if (background.type === 'image' || background.type === 'video') {
-    const asset = assets.get(background.source);
+    const asset = assets.get(background.type === 'video' ? backgroundVideoKey : background.source);
     if (asset) {
       context.save();
       context.globalAlpha = background.opacity;
@@ -125,7 +127,7 @@ function drawBackground(context: CanvasRenderingContext2D, spec: RenderSpec, ass
 }
 
 export function drawLayer(context: CanvasRenderingContext2D, layer: RenderLayer, spec: RenderSpec, assets: RenderAssets, time = 0): void {
-  if (!layer.visible || (layer.enable && (time < layer.enable.start || time >= layer.enable.end))) return;
+  if (!activeAt(layer, time)) return;
   if (layer.type === 'text') drawText(context, layer, spec);
   else drawImageLayer(context, layer, spec, assets);
 }
@@ -135,7 +137,7 @@ export function drawFrame(context: CanvasRenderingContext2D, spec: RenderSpec, a
   context.save();
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.clearRect(0, 0, spec.canvas.width, spec.canvas.height);
-  drawBackground(context, spec, assets);
+  drawBackground(context, spec, assets, time);
   const entries = [
     { zIndex: spec.media.zIndex, layer: null as RenderLayer | null },
     ...spec.layers.map((layer) => ({ zIndex: layer.zIndex, layer })),
@@ -172,7 +174,7 @@ export async function composeCanvas(spec: RenderSpec, options: CompositionOption
   await prepareFonts(spec);
   const assets = options.assets ?? (await loadAssets(spec, options.resolveSource));
   try {
-    if (options.time !== undefined) await seekAssets(assets, options.time);
+    if (options.time !== undefined) await seekAssets(assets, options.time, spec);
     const canvas = makeCanvas(spec);
     const context = canvas.getContext('2d');
     if (!context) throw new Error('Canvas 2D indisponível neste ambiente.');

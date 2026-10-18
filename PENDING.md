@@ -40,7 +40,7 @@
 - Tradução completa da interface: continua em pt-BR. As frases já têm pt-BR,
   inglês e espanhol; temas claro/escuro/sistema e cores estão implementados.
 - Rastreamento contínuo de marca em movimento, remoção por reconstrução e OCR de
-  todos os frames não fazem parte da 0.3.0. A análise usa até cinco amostras e
+  todos os frames não fazem parte da 0.4.0. A análise usa até cinco amostras e
   exige revisão; resultados ambíguos não ficam selecionados automaticamente.
 - O catálogo de frases é local e pequeno; um autor com uma única frase repete
   esse texto. Frases pessoais ampliam o catálogo. Ilia Topuria está disponível
@@ -61,3 +61,7 @@
   Para obter o código atualizado, selecione essa branch; `main` mantém a versão
   anterior. Builds e instaladores não foram publicados. A restauração do ambiente
   completo em uma nova tarefa da nuvem continua sem validação.
+
+- Templates em vídeo sobre imagens exportam um quadro estático. Animação de foto
+  para MP4 e faixas independentes de áudio não estão incluídas. O mix de áudio
+  existente do fundo em vídeo permanece disponível e respeita sua janela.

@@ -105,13 +105,15 @@ export function mediaActions(context: WorkspaceContext) {
         const profile = currentProfile();
         if (typeof input === 'string') await authorizePaths([input]);
         const filename = typeof input === 'string' ? baseName(input) : input.name;
-        const kind = mediaKind(filename) === 'video' ? 'video' : 'image';
+        const kind = mediaKind(filename);
+        if (!kind) throw new Error('Escolha uma imagem ou um vídeo compatível para o template.');
+        if (typeof input !== 'string' && input.size > 256 * 1024 * 1024) throw new Error('O template deve ter até 256 MB.');
         const asset = await saveAsset(profile.id, input, filename, kind, typeof input === 'string' ? undefined : input.type);
         const runtimeUrl = await context.manager().resolve(asset);
-        const probe =
-          typeof input === 'string' && isNative()
-            ? await invoke<MediaProbe>('probe_media', { path: input })
-            : await probeBrowser(runtimeUrl, kind, filename, typeof input === 'string' ? 0 : input.size);
+        asset.runtimeUrl = runtimeUrl;
+        const probe = isNative()
+          ? await invoke<MediaProbe>('probe_media', { path: asset.source })
+          : await probeBrowser(runtimeUrl, kind, filename, typeof input === 'string' ? 0 : input.size);
         const group = profile.groups.find((group) => group.type === targetKind) ?? {
           id: uid(),
           name: targetKind === 'video' ? 'Vídeos' : 'Imagens',
@@ -126,6 +128,7 @@ export function mediaActions(context: WorkspaceContext) {
           mediaType: kind,
           sourceWidth: probe.width,
           sourceHeight: probe.height,
+          sourceDuration: kind === 'video' ? probe.duration : undefined,
           assetId: asset.id,
           source: `asset:${asset.id}`,
           runtimeUrl,

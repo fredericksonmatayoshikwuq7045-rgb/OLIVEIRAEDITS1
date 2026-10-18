@@ -1,4 +1,5 @@
-import { convertFileSrc, invoke } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core';
+import { nativeMediaUrl } from './nativeMedia';
 import { createMediaItem } from '../domain/defaults';
 import { mediaKind } from '../domain/mediaFormats';
 import type { AssetRef, MediaItem, MediaKind, MediaProbe, Profile } from '../domain/models';
@@ -87,7 +88,7 @@ export async function importMedia(
   if (typeof input === 'string') {
     if (!isNative()) throw new Error('Importação por caminho exige o aplicativo desktop. No navegador, selecione os arquivos.');
     item.sourcePath = input;
-    item.runtimeUrl = convertFileSrc(input);
+    item.runtimeUrl = await nativeMediaUrl(input, kind);
     item.probe = await invoke<MediaProbe>('probe_media', { path: input });
   } else {
     const temporaryUrl = URL.createObjectURL(input);
@@ -99,6 +100,7 @@ export async function importMedia(
     asset = await saveAsset(profile.id, input, input.name, kind, input.type);
     item.assetId = asset.id;
     item.runtimeUrl = await manager.resolve(asset);
+    asset.runtimeUrl = item.runtimeUrl;
   }
   item.status = 'ready';
   item.render.media.source = item.runtimeUrl;

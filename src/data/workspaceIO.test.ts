@@ -42,6 +42,7 @@ function fixture() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(invoke).mockReset();
   vi.mocked(isNative).mockReturnValue(true);
   vi.mocked(pathExists).mockResolvedValue(true);
   vi.mocked(generateThumbnail).mockResolvedValue('asset://localhost/cache/regenerated.jpg');
@@ -137,7 +138,10 @@ describe('miniaturas recuperáveis após limpar o cache', () => {
   it('mantém o erro de um vídeo ilegível sem tentar gerar sua miniatura', async () => {
     const { workspace, item, manager } = fixture();
     item.probe = undefined;
-    vi.mocked(invoke).mockRejectedValueOnce(new Error('vídeo corrompido'));
+    vi.mocked(invoke).mockImplementation(async (command) => {
+      if (command === 'probe_media') throw new Error('vídeo corrompido');
+      return null;
+    });
     const restored = await hydrateWorkspace(workspace, manager);
     expect(restored.workspace.projects[0].items[0].status).toBe('error');
     expect(restored.workspace.projects[0].items[0].error).toContain('vídeo corrompido');

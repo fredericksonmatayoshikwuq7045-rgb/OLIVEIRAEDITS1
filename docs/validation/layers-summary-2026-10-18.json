@@ -1,0 +1,80 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-18",
+  "branch": "refactor/v2",
+  "status": "passed",
+  "platform": "Linux x86_64; Chromium and production WebKitGTK headless/software",
+  "unit": {
+    "frontend": 119,
+    "frontendFiles": 21,
+    "rust": 41,
+    "status": "passed"
+  },
+  "builds": {
+    "typescriptVite": "passed",
+    "tauriCliProductionDebugNoBundle": "passed",
+    "windowsCoreAndTestsCrossCheck": "passed",
+    "windowsInstallerOrWebView2Execution": "not run"
+  },
+  "quality": [
+    "ESLint",
+    "Prettier",
+    "code files <=300 lines",
+    "git diff --check"
+  ],
+  "ui": {
+    "checks": 4,
+    "report": "layers-ui-2026-10-18.json"
+  },
+  "temporalParity": {
+    "compositions": 6,
+    "frames": 28,
+    "backgroundAudioWindow": "passed",
+    "report": "layers-timing-2026-10-18.json"
+  },
+  "native": {
+    "checks": 4,
+    "report": "layers-native-2026-10-18.json",
+    "productionProtocol": "tauri://localhost",
+    "uiMp4AndPng": "passed",
+    "workspaceTemporaryUrlsPersisted": false
+  },
+  "regressions": {
+    "exports": 20,
+    "visualParity": 9,
+    "importedFiles": 501,
+    "clearBatchChecks": 3,
+    "appearanceChecks": 2,
+    "migrationChecks": 3,
+    "upgradeChecks": 7
+  },
+  "reports": [
+    "layers-media-2026-10-18.json",
+    "layers-parity-2026-10-18.json",
+    "layers-import-2026-10-18.json",
+    "layers-clear-2026-10-18.json",
+    "layers-appearance-2026-10-18.json"
+  ],
+  "issuesFixedDuringValidation": [
+    "Image composition clock effect restart/freeze",
+    "Timeline layout retained enough player space for pinch",
+    "Native asset URL double conversion",
+    "Linux WebKit video transport and muted detached frames",
+    "Cross-area group filter",
+    "Trimmed layer drag boundaries",
+    "Immediate native export of newly imported video template"
+  ],
+  "testEnvironmentNotes": [
+    "Private GTK/WebKit and GStreamer libav; Xvfb software rendering and virtual/null audio",
+    "Native test launcher maps writable /tmp to WebKit /var/tmp and isolates loopback from HTTP proxies",
+    "Driver sets playbin3/invisible-video flags; CSP permits scoped local streaming in media/connect sources",
+    "WebDriver synchronous UI execution; bounded retry only for read-only IPC after a transport disconnect"
+  ],
+  "limits": [
+    "Windows NSIS and WebView2 require execution on Windows",
+    "No GPU or audio-device validation in this headless run",
+    "Images with video templates export a selected still frame, not an animated MP4",
+    "Video overlay templates are silent; background mix remains available",
+    "Fresh-task cloud snapshot restoration not verified"
+  ]
+}

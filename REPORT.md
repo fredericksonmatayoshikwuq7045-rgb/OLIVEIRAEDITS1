@@ -1,6 +1,18 @@
 # Relatório de implementação — Oliveira Edits 2
 
-Versão atual: **0.3.1**, com limpeza da leva em 18/10/2026.
+Versão atual: **0.4.0**, com camadas temporais, templates em vídeo e ala de imagens.
+Guia: [release 0.4.0](docs/release-0.4.0.md). Evidências da rodada de 18/10/2026:
+[resumo](docs/validation/layers-summary-2026-10-18.json),
+[interface e backup](docs/validation/layers-ui-2026-10-18.json) e
+[28 quadros e áudio](docs/validation/layers-timing-2026-10-18.json).
+Passaram 119 testes frontend/dados, 41 Rust, build CLI desktop Linux e check do
+núcleo/testes Windows; regressões de 20 exports reais, nove casos visuais,
+501 arquivos, migração, aparência e limpeza. Quatro verificações no bundle real
+WebKit Linux comprovaram autorização/ranges, importação/preview e MP4/PNG pela UI:
+[integração nativa](docs/validation/layers-native-2026-10-18.json). A execução é
+headless em software; NSIS/WebView2 ainda exigem Windows.
+
+Histórico da **0.3.1**: limpeza da leva em 18/10/2026.
 Detalhes do botão **Limpar todas** no [README](README.md). A limpeza passou
 em teste real de navegador: cancelar/Escape, uma única ação de desfazer/refazer,
 nova leva no slot 1, reload e preservação de originais, biblioteca e outra conta.

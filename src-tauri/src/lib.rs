@@ -21,7 +21,7 @@ pub fn run() {
             pause_export,resume_export,clean_metadata_only,cache_asset,render_preview,crop_detect,
             open_authorized_path,confirm_close,
             generate_thumbnail,clear_generated_cache,sample_media_frames,
-            storage_read_json,storage_write_json,storage_write_asset,storage_read_asset,
+            storage_read_json,storage_write_json,storage_write_asset,storage_read_asset,storage_media_url,
             storage_import_asset,storage_exists,storage_log_error,storage_get_paths,storage_authorize_paths,storage_export_image
         ])
         .setup(|app|{

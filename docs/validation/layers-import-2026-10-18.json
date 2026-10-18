@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "checks": [
+    "Criar conta e importar imagem",
+    "Pinça com dois dedos amplia e gera uma única edição desfeita",
+    "Editar texto e exportar PNG real 1080×1920",
+    "Recarregar preserva imagem e camadas",
+    "Contas isolam os projetos",
+    "Cancelar seleção de pasta libera a próxima importação",
+    "Uma pasta: 501 mídias em ordem natural e slots contínuos; corrupto e texto isolados, sem reabrir seletor",
+    "Reabrir o grid após rolar ao fim mantém cartões e mídia ativa visíveis",
+    "501 mídias: grid virtualizado, seleção completa, desfazer e refazer",
+    "Backup .oeprofile com assets importa como conta independente"
+  ],
+  "pageErrors": []
+}

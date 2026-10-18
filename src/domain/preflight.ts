@@ -20,6 +20,20 @@ export function exportIssues(items: MediaItem[], profile: Profile): ExportIssue[
     const { width, height } = item.render.canvas;
     if (!Number.isFinite(width + height) || width <= 0 || height <= 0 || (item.kind === 'video' && (width % 2 || height % 2)))
       add('dimensões de saída inválidas; vídeos exigem dimensões pares.');
+    for (const layer of [item.render.background, ...item.render.layers]) {
+      if (layer.visible === false) continue;
+      if (
+        layer.enable &&
+        (!Number.isFinite(layer.enable.start + layer.enable.end) || layer.enable.start < 0 || layer.enable.end <= layer.enable.start)
+      )
+        add('intervalo de uma camada inválido.');
+      if (
+        'sourceOffset' in layer &&
+        layer.sourceOffset !== undefined &&
+        (!Number.isFinite(layer.sourceOffset) || layer.sourceOffset < 0 || layer.sourceOffset > 86400)
+      )
+        add('início do arquivo do template inválido.');
+    }
     for (const layer of item.render.layers)
       if (layer.visible && layer.type === 'text') {
         const font = profile.fonts.find((font) => font.family === layer.fontFamily);

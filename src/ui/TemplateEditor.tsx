@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AccountTemplate, Profile } from '../domain/models';
-import { Button, Field, Modal, Slider } from './Primitives';
+import { Button, Field, Modal, Slider, Toggle } from './Primitives';
+import { mediaUrl } from '../services/native';
 
 export function TemplateEditor({
   template,
@@ -28,6 +29,19 @@ export function TemplateEditor({
         <Field label="Nome do template">
           <input required value={draft.name} onChange={(event) => patch({ name: event.target.value })} />
         </Field>
+        {draft.mediaType === 'video' ? (
+          <video
+            className="template-video-preview"
+            src={draft.runtimeUrl || mediaUrl(draft.source)}
+            controls
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <img className="template-video-preview" src={draft.runtimeUrl || mediaUrl(draft.source)} alt="Template" />
+        )}
+        <Toggle label="Disponível nas alas de vídeos e imagens" checked={draft.shared === true} onChange={(shared) => patch({ shared })} />
         <Field label="Grupo do template">
           <select value={draft.groupId} onChange={(event) => patch({ groupId: event.target.value })}>
             {profile.groups

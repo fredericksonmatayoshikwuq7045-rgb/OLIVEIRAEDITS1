@@ -94,6 +94,8 @@ export function MediaStrip({
   onImportFolder,
   onClear,
   clearingDisabled = false,
+  clearCount = items.length,
+  kind = 'all',
   importing,
   onSelectAll,
   onSelectUnedited,
@@ -114,6 +116,8 @@ export function MediaStrip({
   onImportFolder: () => void;
   onClear: () => void;
   clearingDisabled?: boolean;
+  clearCount?: number;
+  kind?: 'all' | 'video' | 'image';
   importing: boolean;
   onSort: (order: MediaSort) => void;
   onSelectAll: () => void;
@@ -163,7 +167,8 @@ export function MediaStrip({
             {open ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
           </IconButton>
           <h3>
-            Mídias do projeto <span className="muted">({items.filter((item) => item.status !== 'empty').length})</span>
+            {kind === 'image' ? 'Imagens do projeto' : kind === 'video' ? 'Vídeos do projeto' : 'Mídias do projeto'}{' '}
+            <span className="muted">({items.filter((item) => item.status !== 'empty').length})</span>
           </h3>
         </div>
         <div className="row">
@@ -205,7 +210,7 @@ export function MediaStrip({
             variant="ghost"
             className="danger-text"
             aria-label="Limpar todas as mídias"
-            disabled={importing || clearingDisabled || !items.length}
+            disabled={importing || clearingDisabled || !clearCount}
             title={clearingDisabled ? 'Aguarde a prévia terminar.' : 'Esvaziar os slots para começar uma nova leva'}
             onClick={onClear}
           >

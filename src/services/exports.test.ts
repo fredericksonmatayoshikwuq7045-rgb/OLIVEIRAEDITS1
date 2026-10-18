@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMediaItem, createProfile } from '../domain/defaults';
 import { canvasBlob, compileStaticPlanes, composeCanvas } from '../render/compositor';
 import { nativeCall } from './backend';
-import { exportItems } from './exports';
+import { exportItems, prepareExportItem } from './exports';
+import { applyTemplate } from '../domain/templates';
+import type { AccountTemplate } from '../domain/models';
 import { getImageExportReport, recordImageExport, resetImageExportReport } from './imageReport';
 import { getFfmpegInfo, startExport } from './queue';
 
@@ -75,5 +77,36 @@ describe('ação após exportar lote misto', () => {
     await expect(exportItems(profile, [video])).rejects.toThrow('FFmpeg indisponível');
     expect(getImageExportReport()).toEqual([]);
     expect(startExport).not.toHaveBeenCalled();
+  });
+});
+
+describe('exportar template recém-importado', () => {
+  it('resolve a URL temporária pelo template mesmo antes de hidratar os assets novamente', async () => {
+    const { profile, video } = fixture();
+    const source = 'C:\\Owned\\stamp.mp4',
+      runtimeUrl = 'http://127.0.0.1:1234/session-token';
+    profile.assets.push({ id: 'stamp', source, name: 'stamp.mp4', relativePath: 'assets/stamp.mp4', kind: 'video', mimeType: 'video/mp4' });
+    const template: AccountTemplate = {
+      id: 'template-stamp',
+      groupId: 'video',
+      name: 'stamp',
+      type: 'video',
+      category: 'watermark',
+      mediaType: 'video',
+      source: 'asset:stamp',
+      runtimeUrl,
+      assetId: 'stamp',
+      sourceWidth: 64,
+      sourceHeight: 64,
+      sourceDuration: 3,
+      placement: { x: 0.65, y: 0.05, width: 0.28, rotation: 0, opacity: 1, zIndex: 20 },
+    };
+    profile.templates.push(template);
+    const item = applyTemplate(applyTemplate(video, template, 'watermark'), template, 'background');
+    item.render.layers[0].enable = { start: 0.2, end: 0.8 };
+    const prepared = await prepareExportItem(item, profile);
+    expect(prepared.render?.layers[0]).toMatchObject({ source, enable: { start: 0.2, end: 0.8 } });
+    expect(prepared.render?.background).toMatchObject({ source, type: 'video' });
+    expect(profile.assets[0].runtimeUrl).toBeUndefined();
   });
 });

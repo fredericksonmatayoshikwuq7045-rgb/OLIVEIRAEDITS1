@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.0 — 2026-10-18
+
+- Faixas de início/fim para todas as camadas: borda, marca, headline visual/texto,
+  fundo e camadas adicionais; arraste, campos precisos, ocultar, remover e desfazer.
+- Templates em vídeo em todas as categorias, com ponto de entrada, repetição ou
+  último quadro parado; decodificadores independentes para o mesmo arquivo.
+- Fundo com janela temporal e mix de áudio sincronizado; divisão preserva fase.
+- Alas Todas/Vídeos/Imagens com as ferramentas existentes e opção de template
+  compartilhado entre os tipos; Limpar todas continua abrangendo o projeto inteiro.
+- Composição de imagem com duração, reprodução e quadro salvo para PNG/JPG/WebP.
+- Timeline expansível e compacta por padrão; ajuste de espaço mantém o player.
+- Correção de URL nativa convertida duas vezes e de reprodução temporal de imagem.
+- Streaming local com caminhos autorizados e ranges para vídeo no WebKit Linux.
+- Referência de template recém-importado resolvida no export sem reabrir o perfil.
+- Testes de interface, backup, PNG/MP4 reais, janelas/áudio e equivalência temporal.
+  Guia e validação: [release 0.4.0](docs/release-0.4.0.md).
+
 ## 0.3.1 — 2026-10-18
 
 - Botão **Limpar todas** na faixa de mídias, disponível nos três layouts.

@@ -1,4 +1,5 @@
-import { convertFileSrc, invoke } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core';
+import { nativeMediaUrl } from './nativeMedia';
 import type { MediaProbe, Workspace } from '../domain/models';
 import type { AssetManager } from './assets';
 import { probeBrowser } from './mediaImport';
@@ -114,7 +115,7 @@ export async function hydrateWorkspace(workspace: Workspace, manager: AssetManag
         if (item.assetId) item.runtimeUrl = urls.get(item.assetId);
         else if (item.sourcePath && isNative()) {
           try {
-            if (await pathExists(item.sourcePath)) item.runtimeUrl = convertFileSrc(item.sourcePath);
+            if (await pathExists(item.sourcePath)) item.runtimeUrl = await nativeMediaUrl(item.sourcePath, item.kind);
           } catch (error) {
             warnings.push(`${item.title}: ${String(error)}`);
           }

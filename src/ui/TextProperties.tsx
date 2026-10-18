@@ -2,6 +2,8 @@ import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, Plus, Trash2 } from 'lucide-reac
 import type { MediaItem, Profile } from '../domain/models';
 import { createTextLayer, type RenderLayer, type RenderTextLayer } from '../render/types';
 import { Button, Field, IconButton, Section, Slider, Toggle } from './Primitives';
+import { BACKGROUND_TRACK, trackName } from '../domain/timeline';
+import { BackgroundProperties } from './BackgroundProperties';
 export function TextProperties({
   item,
   profile,
@@ -44,11 +46,16 @@ export function TextProperties({
           <Plus /> Adicionar texto
         </Button>
         <div className="stack" style={{ gap: 6 }}>
+          <div className={`layer-row ${selectedId === BACKGROUND_TRACK ? 'active' : ''}`}>
+            <button aria-label="Selecionar fundo nas propriedades" onClick={() => onSelect(BACKGROUND_TRACK)}>
+              {trackName(item, BACKGROUND_TRACK, profile)}
+            </button>
+          </div>
           {[...layers]
             .sort((a, b) => b.zIndex - a.zIndex)
             .map((layer) => (
               <div className={`layer-row ${layer.id === selectedId ? 'active' : ''}`} key={layer.id}>
-                <button onClick={() => onSelect(layer.id)}>{layer.type === 'text' ? layer.text || 'Texto vazio' : 'Template'}</button>
+                <button onClick={() => onSelect(layer.id)}>{trackName(item, layer.id, profile)}</button>
                 <IconButton
                   label="Mostrar ou ocultar camada"
                   onClick={() => replace(layers.map((l) => (l.id === layer.id ? { ...l, visible: !l.visible } : l)))}
@@ -69,6 +76,7 @@ export function TextProperties({
         </div>
         {layers.length === 0 && <small>Adicione um texto ou escolha um template na biblioteca.</small>}
       </Section>
+      {selectedId === BACKGROUND_TRACK && <BackgroundProperties item={item} onChange={onChange} />}
       {text && (
         <>
           <Section title="Conteúdo e fonte">

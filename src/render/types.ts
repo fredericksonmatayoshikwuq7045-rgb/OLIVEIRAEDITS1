@@ -26,11 +26,27 @@ export interface RenderMedia extends Size {
   zIndex: number;
 }
 
-export type RenderBackground =
+export interface Timing {
+  enable?: { start: number; end: number };
+  visible?: boolean;
+}
+export type RenderBackground = (
   | { type: 'solid'; color: string }
   | { type: 'gradient'; from: string; to: string; angle: number }
-  | { type: 'image' | 'video'; source: string; width: number; height: number; opacity: number; loop: boolean; audio: 'mute' | 'mix' }
-  | { type: 'blur'; radius: number };
+  | {
+      type: 'image' | 'video';
+      source: string;
+      width: number;
+      height: number;
+      opacity: number;
+      loop: boolean;
+      audio: 'mute' | 'mix';
+      sourceOffset?: number;
+      sourceDuration?: number;
+    }
+  | { type: 'blur'; radius: number }
+) &
+  Timing;
 
 export interface LayerBase {
   id: string;
@@ -48,6 +64,9 @@ export interface RenderImageLayer extends LayerBase {
   fit: 'cover' | 'contain' | 'stretch';
   sourceWidth: number;
   sourceHeight: number;
+  sourceOffset?: number;
+  sourceDuration?: number;
+  loop?: boolean;
 }
 
 /** Font size is a canvas-height fraction; decoration sizes use min(W,H). */

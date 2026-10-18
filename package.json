@@ -1,7 +1,7 @@
 {
   "name": "oliveira-edits",
   "private": true,
-  "version": "0.3.1",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host",
@@ -26,7 +26,9 @@
     "test:appearance": "node tests/e2e/appearance-layout.mjs",
     "test:reference": "node tests/e2e/automation-reference.mjs",
     "test:native-upgrade": "python3 tests/e2e/native-upgrade.py",
-    "test:clear": "node tests/e2e/clear-media.mjs"
+    "test:clear": "node tests/e2e/clear-media.mjs",
+    "test:layers": "node tests/e2e/layer-timeline.mjs",
+    "test:timing": "python3 tests/e2e/template-timing.py"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

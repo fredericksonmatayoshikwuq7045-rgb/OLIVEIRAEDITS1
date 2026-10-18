@@ -151,3 +151,17 @@ pub fn authorize_native_drop(app: &AppHandle, paths: &[PathBuf]) -> Result<(), S
     }
     storage.add_grants(grants)
 }
+
+/// Register only an authorized path; URLs never contain filesystem paths.
+#[tauri::command]
+pub fn storage_media_url(app: AppHandle, path: String) -> Result<Option<String>, String> {
+    let canonical = authorize_path(&app, Path::new(&path))?;
+    #[cfg(target_os="linux")]
+    {
+        static SERVER: std::sync::OnceLock<Result<super::media_server::MediaServer, String>> = std::sync::OnceLock::new();
+        let server = SERVER.get_or_init(super::media_server::MediaServer::new).as_ref().map_err(Clone::clone)?;
+        server.register(&canonical).map(Some)
+    }
+    #[cfg(not(target_os="linux"))]
+    { let _ = canonical; Ok(None) }
+}

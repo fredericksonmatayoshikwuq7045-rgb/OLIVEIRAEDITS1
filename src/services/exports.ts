@@ -1,4 +1,5 @@
 import { outputFilename } from '../domain/batch';
+import { imageFrameTime } from '../domain/timeline';
 import type { MediaItem, Profile } from '../domain/models';
 import { canvasBlob, compileStaticPlanes, composeCanvas } from '../render/compositor';
 import { computeGeometry } from '../render/geometry';
@@ -9,9 +10,15 @@ import { getFfmpegInfo, startExport } from './queue';
 import { recordImageExport, resetImageExportReport, type ImageExportResult } from './imageReport';
 
 const joinPath = (directory: string, filename: string) => `${directory.replace(/[\\/]$/, '')}/${filename}`;
+function assetForSource(profile: Profile | undefined, source: string) {
+  const templateAssetId = profile?.templates.find((template) => template.runtimeUrl === source || template.source === source)?.assetId;
+  return profile?.assets.find(
+    (entry) => entry.source === source || entry.runtimeUrl === source || `asset:${entry.id}` === source || entry.id === templateAssetId,
+  );
+}
 function sourceResolver(profile?: Profile): (source: string) => string {
   return (source) => {
-    const asset = profile?.assets.find((entry) => entry.source === source || entry.runtimeUrl === source || `asset:${entry.id}` === source);
+    const asset = assetForSource(profile, source);
     return asset ? (asset.runtimeUrl ?? mediaUrl(asset.source)) : mediaUrl(source);
   };
 }
@@ -29,7 +36,7 @@ function filename(item: MediaItem, profile: Profile, index: number, extension: s
   );
 }
 function nativeSource(source: string, profile: Profile): string {
-  const asset = profile.assets.find((entry) => entry.runtimeUrl === source || entry.source === source || `asset:${entry.id}` === source);
+  const asset = assetForSource(profile, source);
   if (asset) return asset.source;
   if (/^(blob:|data:|https?:|asset:)/.test(source))
     throw new Error('Um asset não tem caminho local. Reimporte-o no perfil antes de exportar.');
@@ -54,7 +61,8 @@ export async function prepareExportItem(item: MediaItem, profile: Profile, index
     overlays.push({ path, zIndex: plane.zIndex, enable: plane.enable });
   }
   if ('source' in spec.background) spec.background.source = nativeSource(spec.background.source, profile);
-  if (spec.media.fit === 'blur') spec.background = { type: 'blur', radius: 0.025 };
+  if (spec.media.fit === 'blur')
+    spec.background = { type: 'blur', radius: 0.025, enable: spec.background.enable, visible: spec.background.visible };
   const layers = spec.layers
     .filter((layer): layer is RenderImageLayer => layer.type === 'video' && layer.visible)
     .map((layer) => ({ ...layer, source: nativeSource(layer.source, profile) }));
@@ -91,7 +99,7 @@ export async function exportImage(item: MediaItem, profile?: Profile, index = 0)
   const format = profile?.exportSettings.imageFormat ?? 'png';
   const canvas = await composeCanvas(
     { ...item.render, media: { ...item.render.media, source: item.runtimeUrl || item.render.media.source } },
-    { resolveSource: sourceResolver(profile) },
+    { resolveSource: sourceResolver(profile), time: imageFrameTime(item) },
   );
   const blob = await canvasBlob(canvas, `image/${format}`, profile?.exportSettings.imageQuality ?? 0.92);
   const extension = format === 'jpeg' ? 'jpg' : format;

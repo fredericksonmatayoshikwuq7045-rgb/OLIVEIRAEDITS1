@@ -10,6 +10,7 @@ import { Button } from './Primitives';
 import { appearance } from '../domain/preferences';
 import { PanelResize } from './PanelResize';
 import { DailyQuote } from './DailyQuote';
+import { MediaAreas } from './MediaAreas';
 import { useEditor, type EditorProps } from './useEditor';
 export function Editor(props: EditorProps) {
   const data = useEditor(props);
@@ -24,10 +25,11 @@ export function Editor(props: EditorProps) {
   const resize = (key: 'libraryWidth' | 'detailsWidth', value: number) =>
     data.onSettings?.({ ...data.settings, ...appearance({ ...preferences, [key]: value }) });
   const model = { ...data, profile: data.profile, project: data.project };
-  const { store, active, onTemplate, profile, changeItem, setSaving, setSaveName, notify, items, engine } = model;
+  const { store, active, onTemplate, profile, changeItem, setSaving, setSaveName, notify, engine } = model;
   return (
     <>
       <DailyQuote settings={data.settings} profileId={data.profile.id} compact />
+      <MediaAreas model={model} />
       <EditorToolbar model={model} />
       <div
         className={`editor-shell layout-${preferences.layout}`}
@@ -64,6 +66,7 @@ export function Editor(props: EditorProps) {
               setSaveName('');
             }}
             notify={notify}
+            kind={model.workspaceKind === 'all' ? active?.kind || 'video' : model.workspaceKind}
           />
         </PanelBoundary>
         <PanelResize label="Largura da biblioteca" value={preferences.libraryWidth} onChange={(value) => resize('libraryWidth', value)} />
@@ -79,7 +82,7 @@ export function Editor(props: EditorProps) {
       <footer className="statusbar">
         <span>
           <span className="status-dot" />
-          {profile.name} · {items.length} mídias no projeto
+          {profile.name} · {model.allItems.length} mídias no projeto
         </span>
         <span>
           {engine.info?.available

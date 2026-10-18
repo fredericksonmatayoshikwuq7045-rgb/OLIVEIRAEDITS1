@@ -1,5 +1,21 @@
 import { copyFraming } from './batch';
 import type { MediaItem } from './models';
+import type { RenderBackground, Timing } from '../render/types';
+function afterSplit<T extends Timing>(value: T, offset: number, video = false): T {
+  const media = value as T & { sourceOffset?: number; sourceDuration?: number; loop?: boolean };
+  const position = (media.sourceOffset || 0) + Math.max(0, offset - (value.enable?.start || 0));
+  return {
+    ...value,
+    ...(video ? { sourceOffset: media.loop !== false && media.sourceDuration ? position % media.sourceDuration : position } : {}),
+    ...(value.enable ? { enable: { start: Math.max(0, value.enable.start - offset), end: value.enable.end - offset } } : {}),
+  };
+}
+function splitBackground(value: RenderBackground, offset: number, right: boolean): RenderBackground {
+  const result = right
+    ? afterSplit(value, offset, value.type === 'video')
+    : { ...value, ...(value.enable ? { enable: { start: value.enable.start, end: Math.min(offset, value.enable.end) } } : {}) };
+  return result.enable && result.enable.end <= result.enable.start ? { ...result, enable: undefined, visible: false } : result;
+}
 export type Adjustment = 'framing' | 'layers' | 'trim' | 'speed' | 'background';
 export function duplicateMedia(item: MediaItem): MediaItem {
   return { ...structuredClone(item), id: crypto.randomUUID(), title: `${item.title} (cópia)` };
@@ -20,10 +36,10 @@ export function splitMedia(item: MediaItem, at: number): [MediaItem, MediaItem] 
     .map((layer) => (layer.enable ? { ...layer, enable: { start: layer.enable.start, end: Math.min(offset, layer.enable.end) } } : layer))
     .filter((layer) => !layer.enable || layer.enable.end > layer.enable.start);
   right.render.layers = right.render.layers
-    .map((layer) =>
-      layer.enable ? { ...layer, enable: { start: Math.max(0, layer.enable.start - offset), end: layer.enable.end - offset } } : layer,
-    )
+    .map((layer) => afterSplit(layer, offset, layer.type === 'video'))
     .filter((layer) => !layer.enable || layer.enable.end > layer.enable.start);
+  left.render.background = splitBackground(item.render.background, offset, false);
+  right.render.background = splitBackground(item.render.background, offset, true);
   return [left, right];
 }
 export function copyAdjustments(source: MediaItem, target: MediaItem, groups: Adjustment[]): MediaItem {

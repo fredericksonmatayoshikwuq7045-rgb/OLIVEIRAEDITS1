@@ -8,6 +8,7 @@ export function useClipActions({
   store,
   active,
   selected,
+  items,
   time,
   notify,
   exportOne,
@@ -15,6 +16,7 @@ export function useClipActions({
   store: WorkspaceStore;
   active: MediaItem | null;
   selected: MediaItem[];
+  items: MediaItem[];
   time: number;
   notify: (message: string) => void;
   exportOne: (id: string) => void;
@@ -28,7 +30,7 @@ export function useClipActions({
       if (command === 'copy-all' || command === 'copy-selected')
         setCopy({
           source: structuredClone(item),
-          ids: (command === 'copy-all' ? store.project?.items || [] : selected)
+          ids: (command === 'copy-all' ? items : selected)
             .filter((value) => value.id !== item.id && value.status !== 'empty')
             .map((value) => value.id),
         });

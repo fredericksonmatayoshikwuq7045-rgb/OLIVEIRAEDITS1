@@ -136,3 +136,50 @@ um único desfazer/refazer, a próxima leva no slot 1, botão bloqueado na impor
 layout em 1100px e persistência após reload. Compara os perfis completos e o
 projeto da outra conta e verifica que os arquivos originais continuam intactos.
 Os dados são descartáveis; não há IPC simulado nem exclusão física de originais.
+
+## Camadas temporais e imagens — 0.4.0
+
+Com Vite e Chromium ativos, FFmpeg/FFprobe no PATH:
+
+```sh
+npm run test:layers
+npm run test:timing
+```
+
+`test:layers` usa arquivos reais e nenhum IPC simulado: importa vídeo e foto,
+cria duas camadas do mesmo template com offsets distintos, verifica pixels do
+Canvas, arrasta uma ponta/desfaz, aplica borda/headline/texto/fundo e testa a ala
+de imagens com reprodução e dois PNGs reais. Reload e backup/restore devem
+preservar janelas, repetição, offsets e quadro de imagem. Artefatos ficam em
+`.artifacts/layer-timeline`; `OE_LAYERS_DIR` troca esse diretório.
+
+`test:timing` exige Python Playwright e o harness Rust. Compara 28 quadros de seis
+composições Canvas/FFmpeg: janelas, duas instâncias do mesmo vídeo, corte com
+velocidade, último quadro sem loop, gradiente, fundo em imagem e blur oculto.
+Analisa frequências do áudio exportado para provar a janela do fundo. Usa a
+mesma tolerância da paridade visual acima. `OE_TIMING_DIR` troca os artefatos.
+
+Para testar a janela de produção, use um driver recém-iniciado com diretórios
+de dados/cache descartáveis e o binário produzido pelo CLI Tauri:
+
+```sh
+npm run tauri build -- --debug --no-bundle
+TAURI_DRIVER_URL=http://127.0.0.1:4468 TAURI_APP_BINARY=/caminho/do/binario \
+  python3 tests/e2e/native-layer-timeline.py
+```
+
+Esse teste altera o perfil padrão **da instalação de teste**: cria os arquivos,
+importa um template `File` pela interface, valida a prévia e exporta MP4/PNG reais.
+O PNG deve conter o quadro escolhido da animação; o MP4 deve respeitar a janela.
+`OE_NATIVE_TEST_DIR` escolhe os artefatos e `OE_NATIVE_KEEP_SESSION=1` mantém a
+sessão para diagnóstico. No Linux, o WebKit precisa do decoder H.264 do GStreamer
+(`gstreamer1.0-libav`); os requisitos da nuvem estão em
+[docs/cloud-environment.md](../../docs/cloud-environment.md).
+
+Na nuvem, o driver headless usa as bibliotecas privadas e o launcher descrito no
+setup. O processo de teste fica sem proxies HTTP e com
+`GIO_USE_PROXY_RESOLVER=dummy`, `WEBKIT_GST_USE_PLAYBIN3=1`,
+`WEBKIT_GST_ALLOW_PLAYBACK_OF_INVISIBLE_VIDEOS=1`,
+`WEBKIT_GST_DISABLE_GL_SINK=1`, `LIBGL_ALWAYS_SOFTWARE=1` e
+`ALSOFT_DRIVERS=null`. Essas opções isolam a renderização em software e o áudio
+virtual do teste; não validam hardware/GPU nem áudio em dispositivo real.

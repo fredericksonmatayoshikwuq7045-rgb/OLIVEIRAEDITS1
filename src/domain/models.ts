@@ -50,6 +50,8 @@ export interface AccountTemplate {
   mediaType?: MediaKind;
   sourceWidth?: number;
   sourceHeight?: number;
+  sourceDuration?: number;
+  shared?: boolean;
   assetId?: string;
   source: string;
   runtimeUrl?: string;
@@ -138,6 +140,8 @@ export interface MediaItem {
   render: RenderSpec;
   trim: { in: number; out: number };
   speed: number;
+  imageTime?: number;
+  imageDuration?: number;
   headlineText?: string;
   templates: Record<TemplateCategory, string | null>;
   legacyPayload?: unknown;

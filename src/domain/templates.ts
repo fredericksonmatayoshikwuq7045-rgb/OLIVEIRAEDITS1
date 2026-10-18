@@ -19,6 +19,7 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
           opacity: template.placement.opacity,
           loop: true,
           audio: 'mute',
+          sourceDuration: template.sourceDuration,
         }
       : { type: 'solid', color: '#111111' };
     return { ...item, templates: { ...item.templates, background: template?.id ?? null }, render };
@@ -49,6 +50,8 @@ export function applyTemplate(item: MediaItem, template: AccountTemplate | null,
       fit: category === 'border' ? 'stretch' : 'contain',
       sourceWidth,
       sourceHeight,
+      sourceDuration: template.sourceDuration,
+      loop: true,
     });
     if (category === 'headline' && template.headlineText) {
       const text = createTextLayer(`${prefix}${template.id}:text`);

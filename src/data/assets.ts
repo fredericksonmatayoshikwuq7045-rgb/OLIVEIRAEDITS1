@@ -1,4 +1,4 @@
-import { convertFileSrc } from '@tauri-apps/api/core';
+import { nativeMediaUrl } from './nativeMedia';
 import { uid } from '../domain/defaults';
 import type { AssetRef, Profile } from '../domain/models';
 import { importAsset, isNative, pathExists, readBytes, writeBytes } from './storage';
@@ -103,7 +103,7 @@ export class AssetManager {
       let url: string;
       if (isNative()) {
         if (!(await pathExists(asset.source))) throw new Error(`Asset ausente: ${asset.name}. Restaure o backup do perfil.`);
-        url = convertFileSrc(asset.source);
+        url = await nativeMediaUrl(asset.source, asset.kind === 'video' || asset.mimeType.startsWith('video/') ? 'video' : 'image');
       } else {
         const bytes = await readBytes(asset.relativePath);
         url = URL.createObjectURL(new Blob([bytes.slice().buffer as ArrayBuffer], { type: asset.mimeType }));
