@@ -1,0 +1,49 @@
+.analysis-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  max-height: 390px;
+  overflow: auto;
+}
+.analysis-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px;
+  min-width: 0;
+}
+.analysis-result strong {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.analysis-preview {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+}
+.analysis-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+.analysis-box {
+  position: absolute;
+  border: 2px solid #68e7ae;
+  background: #68e7ae15;
+  pointer-events: none;
+}
+.analysis-results .toggle-field {
+  margin-top: auto;
+  font-size: 10px;
+}
+.analysis-results .toggle-field > span {
+  overflow-wrap: anywhere;
+}
+.automation-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

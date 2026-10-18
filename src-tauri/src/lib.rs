@@ -7,6 +7,7 @@ pub fn run() {
     use tauri::{Emitter,Manager};
     use engine::commands::*;
     use engine::media_tools::{generate_thumbnail, clear_generated_cache};
+    use engine::sampling::sample_media_frames;
     use storage::commands::*;
     let app=tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -19,7 +20,7 @@ pub fn run() {
             get_ffmpeg_info,probe_media,start_export,cancel_export,cancel_all,get_queue_state,
             pause_export,resume_export,clean_metadata_only,cache_asset,render_preview,crop_detect,
             open_authorized_path,confirm_close,
-            generate_thumbnail,clear_generated_cache,
+            generate_thumbnail,clear_generated_cache,sample_media_frames,
             storage_read_json,storage_write_json,storage_write_asset,storage_read_asset,
             storage_import_asset,storage_exists,storage_log_error,storage_get_paths,storage_authorize_paths,storage_export_image
         ])

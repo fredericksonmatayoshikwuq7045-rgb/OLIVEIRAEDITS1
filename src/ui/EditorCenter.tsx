@@ -1,9 +1,10 @@
 import { sortMedia } from '../domain/batch';
-import { Copy, FolderOpen, Play, Scissors, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Copy, FolderOpen, Play, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { isNative } from '../services/native';
 import { MediaStrip } from './MediaStrip';
 import { PanelBoundary } from './PanelBoundary';
-import { Button, IconButton, timecode } from './Primitives';
+import { Button, IconButton } from './Primitives';
+import { VideoTimeline } from './VideoTimeline';
 import { Stage } from './Stage';
 import type { EditorContext } from './useEditor';
 
@@ -62,6 +63,11 @@ export function EditorCenter({ model }: { model: EditorContext }) {
           <IconButton label="Importar pasta" disabled={importing} onClick={() => void importMedia(true)}>
             <FolderOpen size={15} />
           </IconButton>
+          {active && (
+            <Button aria-pressed={model.compare} onClick={() => model.setCompare((value) => !value)}>
+              {model.compare ? 'Ver edição' : 'Ver original'}
+            </Button>
+          )}
           {active?.kind === 'video' && (
             <IconButton
               label="Prévia real do export (4 segundos)"
@@ -76,6 +82,14 @@ export function EditorCenter({ model }: { model: EditorContext }) {
       <PanelBoundary name="prévia">
         <Stage
           item={active}
+          compare={model.compare}
+          onSelectLayer={step === 3 ? model.setLayerId : undefined}
+          onContextMenu={(event) => {
+            if (active) {
+              event.preventDefault();
+              model.setMenu({ x: event.clientX, y: event.clientY, item: active });
+            }
+          }}
           onChange={changeItem}
           playing={playing}
           time={time}
@@ -97,72 +111,25 @@ export function EditorCenter({ model }: { model: EditorContext }) {
         />
       </PanelBoundary>
       {active?.kind === 'video' && active.status === 'ready' && (
-        <div className="timeline">
-          <IconButton label={playing ? 'Pausar prévia' : 'Reproduzir prévia'} onClick={() => setPlaying((v) => !v)}>
-            {playing ? <span>Ⅱ</span> : <Play size={17} />}
-          </IconButton>
-          <div className="timeline-track">
-            <div className="timeline-times">
-              <span className="mono">
-                {timecode(Math.max(0, time - active.trim.in))}{' '}
-                <span className="muted">/ {timecode((active.trim.out - active.trim.in) / active.speed)}</span>
-              </span>
-              <span>
-                {active.speed}× · {active.probe?.fps ? `${active.probe.fps.toFixed(2)} fps` : ''}
-              </span>
-            </div>
-            <input
-              aria-label="Posição de reprodução"
-              className="timeline-seek"
-              type="range"
-              min={active.trim.in}
-              max={Math.max(active.trim.in, active.trim.out)}
-              step={0.01}
-              value={Math.min(active.trim.out, Math.max(active.trim.in, time))}
-              onChange={(e) => setTime(Number(e.target.value))}
-            />
-            <div className="timeline-trims">
-              <Scissors size={12} />
-              <span>De</span>
-              <input
-                aria-label="Início do corte"
-                type="number"
-                min={0}
-                max={active.trim.out - 0.001}
-                step={0.1}
-                value={active.trim.in}
-                onChange={(e) =>
-                  changeItem({
-                    ...active,
-                    trim: { ...active.trim, in: Math.max(0, Math.min(Number(e.target.value), active.trim.out - 0.001)) },
-                  })
-                }
-              />
-              <span>até</span>
-              <input
-                aria-label="Fim do corte"
-                type="number"
-                min={active.trim.in + 0.001}
-                max={active.probe?.duration || active.trim.out}
-                step={0.1}
-                value={active.trim.out}
-                onChange={(e) =>
-                  changeItem({
-                    ...active,
-                    trim: {
-                      ...active.trim,
-                      out: Math.min(active.probe?.duration || Infinity, Math.max(active.trim.in + 0.001, Number(e.target.value))),
-                    },
-                  })
-                }
-              />
-              <span>segundos</span>
-            </div>
-          </div>
-        </div>
+        <VideoTimeline
+          item={active}
+          profile={model.profile}
+          time={time}
+          playing={playing}
+          onTime={setTime}
+          onPlay={() => setPlaying((value) => !value)}
+          onChange={changeItem}
+          onSplit={model.split}
+          performance={model.settings.performance}
+        />
       )}
       <MediaStrip
         items={items}
+        grid={model.settings.layout === 'right'}
+        onContextMenu={(event, item) => {
+          event.preventDefault();
+          model.setMenu({ x: event.clientX, y: event.clientY, item });
+        }}
         exportStates={exportStates}
         onSort={(order) => model.store.updateProject((project) => ({ ...project, items: sortMedia(project.items, order) }))}
         selectedIds={selectedIds}

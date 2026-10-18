@@ -1,3 +1,4 @@
+pub mod sampling;
 pub mod model;
 pub mod probe;
 pub mod graph;

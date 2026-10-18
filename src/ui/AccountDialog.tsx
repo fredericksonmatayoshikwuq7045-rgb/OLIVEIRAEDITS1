@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Profile } from '../domain/models';
+import { AvatarPicker } from './AvatarPicker';
 import { Button, Field, Modal } from './Primitives';
 export type AccountIdentity = Pick<Profile, 'name' | 'handle' | 'niche' | 'color' | 'notes'>;
 export function AccountDialog({
@@ -8,7 +9,7 @@ export function AccountDialog({
   onClose,
 }: {
   profile?: Profile;
-  onSave: (identity: AccountIdentity) => void;
+  onSave: (identity: AccountIdentity, photo?: Blob | null) => void | Promise<void>;
   onClose: () => void;
 }) {
   const [draft, setDraft] = useState<AccountIdentity>({
@@ -18,13 +19,24 @@ export function AccountDialog({
     color: profile?.color ?? '#ed4355',
     notes: profile?.notes ?? '',
   });
+  const [photo, setPhoto] = useState<Blob | null | undefined>(undefined),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState('');
+  const [photoPending, setPhotoPending] = useState(false);
   const patch = (value: Partial<AccountIdentity>) => setDraft((p) => ({ ...p, ...value }));
   return (
     <Modal title={profile ? 'Editar conta' : 'Criar uma conta'} onClose={onClose}>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          if (draft.name.trim()) onSave({ ...draft, name: draft.name.trim() });
+          if (!draft.name.trim() || busy || photoPending) return;
+          setBusy(true);
+          try {
+            await onSave({ ...draft, name: draft.name.trim() }, photo);
+          } catch (error) {
+            setError(String(error));
+            setBusy(false);
+          }
         }}
         className="stack"
       >
@@ -47,6 +59,16 @@ export function AccountDialog({
             <input placeholder="Ex.: Esportes" value={draft.niche} onChange={(e) => patch({ niche: e.target.value })} />
           </Field>
         </div>
+        <AvatarPicker
+          current={profile?.assets.find((asset) => asset.id === profile.avatarAssetId)?.runtimeUrl}
+          onChange={setPhoto}
+          onPending={setPhotoPending}
+        />
+        {error && (
+          <p role="alert" className="error-message">
+            {error}
+          </p>
+        )}
         <Field label="Cor da identidade">
           <input type="color" value={draft.color} onChange={(e) => patch({ color: e.target.value })} />
         </Field>
@@ -60,7 +82,7 @@ export function AccountDialog({
         </Field>
         <div className="form-actions">
           <Button onClick={onClose}>Cancelar</Button>
-          <Button variant="primary" type="submit" disabled={!draft.name.trim()}>
+          <Button variant="primary" type="submit" disabled={!draft.name.trim() || busy || photoPending}>
             {profile ? 'Salvar alterações' : 'Criar conta'}
           </Button>
         </div>

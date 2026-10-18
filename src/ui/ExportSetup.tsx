@@ -1,4 +1,6 @@
 import { Download, FolderOpen } from 'lucide-react';
+import { exportIssues } from '../domain/preflight';
+import { ExportPreflight } from './ExportPreflight';
 import { outputFilename } from '../domain/batch';
 import type { Profile } from '../domain/models';
 import { chooseOutputDirectory, isNative, type FinishAction } from '../services/native';
@@ -28,6 +30,7 @@ export function ExportSetup({ model }: { model: ExportDialogContext }) {
     busy,
     run,
   } = model;
+  const issues = exportIssues(items, profile);
   return (
     <div className="stack">
       <div className="notice">
@@ -35,6 +38,7 @@ export function ExportSetup({ model }: { model: ExportDialogContext }) {
         {items.length - ready.length > 0 && `${items.length - ready.length} itens indisponíveis serão ignorados.`} Confira a pasta e o nome
         antes de iniciar.
       </div>
+      <ExportPreflight issues={issues} />
       <Toggle label="Só limpar metadados (sem aplicar edições)" checked={metadata} onChange={setMetadata} />
       {metadata && (
         <>
@@ -165,7 +169,13 @@ export function ExportSetup({ model }: { model: ExportDialogContext }) {
         <Button onClick={onClose}>Voltar à edição</Button>
         <Button
           variant="primary"
-          disabled={busy || !ready.length || !available || (isNative() && !profile.exportSettings.outputDir.trim())}
+          disabled={
+            busy ||
+            issues.some((issue) => issue.blocking) ||
+            !ready.length ||
+            !available ||
+            (isNative() && !profile.exportSettings.outputDir.trim())
+          }
           onClick={() => void run()}
         >
           <Download />

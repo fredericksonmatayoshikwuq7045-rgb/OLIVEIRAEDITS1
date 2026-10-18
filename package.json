@@ -1,7 +1,7 @@
 {
   "name": "oliveira-edits",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host",
@@ -19,17 +19,23 @@
     "test:e2e": "node tests/e2e/app-smoke.mjs",
     "test:migration": "node tests/e2e/migration-smoke.mjs",
     "test:native": "python3 tests/e2e/native-smoke.py",
-    "test:close": "python3 tests/e2e/native-close.py"
+    "test:close": "python3 tests/e2e/native-close.py",
+    "postinstall": "node scripts/setup-vision.mjs",
+    "setup:vision": "node scripts/setup-vision.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-notification": "2.4.0",
+    "@tesseract.js-data/eng": "1.0.0",
+    "@tesseract.js-data/por": "1.0.0",
+    "@tesseract.js-data/spa": "1.0.0",
     "fflate": "^0.8.3",
     "lucide-react": "^0.546.0",
     "react": "^19.0.1",
-    "react-dom": "^19.0.1"
+    "react-dom": "^19.0.1",
+    "tesseract.js": "6.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

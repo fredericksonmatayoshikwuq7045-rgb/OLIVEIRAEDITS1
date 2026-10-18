@@ -1,4 +1,7 @@
 import type { AspectRatio } from '../domain/models';
+import { AutomationPanel } from './AutomationPanel';
+import { CopyAdjustments } from './CopyAdjustments';
+import { MediaContextMenu } from './MediaContextMenu';
 import { BatchDialog } from './BatchDialog';
 import { ExportDialog } from './ExportDialog';
 import { PanelBoundary } from './PanelBoundary';
@@ -31,6 +34,16 @@ export function EditorDialogs({ model }: { model: EditorContext }) {
   } = model;
   return (
     <>
+      {model.automation && <AutomationPanel model={model} onClose={() => model.setAutomation(false)} />}
+      {model.menu && <MediaContextMenu menu={model.menu} onClose={() => model.setMenu(null)} onAction={model.clipAction} />}
+      {model.copy && (
+        <CopyAdjustments
+          source={model.copy.source}
+          targets={items.filter((item) => model.copy!.ids.includes(item.id))}
+          onApply={applyUpdated}
+          onClose={() => model.setCopy(null)}
+        />
+      )}
       {batch && (
         <BatchDialog
           onMixChange={(category, rule) => store.updateProfile({ mixRules: { ...profile.mixRules, [category]: rule } })}
@@ -45,7 +58,7 @@ export function EditorDialogs({ model }: { model: EditorContext }) {
         <PanelBoundary name="exportação">
           <ExportDialog
             profile={profile}
-            items={selected.length ? selected : items}
+            items={model.exportIds ? items.filter((item) => model.exportIds!.includes(item.id)) : selected.length ? selected : items}
             engine={engine}
             settings={settings}
             onProfile={(value) => store.updateProfile(value)}

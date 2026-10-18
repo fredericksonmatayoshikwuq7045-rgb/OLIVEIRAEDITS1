@@ -3,10 +3,8 @@ import { chooseOutputDirectory, clearGeneratedCache, isNative, openLogs } from '
 import type { WorkspaceStore } from './Dashboard';
 import { Button, Field, Modal, Section, Toggle } from './Primitives';
 import type { EngineState } from './useEngine';
-export interface UiSettings {
-  concurrency: number;
-  confirmExport: boolean;
-}
+import type { UiSettings } from '../domain/preferences';
+export type { UiSettings } from '../domain/preferences';
 export function Settings({
   store,
   engine,

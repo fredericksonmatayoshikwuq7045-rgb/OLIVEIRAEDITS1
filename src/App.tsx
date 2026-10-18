@@ -1,4 +1,4 @@
-import { Check, HelpCircle, LoaderCircle, Settings as SettingsIcon, X } from 'lucide-react';
+import { Check, HelpCircle, LoaderCircle, Palette, Settings as SettingsIcon, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useWorkspace } from './data/useWorkspace';
 import { installErrorHandlers, isNative, notifyCompleted } from './services/native';
@@ -9,27 +9,21 @@ import './ui/editor.css';
 import { Help } from './ui/Help';
 import { PanelBoundary } from './ui/PanelBoundary';
 import { Button, IconButton } from './ui/Primitives';
-import { Settings, type UiSettings } from './ui/Settings';
+import { Settings } from './ui/Settings';
 import { useEngine } from './ui/useEngine';
-const defaultSettings: UiSettings = { concurrency: 1, confirmExport: true };
-function readSettings(): UiSettings {
-  try {
-    const saved: unknown = JSON.parse(localStorage.getItem('oe_ui_v2') || 'null');
-    if (saved && typeof saved === 'object' && 'concurrency' in saved && [1, 2, 3].includes(Number(saved.concurrency)))
-      return { concurrency: Number(saved.concurrency), confirmExport: true };
-  } catch {
-    /* Small UI preferences fall back safely. */
-  }
-  return defaultSettings;
-}
+import { readSettings } from './domain/preferences';
+import { Customize } from './ui/Customize';
+import { useAppearance } from './ui/useAppearance';
 export default function App() {
   const store = useWorkspace(),
     engine = useEngine();
   const [inEditor, setInEditor] = useState(false),
     [showSettings, setShowSettings] = useState(false),
+    [showCustomize, setShowCustomize] = useState(false),
     [showHelp, setShowHelp] = useState(false),
     [toast, setToast] = useState(''),
     [settings, setSettings] = useState(readSettings);
+  useAppearance(settings);
   const notify = useCallback((message: string) => setToast(message.replace(/^Error:\s*/, '')), []);
   useEffect(() => installErrorHandlers(), []);
   useEffect(() => {
@@ -99,6 +93,9 @@ export default function App() {
             {store.saveStatus === 'saved' ? <Check size={12} /> : <LoaderCircle size={12} />}
             {saveLabel}
           </span>
+          <IconButton label="Personalizar estúdio" onClick={() => setShowCustomize(true)}>
+            <Palette size={17} />
+          </IconButton>
           <IconButton label="Ajuda e atalhos (?)" onClick={() => setShowHelp(true)}>
             <HelpCircle size={17} />
           </IconButton>
@@ -129,12 +126,14 @@ export default function App() {
                 store={store}
                 engine={engine}
                 settings={settings}
+                onSettings={setSettings}
                 onBack={() => setInEditor(false)}
                 notify={notify}
               />
             ) : (
               <Dashboard
                 store={store}
+                settings={settings}
                 onOpen={(id) => {
                   store.activateProfile(id);
                   setInEditor(true);
@@ -169,6 +168,7 @@ export default function App() {
           )}
         </>
       )}
+      {showCustomize && <Customize settings={settings} onChange={setSettings} onClose={() => setShowCustomize(false)} />}
       {showHelp && <Help onClose={() => setShowHelp(false)} />}
       {showSettings && (
         <Settings

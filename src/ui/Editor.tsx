@@ -7,6 +7,9 @@ import { EditorToolbar } from './EditorToolbar';
 import { Library } from './Library';
 import { PanelBoundary } from './PanelBoundary';
 import { Button } from './Primitives';
+import { appearance } from '../domain/preferences';
+import { PanelResize } from './PanelResize';
+import { DailyQuote } from './DailyQuote';
 import { useEditor, type EditorProps } from './useEditor';
 export function Editor(props: EditorProps) {
   const data = useEditor(props);
@@ -17,12 +20,21 @@ export function Editor(props: EditorProps) {
         <Button onClick={props.onBack}>Voltar às contas</Button>
       </div>
     );
+  const preferences = appearance(data.settings);
+  const resize = (key: 'libraryWidth' | 'detailsWidth', value: number) =>
+    data.onSettings?.({ ...data.settings, ...appearance({ ...preferences, [key]: value }) });
   const model = { ...data, profile: data.profile, project: data.project };
   const { store, active, onTemplate, profile, changeItem, setSaving, setSaveName, notify, items, engine } = model;
   return (
     <>
+      <DailyQuote settings={data.settings} profileId={data.profile.id} compact />
       <EditorToolbar model={model} />
-      <div className="editor-shell">
+      <div
+        className={`editor-shell layout-${preferences.layout}`}
+        style={
+          { '--library-width': `${preferences.libraryWidth}px`, '--details-width': `${preferences.detailsWidth}px` } as React.CSSProperties
+        }
+      >
         <PanelBoundary name="biblioteca">
           <Library
             store={store}
@@ -54,7 +66,14 @@ export function Editor(props: EditorProps) {
             notify={notify}
           />
         </PanelBoundary>
+        <PanelResize label="Largura da biblioteca" value={preferences.libraryWidth} onChange={(value) => resize('libraryWidth', value)} />
         <EditorCenter model={model} />
+        <PanelResize
+          label="Largura das propriedades"
+          value={preferences.detailsWidth}
+          reverse
+          onChange={(value) => resize('detailsWidth', value)}
+        />
         <EditorProperties model={model} />
       </div>
       <footer className="statusbar">

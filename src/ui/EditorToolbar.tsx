@@ -29,6 +29,19 @@ export function EditorToolbar({ model }: { model: EditorContext }) {
         </div>
       </div>
       <div className="row">
+        <Button disabled={!items.length} onClick={() => model.setAutomation(true)}>
+          Assistente em lote
+        </Button>
+        <select
+          aria-label="Layout do editor"
+          value={model.settings.layout || 'classic'}
+          onChange={(event) => model.onSettings?.({ ...model.settings, layout: event.target.value as 'classic' | 'right' | 'focus' })}
+          style={{ width: 130 }}
+        >
+          <option value="classic">Player central</option>
+          <option value="right">Player à direita</option>
+          <option value="focus">Modo foco</option>
+        </select>
         <IconButton label="Desfazer (Ctrl + Z)" disabled={!store.canUndo} onClick={store.undo}>
           <Undo2 size={16} />
         </IconButton>

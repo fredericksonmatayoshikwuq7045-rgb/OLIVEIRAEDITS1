@@ -18,7 +18,7 @@ export default defineConfig({
         '**/*.svg', '**/*.SVG', '**/*.bmp', '**/*.BMP', '**/*.tiff', '**/*.TIFF',
         '**/*.db', '**/*.DB', '**/Thumbs.db', '**/thumbs.db',
         '**/.DS_Store', '**/desktop.ini',
-        '**/dist/**', '**/public/**'
+        '**/dist/**'
       ]
     }
   }

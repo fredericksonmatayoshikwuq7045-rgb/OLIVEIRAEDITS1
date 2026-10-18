@@ -5,6 +5,10 @@ import { snapMediaPan, snapRect } from '../render/snap';
 import { RenderCanvas } from '../render/RenderCanvas';
 import type { Rect } from '../render/types';
 import { mediaUrl } from '../services/native';
+import { TransformBox } from './TransformBox';
+import { hitLayer } from '../render/transform';
+import { createRenderSpec } from '../render/types';
+import { CropOverlay } from './CropOverlay';
 import { StageEmpty } from './StageEmpty';
 import type { Drag, StageProps } from './stageTypes';
 import { usePinch } from './usePinch';
@@ -12,6 +16,9 @@ import { usePinch } from './usePinch';
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 export function Stage({
   item,
+  compare = false,
+  onContextMenu,
+  onSelectLayer,
   onChange,
   playing,
   time,
@@ -53,7 +60,7 @@ export function Stage({
     };
   }, []);
   const commit = useCallback(() => {
-    if (latest.current) onChange(latest.current);
+    if (drag.current && latest.current && latest.current !== drag.current.item) onChange(latest.current);
     drag.current = null;
   }, [onChange]);
   const changeDraft = (value: MediaItem) => {
@@ -65,16 +72,29 @@ export function Stage({
     if (!pinch.end(event)) commit();
   };
   const start = (event: PointerEvent<HTMLDivElement | HTMLButtonElement>, handle?: string) => {
-    if (!draft || event.button !== 0) return;
+    if (compare || !draft || event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
+    let selectedLayer = activeLayerId;
+    if (onSelectLayer && !handle && !cropMode && preview.current) {
+      const bounds = preview.current.getBoundingClientRect();
+      selectedLayer = hitLayer(
+        draft,
+        {
+          x: ((event.clientX - bounds.left) / bounds.width) * draft.render.canvas.width,
+          y: ((event.clientY - bounds.top) / bounds.height) * draft.render.canvas.height,
+        },
+        Math.max(0, (time - draft.trim.in) / draft.speed),
+      );
+      onSelectLayer(selectedLayer);
+    }
     drag.current = {
       x: event.clientX,
       y: event.clientY,
       item: draft,
       handle,
-      layerId: !handle && !cropMode ? activeLayerId || undefined : undefined,
+      layerId: !handle && !cropMode ? selectedLayer || undefined : undefined,
     };
   };
   const move = (event: PointerEvent<HTMLDivElement>) => {
@@ -150,11 +170,19 @@ export function Stage({
   const source = draft && (draft.runtimeUrl || draft.render.media.source || draft.sourcePath);
   const valid = draft && source && draft.status !== 'missing' && draft.status !== 'empty' && draft.status !== 'error';
   const scale = draft ? Math.max(0.01, Math.min(size.width / draft.render.canvas.width, size.height / draft.render.canvas.height)) : 1;
+  const original = draft
+    ? createRenderSpec(draft.render.canvas.width, draft.render.canvas.height, draft.runtimeUrl || draft.render.media.source, draft.kind)
+    : null;
+  if (original && draft) {
+    original.media.width = draft.render.media.width;
+    original.media.height = draft.render.media.height;
+  }
   const cropSelection = valid ? cropSelectionGeometry(draft.render) : null;
   const rect = cropSelection?.rect;
   return (
     <div
       className="stage-area"
+      onContextMenu={onContextMenu}
       ref={area}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
@@ -171,6 +199,7 @@ export function Stage({
           aria-label="Prévia de edição. Arraste para mover a mídia"
           style={{ width: draft.render.canvas.width * scale, height: draft.render.canvas.height * scale }}
           onPointerDownCapture={(e) => {
+            if (compare || (e.target as HTMLElement).closest('.transform-handle')) return;
             if (pinch.start(e)) {
               drag.current = null;
               e.stopPropagation();
@@ -183,6 +212,7 @@ export function Stage({
           onPointerUp={endPointer}
           onPointerCancel={endPointer}
           onWheel={(e) => {
+            if (compare) return;
             e.preventDefault();
             const current = latest.current || draft;
             const next = {
@@ -200,7 +230,7 @@ export function Stage({
             }, 180);
           }}
           onKeyDown={(e) => {
-            if (e.ctrlKey || e.metaKey || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+            if (compare || e.ctrlKey || e.metaKey || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
             e.preventDefault();
             const pixels = e.shiftKey ? 10 : 1;
             const pan = { ...draft.render.media.pan };
@@ -212,13 +242,17 @@ export function Stage({
           }}
         >
           <RenderCanvas
-            spec={{
-              ...(cropMode && cropSelection ? cropSelection.previewSpec : draft.render),
-              media: {
-                ...(cropMode && cropSelection ? cropSelection.previewSpec.media : draft.render.media),
-                source: draft.runtimeUrl || draft.render.media.source,
-              },
-            }}
+            spec={
+              compare && original
+                ? original
+                : {
+                    ...(cropMode && cropSelection ? cropSelection.previewSpec : draft.render),
+                    media: {
+                      ...(cropMode && cropSelection ? cropSelection.previewSpec.media : draft.render.media),
+                      source: draft.runtimeUrl || draft.render.media.source,
+                    },
+                  }
+            }
             playbackRate={draft.speed}
             timeOrigin={draft.trim.in}
             playing={playing && draft.kind === 'video'}
@@ -239,39 +273,8 @@ export function Stage({
               </div>
             )}
           </div>
-          {cropMode && rect && (
-            <div
-              className="crop-box"
-              style={{
-                left: `${(rect.x / draft.render.canvas.width) * 100}%`,
-                top: `${(rect.y / draft.render.canvas.height) * 100}%`,
-                width: `${(rect.width / draft.render.canvas.width) * 100}%`,
-                height: `${(rect.height / draft.render.canvas.height) * 100}%`,
-                transform: `rotate(${draft.render.media.rotation}deg) scaleX(${draft.render.media.flipH ? -1 : 1}) scaleY(${draft.render.media.flipV ? -1 : 1})`,
-              }}
-              onPointerDown={(e) => start(e)}
-            >
-              {[
-                ['nw', 0, 0],
-                ['n', 50, 0],
-                ['ne', 100, 0],
-                ['e', 100, 50],
-                ['se', 100, 100],
-                ['s', 50, 100],
-                ['sw', 0, 100],
-                ['w', 0, 50],
-              ].map(([handle, x, y]) => (
-                <button
-                  key={handle}
-                  className="crop-handle"
-                  title={`Ajustar recorte ${handle}`}
-                  aria-label={`Ajustar recorte ${handle}`}
-                  style={{ left: `${x}%`, top: `${y}%`, cursor: `${handle}-resize` }}
-                  onPointerDown={(e) => start(e, String(handle))}
-                />
-              ))}
-            </div>
-          )}
+          {!cropMode && !compare && <TransformBox item={draft} layerId={activeLayerId} onDraft={changeDraft} onCommit={onChange} />}
+          {cropMode && !compare && rect && <CropOverlay item={draft} rect={rect} onStart={start} />}
         </div>
       ) : (
         <StageEmpty item={draft} onImport={onImport} onImportFolder={onImportFolder} importing={importing} />

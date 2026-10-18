@@ -17,6 +17,9 @@ import {
 import { useRef, useState } from 'react';
 import type { useWorkspace } from '../data/useWorkspace';
 import type { Profile } from '../domain/models';
+import { appearance, type UiSettings } from '../domain/preferences';
+import { DailyQuote } from './DailyQuote';
+import { MatrixBackground } from './MatrixBackground';
 import { AccountDialog, type AccountIdentity } from './AccountDialog';
 import { Button, IconButton, Modal } from './Primitives';
 export type WorkspaceStore = ReturnType<typeof useWorkspace>;
@@ -33,11 +36,13 @@ export function Dashboard({
   onOpen,
   onSettings,
   notify,
+  settings = { concurrency: 1, confirmExport: true },
 }: {
   store: WorkspaceStore;
   onOpen: (id: string) => void;
   onSettings: () => void;
   notify: (message: string) => void;
+  settings?: UiSettings;
 }) {
   const [search, setSearch] = useState('');
   const [archived, setArchived] = useState(false);
@@ -52,9 +57,8 @@ export function Dashboard({
     (p) =>
       p.archived === archived && `${p.name} ${p.handle} ${p.niche}`.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR')),
   );
-  const saveIdentity = (identity: AccountIdentity) => {
-    const id = editing === 'new' ? store.createProfile(identity.name) : editing?.id;
-    if (id) store.updateWorkspace((w) => ({ ...w, profiles: w.profiles.map((p) => (p.id === id ? { ...p, ...identity } : p)) }));
+  const saveIdentity = async (identity: AccountIdentity, photo?: Blob | null) => {
+    await store.saveAccount(editing === 'new' ? undefined : editing?.id, identity, photo);
     setEditing(null);
     notify(editing === 'new' ? 'Conta criada. Sua biblioteca está pronta.' : 'Conta atualizada.');
   };
@@ -77,6 +81,7 @@ export function Dashboard({
   };
   return (
     <main className="dashboard">
+      <MatrixBackground enabled={appearance(settings).animation && !settings.performance} />
       <div className="dashboard-content">
         <div className="dashboard-heading">
           <div>
@@ -88,6 +93,7 @@ export function Dashboard({
             <Plus /> Nova conta
           </Button>
         </div>
+        <DailyQuote settings={settings} />
         <div className="dashboard-toolbar">
           <div className="search-field">
             <Search size={16} />

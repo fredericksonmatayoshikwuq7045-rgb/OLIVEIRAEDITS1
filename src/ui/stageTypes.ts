@@ -1,3 +1,4 @@
+import type { MouseEventHandler } from 'react';
 import type { MediaItem } from '../domain/models';
 export interface Drag {
   x: number;
@@ -8,6 +9,9 @@ export interface Drag {
 }
 export type StageProps = {
   item: MediaItem | null;
+  compare?: boolean;
+  onContextMenu?: MouseEventHandler<HTMLDivElement>;
+  onSelectLayer?: (id: string | null) => void;
   onChange: (item: MediaItem) => void;
   playing: boolean;
   time: number;

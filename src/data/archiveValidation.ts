@@ -61,6 +61,17 @@ const profile: Check = fields({
   color: text,
   notes: text,
   avatarAssetId: optional(identifier),
+  markRule: optional(
+    fields({
+      mode: choices('text', 'image'),
+      targetText: text,
+      replacementText: text,
+      referenceAssetId: optional(identifier),
+      replacementTemplateId: optional(identifier),
+      color: text,
+      margin: opacity,
+    }),
+  ),
   archived: boolean,
   order: number,
   createdAt: text,

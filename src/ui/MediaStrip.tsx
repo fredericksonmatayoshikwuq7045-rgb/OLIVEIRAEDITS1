@@ -1,5 +1,5 @@
 import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, FolderOpen, Image as ImageIcon, Plus } from 'lucide-react';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { MediaSort } from '../domain/batch';
 import type { MediaItem } from '../domain/models';
 import type { ItemState } from '../services/contracts';
@@ -11,12 +11,14 @@ const Card = memo(function Card({
   selected,
   exportState,
   onSelect,
+  onContextMenu,
 }: {
   item: MediaItem;
   active: boolean;
   selected: boolean;
   exportState?: ItemState;
   onSelect: (item: MediaItem, ctrl: boolean, shift: boolean) => void;
+  onContextMenu?: (event: MouseEvent, item: MediaItem) => void;
 }) {
   const warning =
     item.status === 'missing' ||
@@ -26,6 +28,7 @@ const Card = memo(function Card({
   return (
     <div
       role="option"
+      onContextMenu={(event) => onContextMenu?.(event, item)}
       tabIndex={0}
       aria-selected={selected}
       title={`${item.title}${item.error ? ` — ${item.error}` : ''}`}
@@ -86,6 +89,7 @@ export function MediaStrip({
   selectedIds,
   activeId,
   onSelect,
+  onContextMenu,
   onImport,
   onImportFolder,
   importing,
@@ -95,12 +99,15 @@ export function MediaStrip({
   children,
   exportStates = {},
   onSort,
+  grid = false,
 }: {
   items: MediaItem[];
+  grid?: boolean;
   exportStates?: Record<string, ItemState>;
   selectedIds: string[];
   activeId: string | null;
   onSelect: (item: MediaItem, ctrl: boolean, shift: boolean) => void;
+  onContextMenu?: (event: MouseEvent, item: MediaItem) => void;
   onImport: () => void;
   onImportFolder: () => void;
   importing: boolean;
@@ -111,28 +118,39 @@ export function MediaStrip({
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(true);
-  const [viewport, setViewport] = useState({ left: 0, width: 1000 });
+  const [viewport, setViewport] = useState({ left: 0, width: 1000, top: 0, height: 200 });
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const updateViewport = () => setViewport({ left: element.scrollLeft, width: element.clientWidth });
+    const updateViewport = () =>
+      setViewport({ left: element.scrollLeft, width: element.clientWidth, top: element.scrollTop, height: element.clientHeight });
     updateViewport();
     const observer = new ResizeObserver(updateViewport);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [open]);
+  }, [open, grid]);
   useEffect(() => {
     const index = items.findIndex((item) => item.id === activeId);
     const element = ref.current;
     if (index < 0 || !element) return;
-    const left = index * CELL;
-    if (left < element.scrollLeft) element.scrollLeft = left;
-    else if (left + CELL > element.scrollLeft + element.clientWidth) element.scrollLeft = left + CELL - element.clientWidth;
-    setViewport({ left: element.scrollLeft, width: element.clientWidth });
-  }, [activeId, items, open]);
-  const first = Math.max(0, Math.floor(viewport.left / CELL) - 3),
-    last = Math.min(items.length, Math.ceil((viewport.left + viewport.width) / CELL) + 3);
+    if (grid) {
+      const columns = Math.max(1, Math.floor(element.clientWidth / CELL)),
+        top = Math.floor(index / columns) * 145;
+      if (top < element.scrollTop) element.scrollTop = top;
+      else if (top + 145 > element.scrollTop + element.clientHeight) element.scrollTop = top + 145 - element.clientHeight;
+    } else {
+      const left = index * CELL;
+      if (left < element.scrollLeft) element.scrollLeft = left;
+      else if (left + CELL > element.scrollLeft + element.clientWidth) element.scrollLeft = left + CELL - element.clientWidth;
+    }
+    setViewport({ left: element.scrollLeft, width: element.clientWidth, top: element.scrollTop, height: element.clientHeight });
+  }, [activeId, items, open, grid]);
+  const columns = Math.max(1, Math.floor(viewport.width / CELL));
+  const first = grid ? Math.max(0, (Math.floor(viewport.top / 145) - 1) * columns) : Math.max(0, Math.floor(viewport.left / CELL) - 3),
+    last = grid
+      ? Math.min(items.length, (Math.ceil((viewport.top + viewport.height) / 145) + 1) * columns)
+      : Math.min(items.length, Math.ceil((viewport.left + viewport.width) / CELL) + 3);
   return (
     <section className="media-strip" aria-label="Biblioteca de mídias">
       <div className="media-strip-heading">
@@ -189,13 +207,36 @@ export function MediaStrip({
           role="listbox"
           aria-multiselectable="true"
           aria-label="Mídias importadas"
-          onScroll={(e) => setViewport({ left: e.currentTarget.scrollLeft, width: e.currentTarget.clientWidth })}
+          onScroll={(e) =>
+            setViewport({
+              left: e.currentTarget.scrollLeft,
+              width: e.currentTarget.clientWidth,
+              top: e.currentTarget.scrollTop,
+              height: e.currentTarget.clientHeight,
+            })
+          }
         >
-          <div className="media-scroll-inner" style={{ width: Math.max(items.length * CELL, viewport.width) }}>
+          <div
+            className="media-scroll-inner"
+            style={
+              grid
+                ? { width: viewport.width, height: Math.max(viewport.height, Math.ceil(items.length / columns) * 145) }
+                : { width: Math.max(items.length * CELL, viewport.width) }
+            }
+          >
             {items.slice(first, last).map((item, offset) => (
-              <div key={item.id} style={{ position: 'absolute', left: (first + offset) * CELL, width: 105 }}>
+              <div
+                key={item.id}
+                style={{
+                  position: 'absolute',
+                  left: grid ? ((first + offset) % columns) * CELL : (first + offset) * CELL,
+                  top: grid ? Math.floor((first + offset) / columns) * 145 : 0,
+                  width: 105,
+                }}
+              >
                 <Card
                   item={item}
+                  onContextMenu={onContextMenu}
                   exportState={exportStates[item.id]}
                   active={item.id === activeId}
                   selected={selectedIds.includes(item.id)}

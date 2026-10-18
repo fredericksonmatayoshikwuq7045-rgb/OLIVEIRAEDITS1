@@ -100,7 +100,7 @@ export function mediaActions(context: WorkspaceContext) {
           }),
         }));
       }),
-    addTemplate: (input: File | string, category: TemplateCategory, name?: string, targetKind: MediaKind = 'video'): Promise<void> =>
+    addTemplate: (input: File | string, category: TemplateCategory, name?: string, targetKind: MediaKind = 'video'): Promise<string> =>
       withRetainedAssets(context, async () => {
         const profile = currentProfile();
         if (typeof input === 'string') await authorizePaths([input]);
@@ -147,6 +147,7 @@ export function mediaActions(context: WorkspaceContext) {
               : value,
           ),
         }));
+        return template.id;
       }),
     addFont: (input: File | string): Promise<void> =>
       withRetainedAssets(context, async () => {

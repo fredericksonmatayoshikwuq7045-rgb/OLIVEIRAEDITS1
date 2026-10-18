@@ -8,18 +8,21 @@ import type { WorkspaceStore } from './Dashboard';
 import type { UiSettings } from './Settings';
 import type { EngineState } from './useEngine';
 import { useMediaImport } from './useMediaImport';
+import { useClipActions } from './useClipActions';
 export function useEditor({
   store,
   engine,
   settings,
   onBack,
   notify,
+  onSettings,
 }: {
   store: WorkspaceStore;
   engine: EngineState;
   settings: UiSettings;
   onBack: () => void;
   notify: (message: string) => void;
+  onSettings?: (settings: UiSettings) => void;
 }) {
   const [step, setStep] = useState(1),
     [activeId, setActiveId] = useState<string | null>(null),
@@ -36,6 +39,8 @@ export function useEditor({
     [metadata, setMetadata] = useState(false),
     [preview, setPreview] = useState<string | null>(null),
     [previewBusy, setPreviewBusy] = useState(false);
+  const [automation, setAutomation] = useState(false);
+  const [exportIds, setExportIds] = useState<string[] | null>(null);
   const [saveName, setSaveName] = useState(''),
     [saving, setSaving] = useState<'preset' | 'style' | null>(null),
     [pendingStyle, setPendingStyle] = useState<RenderTextLayer | null>(null);
@@ -90,11 +95,13 @@ export function useEditor({
   const onTemplate = (id: string | null, category: TemplateCategory) => {
     if (active && profile) changeItem(applyTemplate(active, profile.templates.find((t) => t.id === id) || null, category));
   };
-  const openExport = (cleanOnly = false) => {
+  const openExport = (cleanOnly = false, ids: string[] | null = null) => {
+    setExportIds(ids);
     setMetadata(cleanOnly);
     setExporting(true);
     setStep(4);
   };
+  const clip = useClipActions({ store, active, selected, time, notify, exportOne: (id) => openExport(false, [id]) });
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const element = event.target;
@@ -151,6 +158,11 @@ export function useEditor({
     }
   };
   return {
+    automation,
+    setAutomation,
+    ...clip,
+    exportIds,
+    onSettings,
     store,
     engine,
     settings,

@@ -1,3 +1,4 @@
+import type { MarkRule } from './automation';
 import type { RenderSpec } from '../render/types';
 
 export type MediaKind = 'video' | 'image';
@@ -105,6 +106,7 @@ export interface Profile {
   niche: string;
   color: string;
   avatarAssetId?: string;
+  markRule?: MarkRule;
   notes: string;
   archived: boolean;
   order: number;
