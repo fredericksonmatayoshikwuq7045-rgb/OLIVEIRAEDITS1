@@ -1,6 +1,7 @@
 import type { AspectRatio } from '../domain/models';
 import { AutomationPanel } from './AutomationPanel';
 import { CopyAdjustments } from './CopyAdjustments';
+import { ClearMediaDialog } from './ClearMediaDialog';
 import { MediaContextMenu } from './MediaContextMenu';
 import { BatchDialog } from './BatchDialog';
 import { ExportDialog } from './ExportDialog';
@@ -34,6 +35,7 @@ export function EditorDialogs({ model }: { model: EditorContext }) {
   } = model;
   return (
     <>
+      {model.clearProjectId === model.project.id && <ClearMediaDialog model={model} />}
       {model.automation && <AutomationPanel model={model} onClose={() => model.setAutomation(false)} />}
       {model.menu && <MediaContextMenu menu={model.menu} onClose={() => model.setMenu(null)} onAction={model.clipAction} />}
       {model.copy && (

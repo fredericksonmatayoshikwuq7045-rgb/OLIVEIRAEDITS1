@@ -137,6 +137,8 @@ export function EditorCenter({ model }: { model: EditorContext }) {
         onSelect={select}
         onImport={() => void importMedia()}
         onImportFolder={() => void importMedia(true)}
+        onClear={model.requestClear}
+        clearingDisabled={previewBusy}
         importing={importing}
         onSelectAll={() => setSelectedIds(items.map((item) => item.id))}
         onSelectUnedited={() =>

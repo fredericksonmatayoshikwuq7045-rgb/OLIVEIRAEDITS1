@@ -122,3 +122,17 @@ WebKit e exportação H.264 real pela interface com a placa e a marca no frame
 codificado. FFmpeg/FFprobe precisam estar no PATH do teste. A sessão é encerrada
 no final. O teste altera o perfil padrão da instalação de teste: use um diretório
 de dados descartável, nunca o seu perfil de trabalho. Não executa ações de energia.
+
+## Limpar a leva — 0.3.1
+
+Com Vite, Chromium e FFmpeg disponíveis, execute `npm run test:clear`.
+`OE_TEST_URL` troca a URL, `OE_CLEAR_DIR` o diretório dos artefatos e
+`OE_TEST_FONT` deve apontar para uma fonte TTF/OTF/WOFF válida (o padrão desta
+nuvem é OpenSans-Regular.ttf em `/usr/share/fonts/truetype/open-sans`).
+
+O fluxo cria duas contas isoladas, importa imagens e vídeo reais, foto, template,
+fonte e edição de texto. Verifica cancelar/Escape, limpar tudo, cliques repetidos,
+um único desfazer/refazer, a próxima leva no slot 1, botão bloqueado na importação,
+layout em 1100px e persistência após reload. Compara os perfis completos e o
+projeto da outra conta e verifica que os arquivos originais continuam intactos.
+Os dados são descartáveis; não há IPC simulado nem exclusão física de originais.

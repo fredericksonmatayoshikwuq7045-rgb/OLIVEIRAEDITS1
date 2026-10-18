@@ -1,7 +1,15 @@
-# Oliveira Edits — 0.3.0
+# Oliveira Edits — 0.3.1
 
 Editor local em pt-BR para vídeos e imagens em lote. Cada conta mantém templates,
 fontes, presets, projetos e configurações de exportação próprios.
+
+## Nova leva de mídias
+
+Na faixa **Mídias do projeto**, clique em **Limpar todas** e confirme a quantidade.
+Isso esvazia os slots do projeto atual, preservando originais, foto, templates,
+fontes e configurações. **Ctrl+Z** restaura a leva inteira e suas edições enquanto
+o app estiver aberto. A próxima importação começa no slot 1. O botão fica
+indisponível durante a importação e quando não há mídias.
 
 ## Novidades desta versão
 

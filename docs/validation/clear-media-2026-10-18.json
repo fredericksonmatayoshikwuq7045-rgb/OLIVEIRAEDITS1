@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "checks": [
+    "Botão desativado no projeto vazio; cancelar ou Escape preservam a leva e suas edições",
+    "Limpeza completa é uma única ação, mesmo com cliques repetidos; desfazer restaura imagens, vídeo e edições; refazer limpa",
+    "Nova leva começa no slot 1; limpeza persiste após reload sem apagar foto, template, fonte, preferências, originais ou outro perfil"
+  ],
+  "pageErrors": [],
+  "version": "0.3.1",
+  "dateLocal": "2026-10-18",
+  "platform": "Linux x86_64",
+  "frontendTests": 105,
+  "quality": [
+    "ESLint",
+    "Prettier",
+    "300-line check",
+    "git diff --check"
+  ],
+  "builds": [
+    "TypeScript/Vite",
+    "Tauri CLI Linux debug --no-bundle"
+  ]
+}

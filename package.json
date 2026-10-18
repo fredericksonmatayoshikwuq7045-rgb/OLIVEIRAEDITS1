@@ -1,7 +1,7 @@
 {
   "name": "oliveira-edits",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host",
@@ -25,7 +25,8 @@
     "test:upgrade": "node tests/e2e/editor-upgrade.mjs",
     "test:appearance": "node tests/e2e/appearance-layout.mjs",
     "test:reference": "node tests/e2e/automation-reference.mjs",
-    "test:native-upgrade": "python3 tests/e2e/native-upgrade.py"
+    "test:native-upgrade": "python3 tests/e2e/native-upgrade.py",
+    "test:clear": "node tests/e2e/clear-media.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.11.1",

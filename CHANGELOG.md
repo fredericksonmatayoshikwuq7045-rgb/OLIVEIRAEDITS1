@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.1 — 2026-10-18
+
+- Botão **Limpar todas** na faixa de mídias, disponível nos três layouts.
+- Confirmação com quantidade e projeto; cancelar/Escape preservam a leva.
+- Limpeza de todos os slots em uma única ação de desfazer/refazer; cliques
+  repetidos não criam uma segunda limpeza vazia no histórico.
+- Foto, templates, fontes, configurações, originais e outros perfis preservados;
+  reprodução e seleção reiniciadas para a próxima leva, a partir do slot 1.
+- Botão indisponível durante importação e em projeto vazio; controles da faixa
+  se reorganizam para caber em janelas menores.
+- Teste real de interface para limpar, desfazer/refazer, persistir, importar nova
+  leva e preservar a biblioteca e outra conta. Execute `npm run test:clear`.
+
 ## 0.3.0 — 2026-10-17
 
 - Foto de perfil com recorte, posição, zoom, confirmação e backup.

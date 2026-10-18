@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, FolderOpen, Image as ImageIcon, Plus } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, ChevronUp, Film, FolderOpen, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { MediaSort } from '../domain/batch';
 import type { MediaItem } from '../domain/models';
@@ -92,6 +92,8 @@ export function MediaStrip({
   onContextMenu,
   onImport,
   onImportFolder,
+  onClear,
+  clearingDisabled = false,
   importing,
   onSelectAll,
   onSelectUnedited,
@@ -110,6 +112,8 @@ export function MediaStrip({
   onContextMenu?: (event: MouseEvent, item: MediaItem) => void;
   onImport: () => void;
   onImportFolder: () => void;
+  onClear: () => void;
+  clearingDisabled?: boolean;
   importing: boolean;
   onSort: (order: MediaSort) => void;
   onSelectAll: () => void;
@@ -196,6 +200,16 @@ export function MediaStrip({
           </Button>
           <Button variant="ghost" disabled={importing} onClick={onImport}>
             <Plus size={13} /> Arquivos
+          </Button>
+          <Button
+            variant="ghost"
+            className="danger-text"
+            aria-label="Limpar todas as mídias"
+            disabled={importing || clearingDisabled || !items.length}
+            title={clearingDisabled ? 'Aguarde a prévia terminar.' : 'Esvaziar os slots para começar uma nova leva'}
+            onClick={onClear}
+          >
+            <Trash2 size={13} /> Limpar todas
           </Button>
         </div>
       </div>

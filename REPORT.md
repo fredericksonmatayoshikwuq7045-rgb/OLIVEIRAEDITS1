@@ -1,6 +1,14 @@
 # Relatório de implementação — Oliveira Edits 2
 
-Versão atual: **0.3.0**, atualização de estúdio em 17/10/2026. Frases, foto,
+Versão atual: **0.3.1**, com limpeza da leva em 18/10/2026.
+Detalhes do botão **Limpar todas** no [README](README.md). A limpeza passou
+em teste real de navegador: cancelar/Escape, uma única ação de desfazer/refazer,
+nova leva no slot 1, reload e preservação de originais, biblioteca e outra conta.
+Os 105 testes de dados/frontend, os checks de qualidade e o build desktop Linux
+pelo CLI Tauri também passaram.
+Evidência: [limpeza da leva](docs/validation/clear-media-2026-10-18.json).
+
+A atualização de estúdio 0.3.0 foi entregue em 17/10/2026. Frases, foto,
 personalização, layouts, edição pelo mouse, timeline e assistentes de análise
 estão implementados. Os resultados desta rodada e as instruções estão em
 [release 0.3.0](docs/release-0.3.0.md). As seções abaixo mantêm o relatório

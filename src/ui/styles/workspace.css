@@ -69,6 +69,10 @@
 .layout-right .batch-bar {
   flex-wrap: wrap;
 }
+.media-strip-heading,
+.media-strip-heading > .row {
+  flex-wrap: wrap;
+}
 .video-timeline {
   padding: 8px 14px;
   background: var(--surface);

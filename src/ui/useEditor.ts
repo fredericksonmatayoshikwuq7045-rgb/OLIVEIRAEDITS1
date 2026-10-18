@@ -41,6 +41,8 @@ export function useEditor({
     [previewBusy, setPreviewBusy] = useState(false);
   const [automation, setAutomation] = useState(false);
   const [exportIds, setExportIds] = useState<string[] | null>(null);
+  const [clearProjectId, setClearProjectId] = useState<string | null>(null);
+  const clearRequest = useRef<string | null>(null);
   const [saveName, setSaveName] = useState(''),
     [saving, setSaving] = useState<'preset' | 'style' | null>(null),
     [pendingStyle, setPendingStyle] = useState<RenderTextLayer | null>(null);
@@ -102,6 +104,32 @@ export function useEditor({
     setStep(4);
   };
   const clip = useClipActions({ store, active, selected, time, notify, exportOne: (id) => openExport(false, [id]) });
+  const requestClear = () => {
+    if (importing || previewBusy || !project || !items.length) return;
+    clearRequest.current = project.id;
+    setClearProjectId(project.id);
+  };
+  const clearMedia = () => {
+    if (importing || previewBusy || !project || clearProjectId !== project.id || clearRequest.current !== project.id || !items.length)
+      return;
+    clearRequest.current = null;
+    store.updateProject((value) => ({ ...value, items: [] }));
+    setPlaying(false);
+    setTime(0);
+    setActiveId(null);
+    setSelectedIds([]);
+    setLayerId(null);
+    anchor.current = null;
+    setCropMode(false);
+    clip.setCompare(false);
+    clip.setMenu(null);
+    clip.setCopy(null);
+    setPreview(null);
+    setExportIds(null);
+    setStep(1);
+    setClearProjectId(null);
+    notify(`${items.length} mídia(s) removida(s) do projeto. Originais e biblioteca preservados; Ctrl + Z desfaz.`);
+  };
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const element = event.target;
@@ -158,6 +186,10 @@ export function useEditor({
     }
   };
   return {
+    clearProjectId,
+    setClearProjectId,
+    requestClear,
+    clearMedia,
     automation,
     setAutomation,
     ...clip,
